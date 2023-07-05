@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1">
+
+</head>
+<body>
+<div>
+    <h3>問い合わせ</h3>
+    <table>
+        <tr>
+            <th></th>
+            <th></th>
+            <th></th>
+        </tr>
+        <tr>
+            <td>会社名</td>
+            <td> &nbsp:&nbsp </td>
+            <td th:text="${inqReq.companyName}"></td>
+        </tr>
+        <tr>
+            <td>お名前</td>
+            <td> &nbsp:&nbsp </td>
+            <td th:text="${inqReq.name}" ></td>
+        </tr>
+        <tr>
+            <td>電話番号</td>
+            <td> &nbsp:&nbsp </td>
+            <td th:text="${inqReq.phoneNo}" ></td>
+        </tr>
+        <tr>
+            <td>メールアドレス</td>
+            <td> &nbsp:&nbsp </td>
+            <td th:text="${inqReq.mail}" ></td>
+        </tr>
+    </table>
+    <br>
+    <hr>
+    <h3>輸出登録</h3>
+
+    <table>
+        <tr>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+        </tr>
+        <tr>
+            <td>輸出or輸入</td>
+            <td> : </td>
+            <td th:text="${inqReq.exportInport}" ></td>
+            <td>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</td>
+            <td>Incoterms</td>
+            <td> : </td>
+            <td th:text="${inqReq.incoterms}" ></td>
+        </tr>
+        <tr>
+            <td>輸送モード</td>
+            <td> : </td>
+            <td th:text="${inqReq.transportMode}" ></td>
+            <td>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</td>
+            <td>出発港</td>
+            <td> : </td>
+            <td th:text="${inqReq.departurePort}" ></td>
+        </tr>
+        <tr>
+            <td>到着港</td>
+            <td> : </td>
+            <td th:text="${inqReq.arrivalPort}" ></td>
+            <td>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</td>
+            <td>貨物の種類</td>
+            <td> : </td>
+            <td th:text="${inqReq.cargoType}" ></td>
+        </tr>
+        <tr>
+            <td>積み港</td>
+            <td> : </td>
+            <td th:text="${inqReq.loadingPort}" ></td>
+            <td>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</td>
+            <td>揚げ港</td>
+            <td> : </td>
+            <td th:text="${inqReq.landingPort}" ></td>
+        </tr>
+        <tr>
+            <td>物量</td>
+            <td> : </td>
+            <td th:text="${inqReq.quantity}" ></td>
+            <td>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</td>
+            <td>荷姿</td>
+            <td> : </td>
+            <td th:text="${inqReq.packing}" ></td>
+        </tr>
+    </table>
+    <br>
+    <hr>
+    <h4>その他お問合せ</h4>
+        <p th:text="${inqReq.otherInquires}"></p>
+</div>
+</body>
+</html>

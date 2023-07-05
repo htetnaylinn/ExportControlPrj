@@ -1,0 +1,123 @@
+
+#container1{
+    
+    width: 96%;
+    background-color:white;
+    position: absolute;
+    border-style:solid;
+    border-color: #51affc;
+    border-radius: 3px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* justify-content: center; */
+}
+#heading{
+    letter-spacing: 2px;
+    color:#011627;
+    font-size: 35px;
+    font-weight: 500;
+}
+#container2{
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    /* justify-content: flex-start; */
+    align-items: center;
+
+   
+ 
+}
+.name{
+    margin-top: 10px;
+    text-transform: uppercase;
+    color:black;
+    padding-bottom: 20px;
+    background: none;
+    border-style: none none solid none;
+    padding-right: 20px;
+ 
+    border-color: #011627;
+    font-size: 12px;
+}
+.email{
+    margin-top: 10px;
+    text-transform: uppercase;
+    color:black;
+    padding-bottom: 20px;
+    background: none;
+    border-style: none none solid none;
+    padding-right: 185px;
+    border-color: #011627;
+    font-size: 12px;
+   
+
+}
+.tel{
+    margin-top: 10px;
+    text-transform: uppercase;
+    color:black;
+    padding-bottom: 20px;
+    background: none;
+    border-style: none none solid none;
+    padding-right: 185px;
+    border-color: #011627;
+    font-size: 12px;
+
+}
+.rad{
+    padding-top: 20px;
+    margin-top: 10px;
+    display: inline;
+}
+#gen{
+    text-transform: uppercase;
+    color: #011627;
+}
+.submit{
+    margin-top: 20px;
+    text-transform: uppercase;
+    background-color:#011627;
+    color: white;
+    border-radius: 20px;
+    margin-left: 100px;
+    border-style:solid;
+    font-weight: bold;
+ 
+    border-color: #011627;
+    font-size: 12px;
+    padding: 10px 30px 10px 30px;
+}
+.submit:hover{
+    background-color: white;
+    color:#011627;
+    border-color: #011627;
+    cursor: pointer;
+    font-weight: bold;
+}
+#container3{
+   
+    float: left;
+    padding: 90px 0 0 90px;
+ 
+}
+#heading2{
+    text-transform: uppercase;
+    padding-right: 0;
+    padding-top: 10px;
+    letter-spacing: 2px;
+    color:#011627;
+    font-size: 15px;
+    font-weight: 500;
+
+}
+span{
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color:#011627;
+    font-size: 25px;
+    font-weight: 700;
+
+}
+

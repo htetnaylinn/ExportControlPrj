@@ -1,0 +1,2022 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>スケジュール</title>
+    <meta content="width=device-width, initial-scale=1, shrink-to-fit=0" name="viewport">
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <link href='https://fonts.googleapis.com/css?family=Anton' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Neucha' rel='stylesheet' type='text/css'>
+    <link href="../css/style.css" rel="stylesheet">
+    <link href="../css/scheduleTwo.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link href="https://cdn.jsdelivr.net/npm/mc-datepicker/dist/mc-calendar.min.css" rel="stylesheet" />
+    <link href="../css/magnific-popup.css" rel="stylesheet">
+    <link crossorigin href="https://fonts.gstatic.com" rel="preconnect">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+        integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" rel="stylesheet">
+    <script crossorigin="anonymous" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/common.js"></script>
+    <script src="../js/ajaxMessage/passwordChangeErrorMessages.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script src="../js/jquery.magnific-popup.js"></script>
+    <script src="../js/jquery.magnific-popup.min.js"></script>
+    <script src="../js/sockjs.min.js"></script>
+    <script src="../js/stomp.min.js"></script>
+    <script src="../js/fileSelection.js"></script>
+    <script src="../js/html2canvas.min.js"></script>
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="../js/calendarJp.js" th:if="${languageOption} == 0"></script>
+    <script src="../js/calendarEn.js" th:if="${languageOption} == 1"></script>
+
+</head>
+<style>
+    #div {
+        border: 3px dotted midnightblue;
+        position: absolute;
+        z-index: 9000;
+    }
+
+    #backDiv {
+        position: absolute;
+        z-index: 8999;
+    }
+
+    .column-sticky {
+        position: sticky;
+        right: 0;
+        background-color: white !important;
+        z-index: 2;
+    }
+
+    .last-msg {
+        border-bottom-color: midnightblue;
+        border-bottom-width: 3px !important;
+        padding-bottom: 0px !important;
+
+    }
+
+    .unread-status {
+        color: midnightblue;
+        text-align: center;
+    }
+</style>
+<div id="capture">
+
+    <body>
+        <!--navigation-->
+        <th:block :: header th:include="@{/menu.html}"></th:block>
+
+        <!--<div id="backDiv" style="display: none" class="w-100 h-100"></div>-->
+        <div id="div" style="display:none"></div>
+
+        <div class="box box-4 container">
+            <div class=" row p-xl-4 p-lg-3 p-md-2 p-sm-1 p-0 box-content" style="background-color:#fdfdfd; ">
+                <h2>Chat</h2>
+                <h2 id="load" style="display:none">loading</h2>
+                <div class=" mt-3 ">
+                    <div class="chat-wrapper">
+                        <div id="scroll" style="height:190px;overflow-y: scroll; background-color:#e2e3e5;">
+                            <table class="table table-secondary" id="conversation">
+                                <tbody th:id="${invoiceCode}">
+                                    <tr th:each="allMessage,stat : ${allMessage}">
+                                        <td th:attr="class=${(allMessage.id == userlatestMessageId) && (currentlatestMessageId != userlatestMessageId)  ? 'row w-100 m-0 pt-3 pb-3 last-msg' : 'row w-100 m-0 pt-3 pb-3 '}"
+                                            th:id="${allMessage.id} ">
+                                            <div class="col-10"
+                                                th:text="${#dates.format(allMessage.chatDate,'MM/dd HH:mm')}+'&emsp;'+ ${allMessage.userName} +'&nbsp;:&nbsp;'+${allMessage.chatMessage}  ">
+                                            </div>
+                                            <div class="col-2 p-0">
+                                                <i class="bi bi-hand-thumbs-up cursor-pointer "
+                                                    th:id="id+${allMessage.id}" th:if="${allMessage.reactFlag} != 1"
+                                                    th:onclick="'javascript:sendReact(\'id'+${allMessage.id}+'\');'"></i>
+                                                <i class="bi bi-hand-thumbs-up-fill cursor-pointer" style="color:blue;"
+                                                    th:id="id+${allMessage.id}" th:if="${allMessage.reactFlag} == 1"
+                                                    th:onclick="'javascript:sendReact(\'id'+${allMessage.id}+'\');'"></i>
+
+                                                <i class="bi bi-person cursor-pointer" data-bs-toggle="modal"
+                                                    th:id="show-reaction-id+${allMessage.id}"
+                                                    th:if="${allMessage.reactCount} == 0"
+                                                    th:onclick="'javascript:openReactPerson(\'id'+${allMessage.id}+'\');'"></i>
+                                                <i class="bi bi-person-fill cursor-pointer" data-bs-toggle="modal"
+                                                    th:id="show-reaction-id+${allMessage.id}"
+                                                    th:if="${allMessage.reactCount} > 0"
+                                                    th:onclick="'javascript:openReactPerson(\'id'+${allMessage.id}+'\');'"></i>
+
+                                                <span th:id="show-count-id+${allMessage.id}"
+                                                    th:text="${allMessage.reactCount}"></span>
+                                            </div>
+                                            <a th:onclick="'javascript:showFullImage(\'img'+${allMessage.id}+'\');'">
+                                                <img style="width:150px; height:100px; margin-left:100px; border-radius:10px; border-color:black "
+                                                    th:id="'img'+${allMessage.id}" th:if="${allMessage.chatImage} != ''"
+                                                    th:src="${allMessage.chatImage}">
+                                            </a>
+                                            <span class="unread-status" id="unread-status"
+                                                th:if="${allMessage.id == userlatestMessageId  && currentlatestMessageId != userlatestMessageId }"
+                                                th:text="#{unreadStatus}"> </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+                <div></div>
+                <div id="imageTest2"></div>
+                <div class="row mt-2 ">
+                    <div class="col-9 ">
+                        <div class="p-1 " id="input-wrapper">
+                            <div class="input-group input-group  ">
+                                <input aria-describedby="button-addon2" aria-label="Recipient's username"
+                                    class="form-control p-2" id="message" placeholder="コメント。。。" type="text">
+                            </div>
+                            <div id="imageTest"></div>
+                        </div>
+                    </div>
+                    <div class="col-3 p-0">
+                        <button class="btn btn-secondary" id="button-addon2" type="button">送信</button>
+                        <input hidden id="fileInput" type="file" />
+                        <button class="btn btn-secondary" onclick="document.getElementById('fileInput').click()"><i
+                                class="bi bi-card-image"></i></button>
+                        <!--                <i onclick="takeScreenShot()" class="bi bi-plus-square"></i>-->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <div class="box box-4 container mt-5 mb-5 pt-2 pb-4  " style=" background-color:#e0f8f8;">
+                <div class="box-content p-xl-5 p-lg-5 p-md-5 p-sm-0 p-0">
+
+                    <div class="box box-4 container mt-5 w-50 mfp-hide " id="test-popup"
+                        style="position:fixed;top:50%;left:50%;transform: translate(-50%, -50%);z-index:100;">
+                        <div class="box-content" style="border-radius:8px">
+                            <h2>Edit</h2>
+                        </div>
+                    </div>
+                    <div class="mt-3 border-2 border border-primary">
+                        <div class="row w-100 m-0">
+                            <div
+                                class="mb-xl-3 mb-lg-2 mb-md-1 mb-sm-1 mb-1 col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                                <form class="submitFile" enctype="multipart/form-data" id="form-id" method="POST"
+                                    th:action="@{/OutputXlx}">
+                                    <div class="modal-body">
+                                        <div class="upload-container">
+                                            <input accept=".xlsx, .xlsm, .pdf, .csv" id="file_upload" multiple
+                                                name="file" type="file" value="ファイル選択" />
+                                        </div>
+                                        <div id="">
+
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 p-xl-4 p-lg-3 p-md-0 p-sm-0 p-0 "
+                                style="height:230px;overflow: scroll;">
+                                <table class="table table-striped " style="table-layout: fixed !important;
+    width: max-content !important;
+}">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">ファイル</th>
+                                            <th scope="col"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="document,stat: ${exportDocumentList}">
+                                            <th th:text="${document.documentName}"></th>
+                                            <th class="column-sticky">
+                                                <a class="btn btn-outline-danger"
+                                                    style="border-radius:10px; width:65px;height:35px;"
+                                                    th:href="@{/deleteExportDocument/{invoiceCode}-{documentId}(invoiceCode=${document.invoiceCode},documentId=${document.documentId})}"
+                                                    th:text="#{btnDelete}">
+                                                </a>
+                                                <button class="btn btn-success"
+                                                    th:onclick="downloadDocument([[${document.invoiceCode}]],[[${document.documentId}]]);">
+                                                    ダウンロード
+                                                </button>
+                                            </th>
+                                        </tr>
+
+                                    </tbody>
+                                    <tbody id="selectFile">
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="h-25 mb-5 mt-5">
+            <div class="row justify-content-center w-100" style="margin-left: 0;">
+                <button class="btn btn-secondary  col-2 mt-3" onclick="save()" style="width:102px;">登録</button>
+            </div>
+        </div>
+
+        <div aria-hidden="true" aria-labelledby="staticBackdropLabel" class="modal fade" data-bs-backdrop="static"
+            data-bs-keyboard="false" id="reacted-person-modal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="staticBackdropLabel">Reacted Person</h5>
+                        <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                    </div>
+                    <div class="modal-body w-100" id="reactPersonList">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal" id="myModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                    </div>
+                    <div class="modal-body">
+                        <img id="fullImage">
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-primary" onclick="downloadImage()" type="button">download</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--輸出登録-->
+
+        <form class="" id="exportRegistrationForm" method="POST" modelAttribute="exportObj" nonvalidate
+            th:action="@{/updateExportRegistration}" th:object="${exportRegistration}">
+            <div class="box box-4 container mt-5 pt-1 pb-5">
+                <div class="box-content p-xl-5 p-lg-4 p-md-4 p-sm-4 p-4">
+                    <h2 th:text="#{lblExportRegistration}"></h2>
+
+                    <div class="row mt-5">
+                        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                            <div class="row">
+                                <label class="col-3 label text-info text-end mt-2 "
+                                    th:text="#{lblCustomerName}+':'"></label>
+                                <div class="col-9">
+                                    <select aria-label="" class="form-select" id="customerName" name="customerName">
+                                        <option value=""></option>
+                                        <option th:each="company : ${companyList}"
+                                            th:selected="${#strings.equals(company.companyCode,cusObj)}"
+                                            th:text="${languageOption}== 0? ${company.companyNameJPN}: ${company.companyNameENG}"
+                                            th:value="${company.companyCode}"></option>
+                                    </select>
+                                </div>
+                                <div class="col-12">
+                                    <div class="row">
+                                        <label class="col-3 label text-info text-end mt-2 "></label>
+                                        <div class="col-9" id="customerNameErr" style="visibility:hidden;">
+                                            <span class="font24" id="customerNameErrMsg" style="color:red;"> </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                            <div class="row">
+                                <label class="col-3 label text-info text-end mt-2 "
+                                    th:text="#{lblPatternName}+':'"></label>
+                                <div class="col-9">
+                                    <select aria-label="" class="form-select" id="patternName" name="patternName"
+                                        onchange="comboChangeHandler()">
+                                        <option value=""></option>
+                                        <option th:each="pattern : ${patternList}"
+                                            th:selected="${#strings.equals(pattern,patName)}" th:text="${pattern}"
+                                            th:value="${pattern}"></option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 col-12">
+                            <div class="row">
+                                <label class="col-6 label text-info text-end mt-2 "
+                                    th:text="#{lblInvoiceNo}+':'"></label>
+                                <div class="form__group field col-6">
+                                    <input aria-label="" class="form__field w-100" id='invoiceCode1' maxlength="10"
+                                        name="invoiceCode" oninput="inputChange('invoiceCodeErr')" placeholder=""
+                                        readonly th:field="*{invoiceCode}" type="text" />
+                                </div>
+                                <div class="col-12" id="invoiceCodeErr" style="visibility:hidden;">
+                                    <div class="row">
+                                        <label class="col-6 label text-info text-center  "></label>
+                                        <div class="form__group field col-6">
+                                            <span class="font24" id="invoiceCodeErrMsg" style="color:red;"> </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 col-12">
+                            <div class="row">
+                                <label class="col-6 label text-info text-end mt-2 ">bookingNo:</label>
+                                <div class="form__group field col-6">
+                                    <input aria-label="" autocomplete="off" class="form__field w-100" id='bookingNo'
+                                        maxlength="10" name="bookingNo" oninput="inputChange('bookingNoErr')"
+                                        placeholder="" th:field="*{bookingNo}" type="text" />
+                                </div>
+                                <div class="col-12" id="bookingNoErr" style="visibility:hidden;">
+                                    <div class="row">
+                                        <label class="col-6 label text-info text-end mt-2 "></label>
+                                        <div class="form__group field col-6">
+                                            <span class="font24" id="bookingNoErrMsg" style="color:red;"> </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 col-12">
+                            <div class="row">
+                                <label class="col-6 label text-info text-end mt-2 ">po:</label>
+                                <div class="form__group field col-6">
+                                    <input aria-label="" class="form__field w-100" id='poNo' maxlength="10" name="poNO"
+                                        oninput="inputChange('poNoErr')" th:field="*{poNO}" type="text" />
+                                </div>
+                                <div class="col-12" id="poNoErr" style="visibility:hidden;">
+                                    <div class="row">
+                                        <label class="col-6 label text-info text-end mt-2 "></label>
+                                        <div class="form__group field col-6">
+                                            <span class="font24" id="poNoErrMsg" style="color:red;"> </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-3 col-xl-4 col-lg-4 col-md-6 col-sm-6 col-12">
+                            <div class="row">
+                                <label class="col-6 label text-info text-end mt-2 "
+                                    th:text="#{lblShippingAgency}+':'"></label>
+                                <div class="form__group field col-6">
+                                    <input aria-label="" class="form__field w-100" id='shippingAgency' maxlength="10"
+                                        name="shippingAgency" oninput="inputChange('shippingAgencyErr')"
+                                        th:field="*{shippingAgency}" type="text" />
+                                </div>
+                                <div class="col-12" id="shippingAgencyErr" style="visibility:hidden;">
+                                    <div class="row">
+                                        <label class="col-6 label text-info text-center  "></label>
+                                        <div class="form__group field col-6">
+                                            <span class="font24" id="shippingAgencyErrMsg" style="color:red;"> </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3 col-xl-4 col-lg-4 col-md-6 col-sm-6 col-12">
+                            <div class="row">
+                                <label class="col-6 label text-info text-end mt-2 "
+                                    th:text="#{lblExportOrImport}+':'"></label>
+                                <div class="form__group field col-6">
+                                    <select aria-label="" class="form-select" id="exportInport" name="exportInport"
+                                        onchange="inputChange('exportInportErr')">
+                                        <option value=""></option>
+                                        <option th:each="exportType : ${ExportType}"
+                                            th:selected="${#strings.equals(exportType.name,exportMode)}"
+                                            th:text="${exportType.type}" th:value="${exportType.name}"></option>
+                                    </select>
+                                </div>
+                                <div class="col-12" id="exportInportErr" style="visibility:hidden;">
+                                    <div class="row">
+                                        <label class="col-6 label text-info text-end mt-2 "></label>
+                                        <div class="form__group field col-6">
+                                            <span class="font24" id="exportInportErrMsg" style="color:red;"> </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3 col-xl-4 col-lg-4 col-md-6 col-sm-6 col-12">
+                            <div class="row">
+                                <label class="col-6 label text-info text-end mt-2 ">Incoterms:</label>
+                                <div class="form__group field col-6">
+                                    <input aria-label="" class="form__field w-100" id='incoterms' maxlength="10"
+                                        name="incoterms" oninput="inputChange('incotermsErr')" th:field="*{incoterms}"
+                                        type="text" />
+                                </div>
+                                <div class="col-12" id="incotermsErr" style="visibility:hidden;">
+                                    <div class="row">
+                                        <label class="col-6 label text-info text-end mt-2 "></label>
+                                        <div class="form__group field col-6">
+                                            <span class="font24" id="incotermsErrMsg" style="color:red;"> </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-3 col-xl-4 col-lg-4 col-md-6 col-sm-6 col-12">
+                            <div class="row">
+                                <label class="col-6 label text-info text-end mt-2 "
+                                    th:text="#{lblShipName}+':'"></label>
+                                <div class="form__group field col-6">
+                                    <input aria-label="" class="form__field w-100" id='shipName' name="shipName"
+                                        oninput="inputChange('shipNameErr')" th:field="*{shipName}" type="text" />
+                                </div>
+                                <div class="col-12" id="shipNameErr" style="visibility:hidden;">
+                                    <div class="row">
+                                        <label class="col-6 label text-info text-center  "></label>
+                                        <div class="form__group field col-6">
+                                            <span class="font24" id="shipNameErrMsg" style="color:red;"> </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3 col-xl-4 col-lg-4 col-md-6 col-sm-6 col-12">
+                            <div class="row">
+                                <label class="col-6 label text-info text-end mt-2 ">VOY No:</label>
+                                <div class="form__group field col-6">
+                                    <input aria-label="" class="form__field w-100" id='voyNo' maxlength="10"
+                                        name="voyNo" oninput="inputChange('shipNameErr')" th:field="*{voyNo}"
+                                        type="text" />
+                                </div>
+                                <div class="col-12" id="voyNoErr" style="visibility:hidden;">
+                                    <div class="row">
+                                        <label class="col-6 label text-info text-end mt-2 "></label>
+                                        <div class="form__group field col-6">
+                                            <span class="font24" id="voyNoErrMsg" style="color:red;"> </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3 col-xl-4 col-lg-4 col-md-6 col-sm-6 col-12">
+                            <div class="row">
+                                <label class="col-6 label text-info text-end mt-2 "
+                                    th:text="#{lblBillingMonth}+':'"></label>
+                                <div class="form__group field col-6">
+                                    <input readonly aria-label="" autocomplete="off" class="form__field w-100"
+                                        id='billingMonth' name="billingMonth"
+                                        onfocus="selectMonth('#billingMonth','billingMonthErr')"
+                                        th:field="*{billingMonth}" th:value="*{#dates.format(billingMonth, 'yyyy/MM')}"
+                                        type="input" />
+                                </div>
+                                <div class="col-12" id="billingMonthErr" style="visibility:hidden;">
+                                    <div class="row">
+                                        <label class="col-6 label text-info text-end mt-2 "></label>
+                                        <div class="form__group field col-6">
+                                            <span class="font24" id="billingMonthErrMsg" style="color:red;"> </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class=" mt-3 col-xl-4 col-lg-4 col-md-6 col-sm-6 col-12">
+                            <div class="row">
+                                <label class="col-6 label text-info text-end mt-2 " th:text="#{lblPacking}+':'"></label>
+                                <div class="form__group field col-6">
+                                    <input aria-label="" class="form__field w-100" id='packing' maxlength="10"
+                                        name="packing" oninput="inputChange('packingErr')" th:field="*{packing}"
+                                        type="text" />
+                                </div>
+                                <div class="col-12" id="packingErr" style="visibility:hidden;">
+                                    <div class="row">
+                                        <label class="col-6 label text-info text-center  "></label>
+                                        <div class="form__group field col-6">
+                                            <span class="font24" id="packingErrMsg" style="color:red;"> </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3 col-xl-4 col-lg-4 col-md-6 col-sm-6 col-12">
+                            <div class="row">
+                                <label class="col-6 label text-info text-end mt-2 "
+                                    th:text="#{lblTransportMode}+':'"></label>
+                                <div class="form__group field col-6">
+                                    <select aria-label="" class="form-select" id="transportMode" name="transportMode"
+                                        onchange="inputChange('transportModeErr')" th:field="*{transportMode}">
+                                        <option value=""></option>
+                                        <option th:each="mode : ${TransportType}"
+                                            th:selected="${#strings.equals(mode.name,transportMode)}"
+                                            th:text="${mode.type}" th:value="${mode.name}">
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-12" id="transportModeErr" style="visibility:hidden;">
+                                    <div class="row">
+                                        <label class="col-6 label text-info text-end mt-2 "></label>
+                                        <div class="form__group field col-6">
+                                            <span class="font24" id="transportModeErrMsg" style="color:red;"> </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3 col-xl-4 col-lg-4 col-md-6 col-sm-6 col-12">
+                            <div class="row">
+                                <label class="col-6 label text-info text-end mt-2 ">40f:</label>
+                                <div class="form__group field col-6">
+                                    <input aria-label="" class="form__field w-100" id='fortyF' maxlength="10"
+                                        name="fortyF" oninput="inputChange('fortyFErr')" th:field="*{fourtyf}"
+                                        type="text" />
+                                </div>
+                                <div class="col-4" id="fortyFErr" style="visibility:hidden;">
+                                    <div class="row">
+                                        <label class="col-6 label text-info text-end mt-2 "></label>
+                                        <div class="form__group field col-6">
+                                            <span id="fortyFErrMsg" style="color:red;"> </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-3 col-xl-4 col-lg-4 col-md-6 col-sm-6 col-12">
+                            <div class="row">
+                                <label class="col-6 label text-info text-end mt-2 ">BL No AWB No:</label>
+                                <div class="form__group field col-6">
+                                    <input aria-label="" class="form__field w-100" id='blawbNo' maxlength="10"
+                                        name="blawbNo" oninput="inputChange('blawbNoErr')" th:field="*{blawbNo}"
+                                        type="text" />
+                                </div>
+                                <div class="col-12" id="blawbNoErr" style="visibility:hidden;">
+                                    <div class="row">
+                                        <label class="col-6 label text-info text-center  "></label>
+                                        <div class="form__group field col-6">
+                                            <span class="font24" id="blawbNoErrMsg" style="color:red;"> </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3 col-xl-4 col-lg-4 col-md-6 col-sm-6 col-12">
+                            <div class="row">
+                                <label class="col-6 label text-info text-end mt-2 "
+                                    th:text="#{lblInvoicePrice}+':'"></label>
+                                <div class="form__group field col-6">
+                                    <input aria-label="" class="form__field w-100" id='invoicePrice' maxlength="10"
+                                        name="invoicePrice" oninput="inputChange('invoicePriceErr')"
+                                        th:field="*{invoicePrice}" type="text" />
+                                </div>
+                                <div class="col-12" id="invoicePriceErr" style="visibility:hidden;">
+                                    <div class="row">
+                                        <label class="col-6 label text-info text-end mt-2 "></label>
+                                        <div class="form__group field col-6">
+                                            <span class="font24" id="invoicePriceErrMsg" style="color:red;"> </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3 col-xl-4 col-lg-4 col-md-6 col-sm-6 col-12">
+                            <div class="row">
+                                <label class="col-6 label text-info text-end mt-2 ">20f:</label>
+                                <div class="form__group field col-6">
+                                    <input aria-label="" class="form__field w-100" id='twentyf' maxlength="10"
+                                        name="twentyf" oninput="inputChange('twentyfErr')" th:field="*{twentyf}"
+                                        type="text" />
+                                </div>
+                                <div class="col-12" id="twentyfErr" style="visibility:hidden;">
+                                    <div class="row">
+                                        <label class="col-6 label text-info text-end mt-2 "></label>
+                                        <div class="form__group field col-6">
+                                            <span class="font24" id="twentyfErrMsg" style="color:red;"> </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-3 col-xl-4 col-lg-4 col-md-6 col-sm-6 col-12">
+                            <div class="row">
+                                <label class="col-6 label text-info text-end mt-2 "
+                                    th:text="#{lblDeparturePort}+':'"></label>
+                                <div class="form__group field col-6">
+
+                                    <select aria-label="Default select example" class="form-select" id="departurePort"
+                                        name="departurePort" onchange="inputChange('departurePortErr')">
+                                        <option value=""></option>
+                                        <option th:each="port : ${portList}"
+                                            th:selected="${#strings.equals(port.portCode, exportRegistration.departurePort)}"
+                                            th:text="${port.portName}" th:value="${port.portCode}"></option>
+                                    </select>
+                                </div>
+                                <div class="col-12" id="departurePortErr" style="visibility:hidden;">
+                                    <div class="row">
+                                        <label class="col-6 label text-info text-center  "></label>
+                                        <div class="form__group field col-6">
+                                            <span class="font24" id="departurePortErrMsg" style="color:red;"> </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3 col-xl-4 col-lg-4 col-md-6 col-sm-6 col-12">
+                            <div class="row">
+                                <label class="col-6 label text-info text-end mt-2 "
+                                    th:text="#{lblArrivalPort}+':'"></label>
+                                <div class="form__group field col-6">
+
+                                    <select aria-label="" class="form-select" id="arrivalPort" name="arrivalPort"
+                                        onchange="inputChange('arrivalPortErr')">
+                                        <option value=""></option>
+                                        <option th:each="port : ${portList}"
+                                            th:selected="${#strings.equals(port.portCode, exportRegistration.arrivalPort)}"
+                                            th:text="${port.portName}" th:value="${port.portCode}"></option>
+                                    </select>
+                                </div>
+                                <div class="col-12" id="arrivalPortErr" style="visibility:hidden;">
+                                    <div class="row">
+                                        <label class="col-6 label text-info text-end mt-2 "></label>
+                                        <div class="form__group field col-6">
+                                            <span class="font24" id="arrivalPortErrMsg" style="color:red;"> </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3 col-xl-4 col-lg-4 col-md-6 col-sm-6 col-12">
+                            <div class="row">
+                                <label class="col-6 label text-info text-end mt-2 ">cut:</label>
+                                <div class="form__group field col-6">
+                                    <!--                                <input aria-label="" type="text" class="form__field w-100" th:field="*{cut}" name="cut"-->
+                                    <!--                                       id='cut' oninput="inputChange('cutErr')"/>-->
+                                    <input aria-label="" autocomplete="off" class="form__field w-100" id='cut'
+                                        name="cut" onfocus="openCalander('#cut','cut')" th:field="*{cut}"
+                                        th:value="*{#dates.format(cut, 'yyyy/MM/dd')}" type="input" />
+                                </div>
+                                <div class="col-12" id="cutErr" style="visibility:hidden;">
+                                    <div class="row">
+                                        <label class="col-6 label text-info text-end mt-2 "></label>
+                                        <div class="form__group field col-6">
+                                            <span class="font24" id="cutErrMsg" style="color:red;"> </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="box box-4 container mt-5 mb-5 pb-2" style=" background-color:#e0f8f8;">
+                <div class="box-content">
+                    <!--pagination-->
+                    <div class="row justify-content-center mb-3 mt-3">
+                        <div class="col-8 text-center">
+                            <span style="font-size:22px; color:#2b2f33;" th:text="#{lblConfirm}+':'"></span>
+                        </div>
+                    </div>
+                    <div class="row mt-5">
+                        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                            <div class="row">
+                                <label class="col-3 label text-info text-end mt-2 ">ETD:</label>
+                                <div class="col-9">
+                                    <input aria-label="" autocomplete="off" class="form__field w-100" id='etd'
+                                        name="etd" onfocus="openCalander('#etd','etdErr')" th:field="*{etd}"
+                                        th:value="*{#dates.format(etd, 'yyyy/MM/dd')}" type="input" />
+                                </div>
+                                <div class="col-12">
+                                    <div class="row">
+                                        <label class="col-3 label text-info text-end mt-2 "></label>
+                                        <div class="col-9" id="etdErr" style="visibility:hidden;">
+                                            <div class="row">
+                                                <label class="col-6 label text-info text-end mt-2 "></label>
+                                                <div class="form__group field col-9">
+                                                    <span id="etdErrMsg" style="color:red;"> </span>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                            <div class="row">
+                                <label class="col-3 label text-info text-end mt-2 ">ETA:</label>
+                                <div class="col-9">
+                                    <input aria-label="" autocomplete="off" class="form__field w-100" id='eta'
+                                        name="eta" onfocus="openCalander('#eta','etaErr')" th:field="*{eta}"
+                                        th:value="*{#dates.format(eta, 'yyyy/MM/dd')}" type="input" />
+                                </div>
+                                <div class="col-12">
+                                    <div class="row">
+                                        <label class="col-3 label text-info text-end mt-2 "></label>
+                                        <div class="col-9" id="etaErr" style="visibility:hidden;">
+                                            <div class="row">
+                                                <label class="col-6 label text-info text-end mt-2 "></label>
+                                                <div class="form__group field col-9">
+                                                    <span id="etaErrMsg" style="color:red;"> </span>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="box-content ps-xl-4 ps-lg-2 ps-md-4 ps-sm-4 ps-4 pe-xl-4 pe-lg-2 pe-md-4 pe-sm-4 pe-4 mt-3">
+
+                    <div class="row mt-5">
+                        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 col-12">
+                            <div class="row">
+                                <label class="col-6 label text-info text-end mt-2 "
+                                    th:text="#{lblAnAdvanceFee}+':'"></label>
+                                <div class="form__group field col-6">
+                                    <input aria-label="" class="form__field w-100" id='anAdvanceFee' maxlength="10"
+                                        name="anAdvanceFee" oninput="inputChange('anAdvanceFeeErr')"
+                                        th:field="*{anAdvanceFee}" type="text" />
+                                </div>
+                                <div class="col-12" id="anAdvanceFeeErr" style="visibility:hidden;">
+                                    <div class="row">
+                                        <label class="col-6 label text-info text-center  "></label>
+                                        <div class="form__group field col-6">
+                                            <span class="font24" id="anAdvanceFeeErrMsg" style="color:red;"> </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 col-12">
+                            <div class="row">
+                                <label class="col-6 label text-info text-end mt-2 "
+                                    th:text="#{lblSupplierName}+':'"></label>
+                                <div class="form__group field col-6">
+                                    <input aria-label="" class="form__field w-100" id='supplierName' name="supplierName"
+                                        oninput="inputChange('supplierNameErr')" th:field="*{supplierName}"
+                                        type="text" />
+                                </div>
+                                <div class="col-12" id="supplierNameErr" style="visibility:hidden;">
+                                    <div class="row">
+                                        <label class="col-6 label text-info text-end mt-2 "></label>
+                                        <div class="form__group field col-6">
+                                            <span class="font24" id="supplierNameErrMsg" style="color:red;"> </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 col-12">
+                            <div class="row">
+                                <label class="col-6 label text-info text-end mt-2 " th:text="#{lblRepItem}+':'"></label>
+                                <div class="form__group field col-6">
+                                    <input class="form__field w-100" id='representativeItem' maxlength="10"
+                                        name="representativeItem" oninput="inputChange('representativeItemErr')"
+                                        th:field="*{representativeItem}" type="text" />
+                                </div>
+                                <div class="col-12" id="representativeItemErr" style="visibility:hidden;">
+                                    <div class="row">
+                                        <label class="col-6 label text-info text-end mt-2 "></label>
+                                        <div class="form__group field col-6">
+                                            <span class="font24" id="representativeItemErrMsg" style="color:red;">
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="mt-3 col-xl-4 col-lg-4 col-md-6 col-sm-6 col-12">
+                            <div class="row">
+                                <label class="col-6 label text-info text-end mt-2 " th:text="#{lblCargoKg}+':'"></label>
+                                <div class="form__group field col-6">
+                                    <input class="form__field w-100" id='freightKg' maxlength="10" name="freightKg"
+                                        oninput="inputChange('freightKgErr')" th:field="*{freightKg}" type="text" />
+                                </div>
+                                <div class="col-12" id="freightKgErr" style="visibility:hidden;">
+                                    <div class="row">
+                                        <label class="col-6 label text-info text-center  "></label>
+                                        <div class="form__group field col-6">
+                                            <span class="font24" id="freightKgErrMsg" style="color:red;"> </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3 col-xl-4 col-lg-4 col-md-6 col-sm-6 col-12">
+                            <div class="row">
+                                <label class="col-6 label text-info text-end mt-2 " th:text="#{lblCargoM3}+':'"></label>
+                                <div class="form__group field col-6">
+                                    <input class="form__field w-100" id='freightM3' maxlength="10" name="freightM3"
+                                        oninput="inputChange('freightM3Err')" th:field="*{freightM3}" type="text" />
+                                </div>
+                                <div class="col-12" id="freightM3Err" style="visibility:hidden;">
+                                    <div class="row">
+                                        <label class="col-6 label text-info text-end mt-2 "></label>
+                                        <div class="form__group field col-6">
+                                            <span class="font24" id="freightM3ErrMsg" style="color:red;"> </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3 col-xl-4 col-lg-4 col-md-6 col-sm-6 col-12">
+                            <div class="row">
+                                <label class="col-6 label text-info text-end mt-2 " th:text="#{lblCTSNo}+':'"></label>
+                                <div class="form__group field col-6">
+                                    <input aria-label="" class="form__field w-100" id='ctsNumber' maxlength="10"
+                                        name="ctsNumber" oninput="inputChange('ctsNumberErr')" th:field="*{ctsNumber}"
+                                        type="text" />
+                                </div>
+                                <div class="col-12" id="ctsNumberErr" style="visibility:hidden;">
+                                    <div class="row">
+                                        <label class="col-6 label text-info text-end mt-2 "></label>
+                                        <div class="form__group field col-6">
+                                            <span class="font24" id="ctsNumberErrMsg" style="color:red;"> </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3 col-xl-4 col-lg-4 col-md-6 col-sm-6 col-12">
+                            <div class="row">
+                                <label class="col-6 label text-info text-end mt-2 " th:text="#{lblSize}+':'"></label>
+                                <div class="form__group field col-6">
+                                    <input aria-label="" class="form__field w-100" id='size' maxlength="10" name="size"
+                                        oninput="inputChange('sizeErr')" th:field="*{size}" type="text" />
+                                </div>
+                                <div class="col-12" id="sizeErr" style="visibility:hidden;">
+                                    <div class="row">
+                                        <label class="col-6 label text-info text-center  "></label>
+                                        <div class="form__group field col-6">
+                                            <span class="font24" id="sizeErrMsg" style="color:red;"> </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="box-content ps-xl-4 ps-lg-2 ps-md-4 ps-sm-4 ps-4 pe-xl-4 pe-lg-2 pe-md-4 pe-sm-4 pe-4 mt-3">
+                    <div class="row mt-5">
+                        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                            <div class="row">
+                                <label class="col-3 label text-info text-end mt-2 ">RT(ship):</label>
+                                <div class="form__group field col-9">
+                                    <input aria-label="" class="form__field w-100" id='rtShip' maxlength="10"
+                                        name="rtShip" th:field="*{rtShip}" type="text" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                            <div class="row">
+                                <label class="col-3 label text-info text-end mt-2 ">VW(air):</label>
+                                <div class="form__group field col-9">
+                                    <input aria-label="" class="form__field w-100" id='vwAir' maxlength="10"
+                                        name="vwAir" placeholder="自動計算" type="text" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="box box-4 container  mt-5 mb-5" style="background-color:#e0f8f8;">
+
+                <div class="box-content ps-xl-4 ps-lg-2 ps-md-1 ps-sm-4 ps-4 pe-xl-4 pe-lg-2 pe-md-1 pe-sm-4 pe-4 ">
+
+                    <div class="row mt-5">
+                        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 col-12">
+                            <div class="row">
+                                <label class="col-6 label text-info text-end mt-2 "
+                                    th:text="#{lblPackingBox}+':'"></label>
+                                <div class="form__group field col-6">
+                                    <input aria-label="" class="form__field w-100" id='hlBoxesNumber' maxlength="10"
+                                        name="hlBoxesNumber" oninput="inputChange('hlBoxesNumberErr')"
+                                        th:field="*{hlBoxesNumber}" type="text" />
+                                </div>
+                                <div class="col-12" id="hlBoxesNumberErr" style="visibility:hidden;">
+                                    <div class="row">
+                                        <label class="col-6 label text-info text-end  "></label>
+                                        <div class="form__group field col-6">
+                                            <span class="font24" id="hlBoxesNumberErrMsg" style="color:red;"> </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 col-12">
+                            <div class="row">
+                                <label class="col-6 label text-info text-end mt-2 "
+                                    th:text="#{lblMoneyOrder}+':'"></label>
+                                <div class="form__group field col-6">
+                                    <input aria-label="" class="form__field w-100" id='moneyOrder' maxlength="10"
+                                        name="moneyOrder" oninput="inputChange('moneyOrderErr')"
+                                        th:field="*{moneyOrder}" type="text" />
+                                </div>
+                                <div class="col-12" id="moneyOrderErr" style="visibility:hidden;">
+                                    <div class="row">
+                                        <label class="col-6 label text-info text-end mt-2 "></label>
+                                        <div class="form__group field col-6">
+                                            <span class="font24" id="moneyOrderErrMsg" style="color:red;"> </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 col-12">
+                            <div class="row">
+                                <label class="col-6 label text-info text-end mt-2 "
+                                    th:text="#{lblImportAmt}+':'"></label>
+                                <div class="form__group field col-6">
+                                    <input aria-label="" class="form__field w-100" id='inportTaxAdvanceAmount'
+                                        maxlength="10" name="inportTaxAdvanceAmount"
+                                        oninput="inputChange('inportTaxAdvanceAmountErr')"
+                                        th:field="*{inportTaxAdvanceAmount}" type="text" />
+                                </div>
+                                <div class="col-12" id="inportTaxAdvanceAmountErr" style="visibility:hidden;">
+                                    <div class="row">
+                                        <label class="col-6 label text-info text-end mt-2 "></label>
+                                        <div class="form__group field col-6">
+                                            <span class="font24" id="inportTaxAdvanceAmountErrMsg" style="color:red;">
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-3 col-xl-4 col-lg-4 col-md-6 col-sm-6 col-12">
+                            <div class="row">
+                                <label class="col-6 label text-info text-end mt-2 "
+                                    th:text="#{lblRemark}+':'">備考:</label>
+                                <div class="form__group field col-6">
+                                    <input aria-label="" class="form__field w-100" id='remarks' maxlength="10"
+                                        name="remarks" th:field="*{remarks}" type="text" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="box-content ps-xl-4 ps-lg-2 ps-md-1 ps-sm-4 ps-4 pe-xl-4 pe-lg-2 pe-md-1 pe-sm-4 pe-4 mt-3">
+
+                    <!--pagination-->
+                    <div class="row justify-content-center mb-3 mt-3">
+                        <div class="col-8 text-center">
+                            <span style="font-size:22px; color:#2b2f33;" th:text="#{lblConfirm}+':'"></span>
+                        </div>
+                    </div>
+                    <div class="row mt-5">
+                        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                            <div class="row">
+                                <label class="col-3 label text-info text-end mt-2 "
+                                    th:text="#{lblDeclarationDt}+':'"></label>
+                                <div class="col-9">
+                                    <input aria-label="" autocomplete="off" class="form__field w-100"
+                                        id='declarationDate' name="declarationDate"
+                                        onfocus="openCalander('#declarationDate','declarationDateErr')"
+                                        th:field="*{declarationDate}"
+                                        th:value="*{#dates.format(declarationDate, 'yyyy/MM/dd')}" type="input" />
+                                </div>
+                                <div class="col-12" id="declarationDateErr" style="visibility:hidden;">
+                                    <div class="row w-100">
+                                        <label class="col-3 label text-info text-end mt-2 "></label>
+                                        <div class="form__group field col-6">
+                                            <span id="declarationDateErrMsg" style="color:red;"> </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                            <div class="row">
+                                <label class="col-3 label text-info text-end mt-2 "
+                                    th:text="#{lblInspectionDt}+':'">検査日:</label>
+                                <div class="col-9">
+                                    <input aria-label="" autocomplete="off" class="form__field w-100"
+                                        id='inspectionDate' name="inspectionDate"
+                                        onfocus="openCalander('#inspectionDate','inspectionDateErr')"
+                                        th:field="*{inspectionDate}"
+                                        th:value="*{#dates.format(inspectionDate, 'yyyy/MM/dd')}" type="input" />
+                                </div>
+                                <div class="col-12" id="inspectionDateErr" style="visibility:hidden;">
+                                    <div class="row w-100">
+                                        <label class="col-3 label text-info text-end mt-2 "></label>
+                                        <div class="form__group field col-6">
+                                            <span id="inspectionDateErrMsg" style="color:red;"> </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-3 col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                            <div class="row">
+                                <label class="col-3 label text-info text-end mt-2 "
+                                    th:text="#{lblDeliveryDt}+':'"></label>
+                                <div class="col-9">
+                                    <input aria-label="" autocomplete="off" class="form__field w-100"
+                                        id='deliveryDateAndTime' name="deliveryDateAndTime"
+                                        onfocus="openCalander('#deliveryDateAndTime','deliveryDateAndTimeErr')"
+                                        th:field="*{deliveryDateAndTime}"
+                                        th:value="*{#dates.format(deliveryDateAndTime, 'yyyy/MM/dd')}" type="input" />
+                                </div>
+                                <div class="col-12" id="deliveryDateAndTimeErr" style="visibility:hidden;">
+                                    <div class="row w-100">
+                                        <label class="col-3 label text-info text-end mt-2 "></label>
+                                        <div class="form__group field col-6">
+                                            <span id="deliveryDateAndTimeErrMsg" style="color:red;"> </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="mt-3 col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                            <div class="row">
+                                <label class="col-3 label text-info text-end mt-2 "
+                                    th:text="#{lblPossiblePickupDate}+':'"></label>
+                                <div class="col-9">
+                                    <input aria-label="" autocomplete="off" class="form__field w-100"
+                                        id='possiblePickUpDate' name="possiblePickUpDate"
+                                        onfocus="openCalander('#possiblePickUpDate','possiblePickUpDateErr')"
+                                        th:field="*{possiblePickUpDate}"
+                                        th:value="*{#dates.format(possiblePickUpDate, 'yyyy/MM/dd')}" type="input" />
+                                </div>
+                                <div class="col-12" id="possiblePickUpDateErr" style="visibility:hidden;">
+                                    <div class="row w-100">
+                                        <label class="col-3 label text-info text-end mt-2 "></label>
+                                        <div class="form__group field col-6">
+                                            <span id="possiblePickUpDateErrMsg" style="color:red;"> </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-3 col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                            <div class="row">
+                                <label class="col-3 label text-info text-end mt-2 "
+                                    th:text="#{lblPickupDate}+':'"></label>
+                                <div class="col-9">
+                                    <input aria-label="" autocomplete="off" class="form__field w-100" id='pickUpDate'
+                                        name="pickUpDate" onfocus="openCalander('#pickUpDate','pickUpDateErr')"
+                                        th:field="*{pickUpDate}" th:value="*{#dates.format(pickUpDate, 'yyyy/MM/dd')}"
+                                        type="input" />
+                                </div>
+                                <div class="col-12" id="pickUpDateErr" style="visibility:hidden;">
+                                    <div class="row w-100">
+                                        <label class="col-3 label text-info text-end mt-2 "></label>
+                                        <div class="form__group field col-6">
+                                            <span id="pickUpDateErrMsg" style="color:red;"> </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="mt-3 col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                            <div class="row">
+                                <label class="col-3 label text-info text-end mt-2 "
+                                    th:text="#{lblFreeTime}+':'"></label>
+                                <div class="col-9">
+                                    <input aria-label="" autocomplete="off" class="form__field w-100" id='freeTime'
+                                        name="freeTime" onfocus="openCalander('#freeTime','freeTimeErr')"
+                                        th:field="*{freeTime}" th:value="*{#dates.format(freeTime, 'yyyy/MM/dd')}"
+                                        type="input" />
+                                </div>
+                                <div class="col-12" id="freeTimeErr" style="visibility:hidden;">
+                                    <div class="row w-100">
+                                        <label class="col-3 label text-info text-end mt-2 "></label>
+                                        <div class="form__group field col-6">
+                                            <span id="freeTimeErrMsg" style="color:red;"> </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="box-content ps-xl-4 ps-lg-2 ps-md-4 ps-sm-4 ps-4 pe-xl-4 pe-lg-2 pe-md-4 pe-sm-4 pe-4 mt-3">
+                    <div class="row mt-5">
+                        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                            <div class="row">
+                                <label class="col-3 label text-info text-end mt-2 "
+                                    th:text="#{lblContainerNo}+':'"></label>
+                                <div class="form__group field col-9">
+                                    <input aria-label="" class="form__field w-100" id='containerNo' maxlength="10"
+                                        name="containerNo" th:field="*{containerNo}" type="text" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                            <div class="row">
+                                <label class="col-3 label text-info text-end mt-2 "
+                                    th:text="#{lblCargoInsurance}+':'"></label>
+                                <div class="form__group field col-9">
+                                    <input aria-label="" class="form__field w-100" id='cargoInsurance' maxlength="10"
+                                        name="cargoInsurance" th:field="*{cargoInsurance}" type="text" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-3 col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                            <div class="row">
+                                <label class="col-3 label text-info text-end mt-2 "
+                                    th:text="#{lblLogisticsCost}+':'"></label>
+                                <div class="form__group field col-9">
+                                    <input aria-label="" class="form__field w-100 logisticsCost" id='logisticsCost'
+                                        maxlength="10" name="logisticsCost" oninput="inputChange('logisticsCostErr')"
+                                        th:field="*{logisticsCost}" type="text" />
+                                </div>
+                                <div class="col-12">
+                                    <div class="row" id="logisticsCostErr" style="visibility:hidden;">
+                                        <label class="col-3 label text-info text-end mt-2 "></label>
+                                        <div class="form__group field col-9">
+                                            <span id="logisticsCostErrMsg" style="color:red;"> </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </form>
+
+        <div class=" w-100 m-0 pb-2  fixed-bottom row" style="display: none;" id="submitBtn" data-aos="fade-up"
+            data-aos-duration="2000">
+            <div class="">
+                <div class="row justify-content-center " style="margin-left: 0;">
+                    <div
+                        style="
+                 width: inherit;
+                 background: white;
+                 border-radius: 8px;
+                 box-shadow: rgba(136, 165, 191, 0.48) 6px 2px 16px 0px, rgba(255, 255, 255, 0.8) -6px -2px 16px 0px;s">
+                        <button class="btn btn-secondary  col-2 m-2" onclick="exportRegistrationCheck()"
+                            style="width:102px;" th:text="#{btnExportEdit}">
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <form id="saveExportDocument" method="POST" th:action="@{/saveExportDocument}">
+            <input aria-label="" hidden id="documentFilesNames" name="documentFilesNames" type="text">
+            <input aria-label="" hidden id="documentFilesLists" name="documentFilesLists" type="text">
+            <input aria-label="" hidden id="documentFilesSizes" name="documentFilesSizes" type="text">
+            <input aria-label="" hidden name="invoiceCode" th:value="${invoiceCode}">
+        </form>
+
+        <input aria-label="" hidden id="companyCode" th:value="${companyCode}">
+        <input aria-label="" hidden id="userCode" th:value="${userCode}">
+        <input aria-label="" hidden id="invoiceCode" th:value="${invoiceCode}">
+        <input aria-label="" hidden id="userlatestMessageId" th:value="${userlatestMessageId}">
+        <input aria-label="" hidden id="currentlatestMessageId" th:value="${currentlatestMessageId}">
+        <input aria-label="" hidden id="exportDocumentNameList" th:value="${exportDocumentNameList}">
+
+
+        <script>
+            let languageFlag = "[[${languageOption}]]";
+            loadErrorMessage();
+            onscroll = (event) => {
+                let elem = document.getElementById('submitBtn');
+
+                if (window.scrollY > 600) {
+                    elem.style.display = '';
+                }
+                if (window.scrollY < 600) {
+                    elem.style.display = 'none';
+                }
+            };
+
+            window.onbeforeunload = function (e) {
+
+                $.ajax({
+                    type: "GET",
+                    url: "/updateLatestReadMessage",
+                    data: { invoiceCode: $("#invoiceCode").val() },
+                    success: function (result) {
+                        console.log("chat read history" + result);
+                    }
+                })
+                // For Safari
+                return undefined;
+            };
+
+            fileSelectionDocument('file_upload_test', 'file_upload', 'selectFile', "table");
+
+
+            document.getElementById('scroll').scrollTo(0, document.getElementById('scroll').scrollHeight);
+            let binaryFile;
+            let fileSelected = "false";
+
+            let fileElement = document.getElementById('fileInput');
+            fileElement.addEventListener('changestart', (e) => {
+                window.addEventListener("load", (event) => {
+                    document.getElementById('load').style.display = "block";
+                });
+            })
+            fileElement.addEventListener('change', (e) => {
+                let input = document.getElementById("message");
+                let inputOuter = document.getElementById("input-wrapper")
+
+                input.classList.add('input-border-change');
+                inputOuter.classList.add('image-border');
+
+                let fileInput = document.getElementById("fileInput");
+                fileSelected = "true";
+                let file = fileInput.files[0];
+                let reader = new FileReader();
+
+                reader.addEventListener("load", () => {
+                    binaryFile = reader.result;
+                    let img = document.createElement('img');
+                    img.src = binaryFile;
+                    img.style.width = "150px";
+                    img.style.height = "100px";
+                    let image = document.getElementById("imageTest");
+                    image.appendChild(img);
+                });
+                reader.readAsDataURL(file);
+
+                reader.addEventListener("loadend", () => {
+                    document.getElementById('load').style.display = "none";
+
+                })
+            })
+
+
+            function submitForm() {
+                document.getElementById("searchForm").submit();
+            }
+
+            $('.open-popup-link').magnificPopup({
+                type: 'inline',
+                midClick: true // Allow opening popup on middle mouse click. Always set it to true if you don't provide alternative source in href.
+            });
+
+
+            let next = document.getElementById("next");
+            let prev = document.getElementById("prev");
+
+            function disableNext() {
+                next.style.display = "none";
+                prev.style.display = "";
+            }
+
+            function disablePrev() {
+                prev.style.display = "none";
+                next.style.display = "";
+            }
+
+            window.onload = function () {
+                document.getElementById("navbarDropdownMenuLink").classList.add("active");
+            };
+
+            function showFullImage(imageId) {
+                let image = document.getElementById(imageId)
+                let imageBase64 = image.src;
+                let fullImage = document.getElementById("fullImage")
+                fullImage.src = imageBase64;
+                fullImage.style.width = "500px";
+                fullImage.style.height = "300px";
+                $('#myModal').modal('show');
+
+            }
+
+            function downloadImage() {
+                let fullImage = document.getElementById("fullImage")
+                const linkSource = fullImage.src
+                const downloadLink = document.createElement("a");
+                downloadLink.href = linkSource;
+                downloadLink.download = "fileName";
+                downloadLink.click();
+            }
+
+            $(window).click(function (e) {
+                let latestMessageId = "[[${userlatestMessageId}]]";
+                let latestMessage = document.getElementById(latestMessageId);
+                let unreadStatus = document.getElementById('unread-status');
+                if (unreadStatus != null) {
+                    unreadStatus.style.display = 'none';
+                    latestMessage.classList.remove("last-msg");
+                }
+            });
+
+
+            function exportRegistrationCheck() {
+                let customerName = document.getElementById('customerName');
+                let invoiceCode = document.getElementById('invoiceCode1');
+                let bookingNo = document.getElementById('bookingNo');
+                let poNo = document.getElementById('poNo');
+                let shippingAgency = document.getElementById('shippingAgency');
+                let exportInport = document.getElementById('exportInport');
+                let incoterms = document.getElementById('incoterms');
+                let shipName = document.getElementById('shipName');
+                let voyNo = document.getElementById('voyNo');
+                let packing = document.getElementById('packing');
+                let fortyF = document.getElementById('fortyF');
+                let blawbNo = document.getElementById('blawbNo');
+                let invoicePrice = document.getElementById('invoicePrice');
+                let twentyf = document.getElementById('twentyf');
+                let billingMonth = document.getElementById('billingMonth');
+                let transportMode = document.getElementById('transportMode');
+                let departurePort = document.getElementById('departurePort');
+                let arrivalPort = document.getElementById('arrivalPort');
+                let cut = document.getElementById('cut');
+                let etd = document.getElementById('etd');
+                let eta = document.getElementById('eta');
+                let anAdvanceFee = document.getElementById('anAdvanceFee');
+                let supplierName = document.getElementById('supplierName');
+                let representativeItem = document.getElementById('representativeItem');
+                let freightKg = document.getElementById('freightKg');
+                let freightM3 = document.getElementById('freightM3');
+                let ctsNumber = document.getElementById('ctsNumber');
+                let size = document.getElementById('size');
+                let hlBoxesNumber = document.getElementById('hlBoxesNumber');
+                let moneyOrder = document.getElementById('moneyOrder');
+                let inportTaxAdvanceAmount = document.getElementById('inportTaxAdvanceAmount');
+                let declarationDate = document.getElementById('declarationDate');
+                let inspectionDate = document.getElementById('inspectionDate');
+                let possiblePickUpDate = document.getElementById('possiblePickUpDate');
+                let pickUpDate = document.getElementById('pickUpDate');
+                let deliveryDateAndTime = document.getElementById('deliveryDateAndTime');
+                let freeTime = document.getElementById('freeTime');
+                let logisticsCost = document.getElementById('logisticsCost');
+                let regex = /[\u3000-\u303F]|[\u3040-\u309F]|[\u30A0-\u30FF]|[\uFF00-\uFFEF]|[\u4E00-\u9FAF]|[\u2605-\u2606]|[\u2190-\u2195]|\u203B/g;
+                let valid = true;
+
+                if (customerName.value === "") {
+                    showErrorMsg("customerNameErr", customerCodeEmptyErrMsg, customerCodeEmptyErrMsg, "customerNameErrMsg", languageFlag)
+                    valid = false;
+                }
+
+                if (invoiceCode.value === "") {
+                    showErrorMsg("invoiceCodeErr", invoiceCodeEmptyErrMsg, invoiceCodeEmptyErrMsg, "invoiceCodeErrMsg", languageFlag)
+                    valid = false;
+                }
+
+                if (bookingNo.value === "") {
+                    showErrorMsg("bookingNoErr", bookingNoEmptyErrMsg, bookingNoEmptyErrMsg, "bookingNoErrMsg", languageFlag)
+                    valid = false;
+                }
+
+                if (poNo.value === "") {
+                    showErrorMsg("poNoErr", poNoEmptyErrMsg, poNoEmptyErrMsg, "poNoErrMsg", languageFlag)
+                    valid = false;
+                }
+
+                if (shippingAgency.value === "") {
+                    showErrorMsg("shippingAgencyErr", shippingAgencyEmptyErrMsg, shippingAgencyEmptyErrMsg, "shippingAgencyErrMsg", languageFlag)
+                    valid = false;
+                }
+
+                if (exportInport.value === "") {
+                    showErrorMsg("exportInportErr", tradeEmptyErrMsg, tradeEmptyErrMsg, "exportInportErrMsg", languageFlag)
+                    valid = false;
+                }
+
+                if (incoterms.value === "") {
+                    showErrorMsg("incotermsErr", incotermsEmptyErrMsg, incotermsEmptyErrMsg, "incotermsErrMsg", languageFlag)
+                    valid = false;
+                }
+
+                if (shipName.value === "") {
+                    showErrorMsg("shipNameErr", shipNameEmptyErrMsg, shipNameEmptyErrMsg, "shipNameErrMsg", languageFlag)
+                    valid = false;
+                }
+
+                if (voyNo.value === "") {
+                    showErrorMsg("voyNoErr", VOYNoEmptyErrMsg, VOYNoEmptyErrMsg, "voyNoErrMsg", languageFlag)
+                    valid = false;
+                }
+
+                if (billingMonth.value === "") {
+                    showErrorMsg("billingMonthErr", billingMonthEmptyErrMsg, billingMonthEmptyErrMsg, "billingMonthErrMsg", languageFlag)
+                    valid = false;
+                }
+
+                if (packing.value === "") {
+                    showErrorMsg("packingErr", packingEmptyErrMsg, packingEmptyErrMsg, "packingErrMsg", languageFlag)
+                    valid = false;
+                } else if (regex.test(packing.value)) {
+                    showErrorMsg("packingErr", packingJpnCharacterErrMsg, packingJpnCharacterErrMsg, "packingErrMsg", languageFlag)
+                    valid = false;
+                } else if (!packing.value.match("^[0-9]*$")) {
+                    showErrorMsg("packingErr", packingNumberErrMsg, packingNumberErrMsg, "packingErrMsg", languageFlag)
+                    valid = false;
+                }
+
+                if (fortyF.value === "") {
+                    showErrorMsg("fortyFErr", fortyFEmptyErrMsg, fortyFEmptyErrMsg, "fortyFErrMsg", languageFlag)
+                    valid = false;
+                } else if (regex.test(fortyF.value)) {
+                    showErrorMsg("fortyFErr", fortyFJpnCharacterErrMsg, fortyFJpnCharacterErrMsg, "fortyFErrMsg", languageFlag)
+                    valid = false;
+                } else if (!fortyF.value.match("^[0-9]*$")) {
+                    showErrorMsg("fortyFErr", fortyFNumberErrMsg, fortyFNumberErrMsg, "fortyFErrMsg", languageFlag)
+                    valid = false;
+                }
+
+                if (transportMode.value === "") {
+                    showErrorMsg("transportModeErr", transportModeEmptyErrMsg, transportModeEmptyErrMsg, "transportModeErrMsg", languageFlag)
+                    valid = false;
+                }
+
+                if (blawbNo.value === "") {
+                    showErrorMsg("blawbNoErr", blNoAwbNoEmptyErrMsg, blNoAwbNoEmptyErrMsg, "blawbNoErrMsg", languageFlag)
+                    valid = false;
+                }
+
+                if (invoicePrice.value === "") {
+                    showErrorMsg("invoicePriceErr", invoicePriceEmptyErrMsg, invoicePriceEmptyErrMsg, "invoicePriceErrMsg", languageFlag)
+                    valid = false;
+                } else if (regex.test(invoicePrice.value)) {
+                    showErrorMsg("invoicePriceErr", invoicePriceJpnCharacterErrMsg, invoicePriceJpnCharacterErrMsg, "invoicePriceErrMsg", languageFlag)
+                    valid = false;
+                } else if (!invoicePrice.value.match("^[0-9]*$")) {
+                    showErrorMsg("invoicePriceErr", invoicePriceNumberErrMsg, invoicePriceNumberErrMsg, "invoicePriceErrMsg", languageFlag)
+                    valid = false;
+                }
+
+                if (twentyf.value === "") {
+                    showErrorMsg("twentyfErr", twentyFEmptyErrMsg, twentyFEmptyErrMsg, "twentyfErrMsg", languageFlag)
+                    valid = false;
+                } else if (regex.test(twentyf.value)) {
+                    showErrorMsg("twentyfErr", twentyFJpnCharacterErrMsg, twentyFJpnCharacterErrMsg, "twentyfErrMsg", languageFlag)
+                    valid = false;
+                } else if (!twentyf.value.match("^[0-9]*$")) {
+                    showErrorMsg("twentyfErr", twentyFNumberErrMsg, twentyFNumberErrMsg, "twentyfErrMsg", languageFlag)
+                    valid = false;
+                }
+
+                if (cut.value === "") {
+                    showErrorMsg("cutErr", cutEmptyErrMsg, cutEmptyErrMsg, "cutErrMsg", languageFlag)
+                    valid = false;
+                }
+                if (departurePort.value === "") {
+                    showErrorMsg("departurePortErr", departPortEmptyErrMsg, departPortEmptyErrMsg, "departurePortErrMsg", languageFlag)
+                    valid = false;
+                }
+
+                if (arrivalPort.value === "") {
+                    showErrorMsg("arrivalPortErr", arrivalPortEmptyErrMsg, arrivalPortEmptyErrMsg, "arrivalPortErrMsg", languageFlag)
+                    valid = false;
+                }
+
+                if (etd.value === "") {
+                    showErrorMsg("etdErr", etdDateEmptyErrMsg, etdDateEmptyErrMsg, "etdErrMsg", languageFlag)
+                    valid = false;
+                }
+
+                if (eta.value === "") {
+                    showErrorMsg("etaErr", etaDateEmptyErrMsg, etaDateEmptyErrMsg, "etaErrMsg", languageFlag)
+                    valid = false;
+                }
+
+                if (anAdvanceFee.value === "") {
+                    showErrorMsg("anAdvanceFeeErr", anAdvancedFeeEmptyErrMsg, anAdvancedFeeEmptyErrMsg, "anAdvanceFeeErrMsg", languageFlag)
+                    valid = false;
+                } else if (regex.test(anAdvanceFee.value)) {
+                    showErrorMsg("anAdvanceFeeErr", anAdvanceFeeJpnCharacterErrMsg, anAdvanceFeeJpnCharacterErrMsg, "anAdvanceFeeErrMsg", languageFlag)
+                    valid = false;
+                } else if (!anAdvanceFee.value.match("^[0-9]*$")) {
+                    showErrorMsg("anAdvanceFeeErr", anAdvanceFeeNumberErrMsg, anAdvanceFeeNumberErrMsg, "anAdvanceFeeErrMsg", languageFlag)
+                    valid = false;
+                }
+
+                if (supplierName.value === "") {
+                    showErrorMsg("supplierNameErr", supplierEmptyErrMsg, supplierEmptyErrMsg, "supplierNameErrMsg", languageFlag)
+                    valid = false;
+                }
+
+                if (representativeItem.value === "") {
+                    showErrorMsg("representativeItemErr", typeItemEmptyErrMsg, typeItemEmptyErrMsg, "representativeItemErrMsg", languageFlag)
+                    valid = false;
+                }
+
+                if (freightKg.value === "") {
+                    showErrorMsg("freightKgErr", cargoKgEmptyErrMsg, cargoKgEmptyErrMsg, "freightKgErrMsg", languageFlag)
+                    valid = false;
+                } else if (regex.test(freightKg.value)) {
+                    showErrorMsg("freightKgErr", cargoKgJpnCharacterErrMsg, cargoKgJpnCharacterErrMsg, "freightKgErrMsg", languageFlag)
+                    valid = false;
+                } else if (!freightKg.value.match("^[0-9]\\d*(\\.\\d+)?$")) {
+                    showErrorMsg("freightKgErr", cargoKgNumberErrMsg, cargoKgNumberErrMsg, "freightKgErrMsg", languageFlag)
+                    valid = false;
+                }
+
+                if (freightM3.value === "") {
+                    showErrorMsg("freightM3Err", cargoM3EmptyErrMsg, cargoM3EmptyErrMsg, "freightM3ErrMsg", languageFlag)
+                    valid = false;
+                } else if (regex.test(freightM3.value)) {
+                    showErrorMsg("freightM3Err", cargoM3JpnCharacterErrMsg, cargoM3JpnCharacterErrMsg, "freightM3ErrMsg", languageFlag)
+                    valid = false;
+                } else if (!freightM3.value.match("^[0-9]\\d*(\\.\\d+)?$")) {
+                    showErrorMsg("freightM3Err", cargoM3NumberErrMsg, cargoM3NumberErrMsg, "freightM3ErrMsg", languageFlag)
+                    valid = false;
+                }
+
+                if (ctsNumber.value === "") {
+                    showErrorMsg("ctsNumberErr", ctsNosEmptyErrMsg, ctsNosEmptyErrMsg, "ctsNumberErrMsg", languageFlag)
+                    valid = false;
+                } else if (regex.test(ctsNumber.value)) {
+                    showErrorMsg("ctsNumberErr", ctsNumberJpnCharacterErrMsg, ctsNumberJpnCharacterErrMsg, "ctsNumberErrMsg", languageFlag)
+                    valid = false;
+                } else if (!ctsNumber.value.match("^[0-9]*$")) {
+                    showErrorMsg("ctsNumberErr", ctsNumberDigitErrMsg, ctsNumberDigitErrMsg, "ctsNumberErrMsg", languageFlag)
+                    valid = false;
+                }
+                //
+                if (size.value === "") {
+                    showErrorMsg("sizeErr", sizeEmptyErrMsg, sizeEmptyErrMsg, "sizeErrMsg", languageFlag)
+                    valid = false;
+                }
+
+                if (hlBoxesNumber.value === "") {
+                    showErrorMsg("hlBoxesNumberErr", hlPackBoxEmptyErrMsg, hlPackBoxEmptyErrMsg, "hlBoxesNumberErrMsg", languageFlag)
+                    valid = false;
+                } else if (regex.test(hlBoxesNumber.value)) {
+                    showErrorMsg("hlBoxesNumberErr", hlBoxesNumberJpnCharacterErrMsg, hlBoxesNumberJpnCharacterErrMsg, "hlBoxesNumberErrMsg", languageFlag)
+                    valid = false;
+                } else if (!hlBoxesNumber.value.match("^[0-9]*$")) {
+                    showErrorMsg("hlBoxesNumberErr", hlBoxesNumberDigitErrMsg, hlBoxesNumberDigitErrMsg, "hlBoxesNumberErrMsg", languageFlag)
+                    valid = false;
+                }
+
+                if (moneyOrder.value === "") {
+                    showErrorMsg("moneyOrderErr", exchangeEmptyErrMsg, exchangeEmptyErrMsg, "moneyOrderErrMsg", languageFlag)
+                    valid = false;
+                } else if (regex.test(moneyOrder.value)) {
+                    showErrorMsg("moneyOrderErr", exchangeJpnCharacterErrMsg, exchangeJpnCharacterErrMsg, "moneyOrderErrMsg", languageFlag)
+                    valid = false;
+                } else if (!moneyOrder.value.match("^[0-9]*$")) {
+                    showErrorMsg("moneyOrderErr", exchangeNumberErrMsg, exchangeNumberErrMsg, "moneyOrderErrMsg", languageFlag)
+                    valid = false;
+                }
+
+                if (inportTaxAdvanceAmount.value === "") {
+                    showErrorMsg("inportTaxAdvanceAmountErr", advanceAmtEmptyErrMsg, advanceAmtEmptyErrMsg, "inportTaxAdvanceAmountErrMsg", languageFlag)
+                    valid = false;
+                } else if (regex.test(inportTaxAdvanceAmount.value)) {
+                    showErrorMsg("inportTaxAdvanceAmountErr", importTaxAdvanceAmountJpnCharacterErrMsg, importTaxAdvanceAmountJpnCharacterErrMsg, "inportTaxAdvanceAmountErrMsg", languageFlag)
+                    valid = false;
+                } else if (!inportTaxAdvanceAmount.value.match("^[0-9]*$")) {
+                    showErrorMsg("inportTaxAdvanceAmountErr", importTaxAdvanceAmountNumberErrMsg, importTaxAdvanceAmountNumberErrMsg, "inportTaxAdvanceAmountErrMsg", languageFlag)
+                    valid = false;
+                }
+
+                if (declarationDate.value === "") {
+                    showErrorMsg("declarationDateErr", deliveryDtEmptyErrMsg, deliveryDtEmptyErrMsg, "declarationDateErrMsg", languageFlag)
+                    valid = false;
+                }
+
+                if (inspectionDate.value === "") {
+                    showErrorMsg("inspectionDateErr", inspectionDtEmptyErrMsg, inspectionDtEmptyErrMsg, "inspectionDateErrMsg", languageFlag)
+                    valid = false;
+                }
+
+                if (deliveryDateAndTime.value === "") {
+                    showErrorMsg("deliveryDateAndTimeErr", deliveryDtEmptyErrMsg, deliveryDtEmptyErrMsg, "deliveryDateAndTimeErrMsg", languageFlag)
+                    valid = false;
+                }
+
+                if (possiblePickUpDate.value === "") {
+                    showErrorMsg("possiblePickUpDateErr", possiblePickupDtEmptyErrMsg, possiblePickupDtEmptyErrMsg, "possiblePickUpDateErrMsg", languageFlag)
+                    valid = false;
+                }
+
+                if (pickUpDate.value === "") {
+                    showErrorMsg("pickUpDateErr", pickupDtEmptyErrMsg, pickupDtEmptyErrMsg, "pickUpDateErrMsg", languageFlag)
+                    valid = false;
+                }
+
+                if (freeTime.value === "") {
+                    showErrorMsg("freeTimeErr", freeTimeEmptyErrMsg, freeTimeEmptyErrMsg, "freeTimeErrMsg", languageFlag)
+                    valid = false;
+                }
+
+                if (logisticsCost.value != "") {
+                    if (regex.test(logisticsCost.value)) {
+                        showErrorMsg("logisticsCostErr", logisticsCostJpnCharacterErrMsg, logisticsCostJpnCharacterErrMsg, "logisticsCostErrMsg", languageFlag)
+                        valid = false;
+                    } else if (!logisticsCost.value.match("^[0-9]*$")) {
+                        showErrorMsg("logisticsCostErr", logisticsCostNumberErrMsg, logisticsCostNumberErrMsg, "logisticsCostErrMsg", languageFlag)
+                        valid = false;
+                    }
+                }
+
+                if (valid == true) {
+                    let form_elem = document.getElementById('exportRegistrationForm');
+                    form_elem.submit();
+                } else if (valid == false) {
+                    window.scrollTo(0, 900);
+                }
+
+            }
+
+            function comboChangeHandler() {
+
+                let patternName = document.getElementById("patternName").value;
+                // alert(patternName);
+
+                if (patternName == '') {
+                    document.getElementById("billingMonth").value = "";
+                    document.getElementById("bookingNo").value = "";
+                    document.getElementById("poNo").value = "";
+                    document.getElementById("shippingAgency").value = "";
+                    document.getElementById("exportInport").value = "";
+                    document.getElementById("incoterms").value = "";
+                    document.getElementById("shipName").value = "";
+                    document.getElementById("voyNo").value = "";
+                    // document.getElementById("invoiceCode1").value = "";
+                    document.getElementById("packing").value = "";
+                    document.getElementById("transportMode").value = "";
+                    document.getElementById("fortyF").value = "";
+                    document.getElementById("twentyf").value = "";
+                    document.getElementById("invoicePrice").value = "";
+                    document.getElementById("blawbNo").value = "";
+                    document.getElementById("departurePort").value = "";
+                    document.getElementById("arrivalPort").value = "";
+                    document.getElementById("cut").value = "";
+                    document.getElementById("anAdvanceFee").value = "";
+                    document.getElementById("supplierName").value = "";
+                    document.getElementById("representativeItem").value = "";
+                    document.getElementById("freightKg").value = "";
+                    document.getElementById("freightM3").value = "";
+                    document.getElementById("ctsNumber").value = "";
+                    document.getElementById("size").value = "";
+                    document.getElementById("rtShip").value = "";
+                    document.getElementById("vwAir").value = "";
+                    document.getElementById("hlBoxesNumber").value = "";
+                    document.getElementById("inportTaxAdvanceAmount").value = "";
+                    document.getElementById("remarks").value = "";
+                    document.getElementById("declarationDate").value = "";
+                    document.getElementById("inspectionDate").value = "";
+                    document.getElementById("deliveryDateAndTime").value = "";
+                    document.getElementById("possiblePickUpDate").value = "";
+                    document.getElementById("pickUpDate").value = "";
+                    document.getElementById("containerNo").value = "";
+                    document.getElementById("cargoInsurance").value = "";
+                    document.getElementById("logisticsCost").value = "";
+                    document.getElementById("etd").value = "";
+                    document.getElementById("eta").value = "";
+                    document.getElementById("moneyOrder").value = "";
+                    document.getElementById("freeTime").value = "";
+
+                } else {
+
+                    $.get('/getExportData/patternName', { patternName: patternName }, function (data) {
+
+                        let patObj = data.data;
+
+                        // alert(patObj.billingMonth);
+                        if (document.getElementById('billingMonthErr').style.visibility === 'visible' &&
+                            patObj.billingMonth !== '') {
+                            document.getElementById("billingMonthErr").style.visibility = 'hidden';
+                        }
+                        document.getElementById("billingMonth").value = changeDateTime(patObj.billingMonth).toString();
+
+                        if (document.getElementById('bookingNoErr').style.visibility === 'visible' &&
+                            patObj.bookingNo !== '') {
+                            document.getElementById("bookingNoErr").style.visibility = 'hidden';
+                        }
+                        document.getElementById("bookingNo").value = patObj.bookingNo;
+
+                        if (document.getElementById('poNoErr').style.visibility === 'visible' &&
+                            patObj.poNo !== '') {
+                            document.getElementById("poNoErr").style.visibility = 'hidden';
+                        }
+                        document.getElementById("poNo").value = patObj.poNo;
+
+                        if (document.getElementById('shippingAgencyErr').style.visibility === 'visible' &&
+                            patObj.shippingAgency !== '') {
+                            document.getElementById("shippingAgencyErr").style.visibility = 'hidden';
+                        }
+                        document.getElementById("shippingAgency").value = patObj.shippingAgency;
+
+                        if (document.getElementById('exportInportErr').style.visibility === 'visible' &&
+                            patObj.exportInport !== '') {
+                            document.getElementById("exportInportErr").style.visibility = 'hidden';
+                        }
+                        document.getElementById("exportInport").value = patObj.exportInport;
+
+                        if (document.getElementById('incotermsErr').style.visibility === 'visible' &&
+                            patObj.incoterms !== '') {
+                            document.getElementById("incotermsErr").style.visibility = 'hidden';
+                        }
+                        document.getElementById("incoterms").value = patObj.incoterms;
+
+                        if (document.getElementById('shipNameErr').style.visibility === 'visible' &&
+                            patObj.shipName !== '') {
+                            document.getElementById("shipNameErr").style.visibility = 'hidden';
+                        }
+                        document.getElementById("shipName").value = patObj.shipName;
+
+                        if (document.getElementById('voyNoErr').style.visibility === 'visible' &&
+                            patObj.voyNo !== '') {
+                            document.getElementById("voyNoErr").style.visibility = 'hidden';
+                        }
+                        document.getElementById("voyNo").value = patObj.voyNo;
+
+                        if (document.getElementById('invoiceCodeErr').style.visibility === 'visible' &&
+                            patObj.invoiceCode !== '') {
+                            document.getElementById("invoiceCodeErr").style.visibility = 'hidden';
+                        }
+
+                        if (document.getElementById('packingErr').style.visibility === 'visible' &&
+                            patObj.packing !== '') {
+                            document.getElementById("packingErr").style.visibility = 'hidden';
+                        }
+                        document.getElementById("packing").value = patObj.packing;
+
+                        if (document.getElementById('transportModeErr').style.visibility === 'visible' &&
+                            patObj.transportMode !== '') {
+                            document.getElementById("transportModeErr").style.visibility = 'hidden';
+                        }
+                        document.getElementById("transportMode").value = patObj.transportMode;
+
+                        if (document.getElementById('fortyFErr').style.visibility === 'visible' &&
+                            patObj.fortyF !== '') {
+                            document.getElementById("fortyFErr").style.visibility = 'hidden';
+                        }
+                        document.getElementById("fortyF").value = patObj.fourtyf;
+
+                        if (document.getElementById('twentyfErr').style.visibility === 'visible' &&
+                            patObj.twentyf !== '') {
+                            document.getElementById("twentyfErr").style.visibility = 'hidden';
+                        }
+                        document.getElementById("twentyf").value = patObj.twentyf;
+
+                        if (document.getElementById('invoicePriceErr').style.visibility === 'visible' &&
+                            patObj.invoicePrice !== '') {
+                            document.getElementById("invoicePriceErr").style.visibility = 'hidden';
+                        }
+                        document.getElementById("invoicePrice").value = patObj.invoicePrice;
+
+                        if (document.getElementById('blawbNoErr').style.visibility === 'visible' &&
+                            patObj.blawbNo !== '') {
+                            document.getElementById("blawbNoErr").style.visibility = 'hidden';
+                        }
+                        document.getElementById("blawbNo").value = patObj.blawbNo;
+
+                        if (document.getElementById('departurePortErr').style.visibility === 'visible' &&
+                            patObj.departurePort !== '') {
+                            document.getElementById("departurePortErr").style.visibility = 'hidden';
+                        }
+                        document.getElementById("departurePort").value = patObj.departurePort;
+
+                        if (document.getElementById('arrivalPortErr').style.visibility === 'visible' &&
+                            patObj.arrivalPort !== '') {
+                            document.getElementById("arrivalPortErr").style.visibility = 'hidden';
+                        }
+                        document.getElementById("arrivalPort").value = patObj.arrivalPort;
+
+                        // if (document.getElementById('cutErr').style.visibility === 'visible' &&
+                        //     patObj.cut !== '') {
+                        //     document.getElementById("cutErr").style.visibility = 'hidden';
+                        // }
+                        // document.getElementById("cut").value = patObj.cut;
+                        if (document.getElementById('cutErr').style.visibility === 'visible' &&
+                            patObj.cut !== '') {
+                            document.getElementById("cutErr").style.visibility = 'hidden';
+                        }
+                        document.getElementById("cut").value = changeDateTime(patObj.cut).toString();
+
+                        if (document.getElementById('anAdvanceFeeErr').style.visibility === 'visible' &&
+                            patObj.anAdvanceFee !== '') {
+                            document.getElementById("anAdvanceFeeErr").style.visibility = 'hidden';
+                        }
+                        document.getElementById("anAdvanceFee").value = patObj.anAdvanceFee;
+
+                        if (document.getElementById('supplierNameErr').style.visibility === 'visible' &&
+                            patObj.supplierName !== '') {
+                            document.getElementById("supplierNameErr").style.visibility = 'hidden';
+                        }
+                        document.getElementById("supplierName").value = patObj.supplierName;
+
+                        if (document.getElementById('representativeItemErr').style.visibility === 'visible' &&
+                            patObj.representativeItem !== '') {
+                            document.getElementById("representativeItemErr").style.visibility = 'hidden';
+                        }
+                        document.getElementById("representativeItem").value = patObj.representativeItem;
+
+                        if (document.getElementById('freightKgErr').style.visibility === 'visible' &&
+                            patObj.freightKg !== '') {
+                            document.getElementById("freightKgErr").style.visibility = 'hidden';
+                        }
+                        document.getElementById("freightKg").value = patObj.freightKg;
+
+                        if (document.getElementById('freightM3Err').style.visibility === 'visible' &&
+                            patObj.freightM3 !== '') {
+                            document.getElementById("freightM3Err").style.visibility = 'hidden';
+                        }
+                        document.getElementById("freightM3").value = patObj.freightM3;
+
+                        if (document.getElementById('ctsNumberErr').style.visibility === 'visible' &&
+                            patObj.ctsNumber !== '') {
+                            document.getElementById("ctsNumberErr").style.visibility = 'hidden';
+                        }
+                        document.getElementById("ctsNumber").value = patObj.ctsNumber;
+
+                        if (document.getElementById('sizeErr').style.visibility === 'visible' &&
+                            patObj.size !== '') {
+                            document.getElementById("sizeErr").style.visibility = 'hidden';
+                        }
+                        document.getElementById("size").value = patObj.size;
+                        document.getElementById("rtShip").value = patObj.rtShip;
+                        document.getElementById("vwAir").value = patObj.vwAir;
+
+                        if (document.getElementById('hlBoxesNumberErr').style.visibility === 'visible' &&
+                            patObj.hlBoxesNumber !== '') {
+                            document.getElementById("hlBoxesNumberErr").style.visibility = 'hidden';
+                        }
+                        document.getElementById("hlBoxesNumber").value = patObj.hlBoxesNumber;
+
+                        if (document.getElementById('inportTaxAdvanceAmountErr').style.visibility === 'visible' &&
+                            patObj.inportTaxAdvanceAmount !== '') {
+                            document.getElementById("inportTaxAdvanceAmountErr").style.visibility = 'hidden';
+                        }
+                        document.getElementById("inportTaxAdvanceAmount").value = patObj.inportTaxAdvanceAmount;
+
+
+                        document.getElementById("remarks").value = patObj.remarks;
+
+                        if (document.getElementById('declarationDateErr').style.visibility === 'visible' &&
+                            patObj.declarationDate !== '') {
+                            document.getElementById("declarationDateErr").style.visibility = 'hidden';
+                        }
+                        document.getElementById("declarationDate").value = changeDateTime(patObj.declarationDate);
+
+                        if (document.getElementById('inspectionDateErr').style.visibility === 'visible' &&
+                            patObj.inspectionDate !== '') {
+                            document.getElementById("inspectionDateErr").style.visibility = 'hidden';
+                        }
+                        document.getElementById("inspectionDate").value = changeDateTime(patObj.inspectionDate);
+
+                        if (document.getElementById('deliveryDateAndTimeErr').style.visibility === 'visible' &&
+                            patObj.deliveryDateAndTime !== '') {
+                            document.getElementById("deliveryDateAndTimeErr").style.visibility = 'hidden';
+                        }
+                        document.getElementById("deliveryDateAndTime").value = changeDateTime(patObj.deliveryDateAndTime);
+
+                        if (document.getElementById('possiblePickUpDateErr').style.visibility === 'visible' &&
+                            patObj.possiblePickUpDate !== '') {
+                            document.getElementById("possiblePickUpDateErr").style.visibility = 'hidden';
+                        }
+                        document.getElementById("possiblePickUpDate").value = changeDateTime(patObj.possiblePickUpDate);
+
+                        if (document.getElementById('pickUpDateErr').style.visibility === 'visible' &&
+                            patObj.pickUpDate !== '') {
+                            document.getElementById("pickUpDateErr").style.visibility = 'hidden';
+                        }
+                        document.getElementById("pickUpDate").value = changeDateTime(patObj.pickUpDate);
+
+                        if (document.getElementById('freeTimeErr').style.visibility === 'visible' &&
+                            patObj.freeTime !== '') {
+                            document.getElementById("freeTimeErr").style.visibility = 'hidden';
+                        }
+                        document.getElementById("freeTime").value = changeDateTime(patObj.freeTime);
+
+                        document.getElementById("containerNo").value = patObj.containerNo;
+                        document.getElementById("cargoInsurance").value = patObj.cargoInsurance;
+                        // document.getElementById("logisticsCost").value = patObj.logisticsCost;
+                        // if (document.getElementById('containerNoErr').style.visibility == 'visible' &&
+                        //     patObj.containerNo != '') {
+                        //     document.getElementById("containerNoErr").style.visibility = 'hidden' ;
+                        // }
+                        // document.getElementById("containerNo").value = patObj.containerNo;
+                        //
+                        // if (document.getElementById('cargoInsuranceErr').style.visibility == 'visible' &&
+                        //     patObj.cargoInsurance != '') {
+                        //     document.getElementById("cargoInsuranceErr").style.visibility = 'hidden' ;
+                        // }
+                        // document.getElementById("cargoInsurance").value = patObj.cargoInsurance;
+                        //
+                        if (document.getElementById('logisticsCostErr').style.visibility == 'visible' &&
+                            patObj.logisticsCost != '') {
+                            document.getElementById("logisticsCostErr").style.visibility = 'hidden';
+                        }
+                        document.getElementById("logisticsCost").value = patObj.logisticsCost;
+
+                        if (document.getElementById('etdErr').style.visibility === 'visible' &&
+                            patObj.etd !== '') {
+                            document.getElementById("etdErr").style.visibility = 'hidden';
+                        }
+                        document.getElementById("etd").value = changeDateTime(patObj.etd);
+
+                        if (document.getElementById('etaErr').style.visibility === 'visible' &&
+                            patObj.eta !== '') {
+                            document.getElementById("etaErr").style.visibility = 'hidden';
+                        }
+                        document.getElementById("eta").value = changeDateTime(patObj.eta);
+
+                        if (document.getElementById('moneyOrderErr').style.visibility === 'visible' &&
+                            patObj.moneyOrder !== '') {
+                            document.getElementById("moneyOrderErr").style.visibility = 'hidden';
+                        }
+                        document.getElementById("moneyOrder").value = patObj.moneyOrder;
+                        //alert(changeDateTime(patObj.billingMonth))
+                    });
+                }
+            }
+
+
+        </script>
+        <script src="../js/App.js"></script>
+        <script>
+            function openCalander(a) {
+                let date = a;
+                const myDatePicker = MCDatepicker.create({
+                    el: date,
+                    closeOnBlur: true,
+                    dateFormat: 'YYYY/MM/DD',
+                    bodyType: 'inline',
+                    theme: {
+                        display: {
+                            foreground: 'rgba(255, 255, 255, 0.8)',
+                            background: '#18477E'
+                        },
+                        main_background: '#fff',
+                        weekday: {
+                            foreground: '#18477E'
+                        },
+                        date: {
+                            active: {
+                                picked: {
+                                    background: '#18477E'
+                                }
+                            }
+                        },
+                        button: {
+                            success: {
+                                foreground: '#18477E'
+                            }
+                        },
+                    },
+                });
+
+                myDatePicker.open();
+                // alert('hello');
+            }
+
+            function selectMonth(a) {
+                let date = a;
+                const myDatePicker = MCDatepicker.create({
+                    el: date,
+                    closeOnBlur: true,
+                    dateFormat: 'YYYY/MM',
+                    bodyType: 'inline',
+                    theme: {
+                        display: {
+                            foreground: 'rgba(255, 255, 255, 0.8)',
+                            background: '#18477E'
+                        },
+                        main_background: '#fff',
+                        weekday: {
+                            foreground: '#18477E'
+                        },
+                        date: {
+                            active: {
+                                picked: {
+                                    background: '#18477E'
+                                }
+                            }
+                        },
+                        button: {
+                            success: {
+                                foreground: '#18477E'
+                            }
+                        },
+                    },
+                });
+
+                myDatePicker.open();
+                // alert('hello');
+            }
+
+            function changeDateTime(timestamp) {
+                let jsDate = new Date(timestamp);
+                let jsMonth = jsDate.getMonth() + 1;
+                return jsDate.getFullYear() + '/' + jsMonth + '/' + jsDate.getDate()
+            }
+
+        </script>
+    </body>
+</div>
+
+</html>

@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="#{schedule}"></title>
+    <link href="https://unpkg.com/bootstrap-table@1.19.1/dist/bootstrap-table.min.css" rel="stylesheet">
+<!--    <link href="https://unpkg.com/bootstrap-table@1.19.1/dist/extensions/sticky-header/bootstrap-table-sticky-header.css" rel="stylesheet">-->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/scheduleOne.css">
+    <link rel="stylesheet" href="../css/magnific-popup.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/mc-datepicker/dist/mc-calendar.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+<!--    <script src="extensions/sticky-header/bootstrap-table-sticky-header.js"></script>-->
+    <script src="https://unpkg.com/bootstrap-table@1.19.1/dist/bootstrap-table.min.js"></script>
+<!--    <script src="https://unpkg.com/bootstrap-table@1.19.1/dist/extensions/sticky-header/bootstrap-table-sticky-header.min.js"></script>-->
+    <script th:if="${languageOption} == 0" src="../js/calendarJp.js"></script>
+    <script th:if="${languageOption} == 1" src="../js/calendarEn.js"></script>    <script src="../js/common.js"></script>
+    <script src="../js/moment.js"></script>
+    <script src="../js/jquery.magnific-popup.js"></script>
+    <script src="../js/jquery.magnific-popup.min.js"></script>
+    <script src="../js/sockjs.min.js"></script>
+    <script src="../js/stomp.min.js"></script>
+<!--    <script src="../js/parseCSV.js"></script>-->
+
+</head>
+<style>
+    .header-sticky{
+        position:sticky;
+        top:0;
+        background-color:white;
+        z-index: 5;
+    }
+
+    .column-sticky{
+        position:sticky;
+        left:0;
+        background-color:white !important;
+        z-index:2;
+    }
+    <!--.table-bordered>:not(caption)>* {-->
+        <!--    border-width: 2px !important;-->
+        <!--}-->
+
+</style>
+<body>
+<th:block :: header th:include="@{/menu.html}"></th:block>
+<div class="box box-4 container mt-2">
+    <div class="box-content" style="padding-top:5px; padding-bottom:13px" >
+        <h2 th:text="#{schedule}"></h2>
+        <form th:action="@{/searchScheduleWithInputField}" method="POST" id="sub">
+
+            <div class="row max-width ">
+                <div class="col-xl-6 col-lg-12 col-sm-12 col-12 " >
+                    <div class="row max-width margin-xs">
+                        <label class="col-xl-4 col-lg-2 col-sm-4 col-4 label text-info text-end mt-2 font24 " th:text="#{lblDateFilter}+':'"></label>
+                        <div class="form__group field col-xl-8 col-lg-8 col-sm-8 col-8">
+                            <div class="row">
+                                <div class=" col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12">
+                                    <input th:value="${startDate}" type="text" class="form__field dateInput font24 " style="width:60%;" placeholder="From" name="startDate" id='startDate' required onfocus="openCalander('#startDate','endDateErr')" autocomplete="off" readonly/>
+                                </div>
+                                <div class=" col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12">
+                                    <input th:value="${endDate}" type="input" class="form__field dateInput font24" style="width:60%;" placeholder="To" name="endDate" id='endDate' required onfocus="openCalander('#endDate','endDateErr')" autocomplete="off" readonly/>
+                                    <div class="w-100 form__group field" id="endDateErr"  style="display: none;">
+                                        <label id="endDateErrMsg" class="w-100 col-xl-4 col-lg-2 col-sm-4 col-4 label text-danger text-start mt-2 font24 ">Date Filter :</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form__group field col-4" style="display: none">
+                            <input type="input" class="form__field" placeholder="To" name="date_num" id='date_count' />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-6 col-lg-12 col-sm-12 col-12 margin-top">
+                    <div class="row max-width">
+                        <label class="col-xl-4 col-lg-2 col-sm-4 col-4 label text-info text-end mt-2 font24  " th:text="#{lblDeclarationDt}+':'"></label>
+                        <div class="form__group field col-xl-8 col-lg-8 col-sm-8 col-8 ">
+                            <div class="row">
+                                <div class=" col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12">
+                                    <input th:value="${declarationStartDate}" type="input" class="form__field dateInput font24" style="width:60%;" placeholder="From" name="declarationStartDate" id="declarationStartDate" required onfocus="openCalander('#declarationStartDate','declarationEndDateErr')" autocomplete="off" readonly />
+                                </div>
+                                <div class=" col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12">
+                                    <input th:value="${declarationEndDate}" type="input" class="form__field dateInput font24" style="width:60%;" placeholder="To" name="declarationEndDate" id="declarationEndDate" required onfocus="openCalander('#declarationEndDate','declarationEndDateErr')" autocomplete="off" readonly  />
+                                    <div class="w-100 form__group field " id="declarationEndDateErr" style="display: none;">
+                                        <label id="declarationEndDateErrMsg" class="w-100 col-xl-4 col-lg-2 col-sm-4 col-4 label text-danger text-start mt-2 font24 ">Date Filter :</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+<!--            second line-->
+            <div class="row mt-2 max-width">
+                <div class="col-xl-6 col-lg-12 col-sm-12 col-12 margin-top">
+                    <div class="row max-width">
+                        <label class="col-xl-4 col-lg-2 col-sm-4 col-4 label text-info text-end mt-2 font24  " th:text="#{lblInspectionDt}+':'"></label>
+                        <div class="form__group field col-xl-8 col-lg-8 col-sm-8 col-8 ">
+                            <div class="row">
+                                <div class=" col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12">
+                                    <input th:value="${inspectionStartDate}" type="input" class="form__field dateInput font24" style="width:60%;" placeholder="From" name="inspectionStartDate" id="inspectionStartDate" required onfocus="openCalander('#inspectionStartDate','inspectionEndDateErr')" autocomplete="off" readonly   />
+                                </div>
+                                <div class=" col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12">
+                                    <input th:value="${inspectionEndDate}" type="input" class="form__field dateInput font24" style="width:60%;" placeholder="To" name="inspectionEndDate" id="inspectionEndDate" required onfocus="openCalander('#inspectionEndDate','inspectionEndDateErr')" autocomplete="off" readonly  />
+                                    <div class="w-100 form__group field " id="inspectionEndDateErr" style="display: none;">
+                                        <label id="inspectionEndDateErrMsg" class="w-100 col-xl-4 col-lg-2 col-sm-4 col-4 label text-danger text-start mt-2 font24 ">Date Filter :</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-6 col-lg-12 col-sm-12 col-12 margin-top">
+                    <div class="row max-width">
+                        <label class="col-xl-4 col-lg-2 col-sm-4 col-4 label text-info text-end mt-2 font24  " th:text="#{lblDeliveryDt}+':'"></label>
+                        <div class="form__group field col-xl-8 col-lg-8 col-sm-8 col-8 ">
+                            <div class="row">
+                                <div class=" col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12">
+                                    <input th:value="${deliveryStartDate}" type="input" class="form__field dateInput font24" style="width:60%;" placeholder="From" name="deliveryStartDate" id="deliveryStartDate" required onfocus="openCalander('#deliveryStartDate','deliveryEndDateErr')" autocomplete="off" readonly   />
+                                </div>
+                                <div class=" col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12">
+                                    <input th:value="${deliveryEndDate}" type="input" class="form__field dateInput font24" style="width:60%;" placeholder="To" name="deliveryEndDate" id="deliveryEndDate" required onfocus="openCalander('#deliveryEndDate','deliveryEndDateErr')" autocomplete="off" readonly   />
+                                    <div class="w-100 form__group field" id="deliveryEndDateErr" style="display: none;">
+                                        <label id="deliveryEndDateErrMsg" class="w-100 col-xl-4 col-lg-2 col-sm-4 col-4 label text-danger text-start mt-2 font24 ">Date Filter :</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+<!--            next line -->
+            <div class="row mt-2 max-width">
+                <div class="col-xl-6 col-lg-12 col-sm-12 col-12 margin-top">
+                    <div class="row max-width">
+                        <label class="col-xl-4 col-lg-2 col-sm-4 col-4 label text-info text-end mt-2 font24  " th:text="#{lblPossiblePickupDate}+':'"></label>
+                        <div class="form__group field col-xl-8 col-lg-8 col-sm-8 col-8 ">
+                            <div class="row">
+                                <div class=" col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12">
+                                    <input th:value="${possiblePickUpStartDate}" type="input" class="form__field dateInput font24" style="width:60%;" placeholder="From" name="possiblePickUpStartDate" id="possiblePickUpStartDate" required onfocus="openCalander('#possiblePickUpStartDate','possiblePickUpEndDateErr')" autocomplete="off" readonly   />
+                                </div>
+                                <div class=" col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12">
+                                    <input th:value="${possiblePickUpEndDate}" type="input" class="form__field dateInput font24" style="width:60%;" placeholder="To" name="possiblePickUpEndDate" id="possiblePickUpEndDate" required onfocus="openCalander('#possiblePickUpEndDate','possiblePickUpEndDateErr')" autocomplete="off" readonly  />
+                                    <div class="w-100 form__group field " id="possiblePickUpEndDateErr" style="display: none;">
+                                        <label id="possiblePickUpEndDateErrMsg" class="w-100 col-xl-4 col-lg-2 col-sm-4 col-4 label text-danger text-start mt-2 font24 ">Date Filter :</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="col-xl-6 col-lg-12 col-sm-12 col-12 margin-top ">
+                    <div class="row max-width">
+                        <label class="col-xl-4 col-lg-2 col-sm-4 col-4 label text-info text-end mt-2 font24  " th:text="#{lblPickupDate}+':'"></label>
+                        <div class="form__group field col-xl-8 col-lg-8 col-sm-8 col-8 ">
+                            <div class="row">
+                                <div class=" col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12">
+                                    <input th:value="${pickUpStartDate}" type="input" class="form__field dateInput font24" style="width:60%;" placeholder="From" name="pickUpStartDate" id="pickUpStartDate" required onfocus="openCalander('#pickUpStartDate','pickUpEndDateErr')" autocomplete="off" readonly   />
+                                </div>
+                                <div class=" col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12">
+                                    <input th:value="${pickUpEndDate}" type="input" class="form__field dateInput font24" style="width:60%;" placeholder="To" name="pickUpEndDate"  id="pickUpEndDate" required onfocus="openCalander('#pickUpEndDate','pickUpEndDateErr')" autocomplete="off" readonly  />
+                                    <div class="w-100 form__group field" id="pickUpEndDateErr" style="display: none;">
+                                        <label id="pickUpEndDateErrMsg" class="w-100 col-xl-4 col-lg-2 col-sm-4 col-4 label text-danger text-start mt-2 font24 ">Date Filter :</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+<!--            next line-->
+            <div class="row mt-2 max-width">
+                <div class="col-xl-6 col-lg-12 col-sm-12 col-12 margin-top">
+                    <div class="row max-width">
+                        <label class="col-xl-4 col-lg-2 col-sm-4 col-4 label text-info text-end mt-2 font24  " th:text="#{lblFreeTime}+':'"></label>
+                        <div class="form__group field col-xl-8 col-lg-8 col-sm-8 col-8 ">
+                            <div class="row">
+                                <div class=" col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12">
+                                    <input th:value="${freeTimeStartDate}" type="input" class="form__field dateInput font24" style="width:60%;" placeholder="From" name="freeTimeStartDate" id="freeTimeStartDate" required onfocus="openCalander('#freeTimeStartDate','freeTimeEndDateErr')" autocomplete="off" readonly />
+                                </div>
+                                <div class=" col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12">
+                                    <input th:value="${freeTimeEndDate}" type="input" class="form__field dateInput font24" style="width:60%;" placeholder="To" name="freeTimeEndDate" id="freeTimeEndDate" required onfocus="openCalander('#freeTimeEndDate','freeTimeEndDateErr')" autocomplete="off" readonly />
+                                    <div class="w-100 form__group field" id="freeTimeEndDateErr" style="display: none;">
+                                        <label id="freeTimeEndDateErrMsg" class="w-100 col-xl-4 col-lg-2 col-sm-4 col-4 label text-danger text-start mt-2 font24 ">Date Filter :</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-6 col-lg-12 col-sm-12 col-12 margin-top ">
+                    <div class="row margin-top" style="">
+                        <label class="col-xl-4 col-lg-2 col-sm-4 col-4 label text-info text-end mt-2 font24 " th:text="#{lblArrivalPort}+':'"></label>
+                        <div class="form__group field col-xl-4 col-lg-6 col-sm-6 col-6" >
+                            <select class="form-select" name="arrivalPort" aria-label="Default select example"
+                                    id="arrivalPort">
+                                <option value=""></option>
+                                <option th:each="port : ${portList}"
+                                        th:text="${port.portName}"
+                                        th:value="${port.portCode}">
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+<!--            next line-->
+            <div class="row mt-2 max-width">
+                <div class="col-xl-6 col-lg-12 col-sm-12 col-12 margin-top">
+                    <div class="row margin-top" style="">
+                        <label class="col-xl-4 col-lg-2 col-sm-4 col-4 label text-info text-end mt-2 font24  " th:text="#{lblDeparturePort}+':'"></label>
+                        <div class="form__group field col-xl-4 col-lg-6 col-sm-6 col-6" >
+                            <select class="form-select" name="departurePort" aria-label="Default select example"
+                                    id="departurePort">
+                                <option value=""></option>
+                                <option th:each="port : ${portList}"
+                                        th:text="${port.portName}"
+                                        th:value="${port.portCode}">
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+
+        <div class="row mt-2 justify-content-end  ">
+            <button type="button" onclick="search()"   class="btn btn-secondary font24  col-2 mt-3 btn-xs" th:text="#{btnSearch}"></button>
+            <button type="button" onclick="clearSearchInputFields()" class="btn btn-secondary font24 col-2 mt-3 btn-xs" th:text="#{btnClear}"></button>
+        </div>
+    </div>
+</div>
+
+
+
+<!--popup for edit-->
+
+
+<!--table-->
+<div th:if="${#lists.size(allProducts)} > 0" class="container mt-5 ms-0 me-0 mb-5 font24">
+    <div class="box-content ps-0 pe-0"  >
+        <form class="searchMessage" id="searchForm" method="GET" th:action="@{/searchMessage}">
+        <div class="row mb-2 justify-content-between ">
+            <div class="col-xl-6 col-lg-6 col-sm-6 col-9" >
+                <div class="row">
+                    <div class="col-4">
+                        <input type="input" class="form__field font24 w-100 " id="invoice-code-input" name="searchInvoiceCode" placeholder="Invoice Code">
+                    </div>
+                    <div class="col-4">
+                        <input type="input" class="form__field font24 w-100" name="searchMessageKey" placeholder="Keyword ">
+                    </div>
+                    <div class="col-4">
+                        <button class="btn btn-secondary font24 col-7 btn-xs"　  type="button" onclick="submitForm()" th:text="#{btnSearch}"></button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <label class="text-danger" id="invoice-error-msg" style="display: none"></label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 text-end">
+                <button type="button" class="btn btn-secondary font24  col-2 btn-xs " onclick="downloadCSV('scheduleCsvOutput')">CSV</button>
+            </div>
+        </div>
+        <div class="row">
+                <div class="col text-end px-5">
+                    <a  onclick="" href="/scheduleMonthChange/previous" style="text-decoration: none;margin-right:10px;">≪前月</a>
+                    <a  onclick="" href="/scheduleMonthChange/next" style="text-decoration: none">翌月≫</a>
+                </div>
+        </div>
+        </form>
+        <div style="height:400px; overflow: scroll;">
+            <table id="table_size" class="table table-fixed  table-bordered  table-responsive"  data-sticky-header="true">
+                <thead>
+                <tr class="header header-sticky">
+                    <th scope="col" th:text="#{invoiceCode}" style=" position:sticky; left:-1px;background-color:white;vertical-align: middle;" >INV No
+                        <a onclick="myFunction('myDropdown0')" th:attr="class=${(searchColumn == 'INV No') ? 'dropbtnGreen' : 'dropbtn '}"><i class="fa fa-filter" id="icon0" aria-hidden="true"></i></a>
+                        <div id="myDropdown0" class="dropdown-content dropDown">
+                            <input type="text" placeholder="Search.." id="myInput" class="myInput w-100" onkeyup="filterFunction('myDropdown0','myInput')">
+                            <a th:href="@{/scheduleOne}" >Select All</a>
+                            <a th:each="allProducesInvoiceCode,stat: ${allProducesInvoiceCode}" th:text="${allProducesInvoiceCode.invoiceCode}" th:href="@{/scheduleOneSearch/{id}-{searchType}(id=${allProducesInvoiceCode.invoiceCode},searchType='INVOICECODE')}" >About</a>
+                        </div>
+                    </th>
+
+                    <th  th:each="columnarrayList,stat: ${columnarrayList}"  style="vertical-align: middle;">
+                        <span th:text="${columnarrayList}"></span>
+                        <a  th:onclick="'javascript:myFunction(\'myDropdown' + ${stat.count} + '\');'"  th:attr="class=${(columnarrayList == searchColumn) ? 'dropbtnGreen' : 'dropbtn '}"><i class="fa fa-filter" th:id="icon + ${stat.count}" aria-hidden="true"></I></a>
+                        <div th:id="myDropdown + ${stat.count} " class="dropdown-content dropDown" >
+                            <input type="text" placeholder="Search.." th:id="myInput + ${stat.count}" class="myInput w-100"  th:onkeyup="|filterFunction('myDropdown${stat.count}', 'myInput${stat.count}')|">
+                            <a th:href="@{/scheduleOne}" >Select All</a>
+                            <a th:if="${columnarrayList} == ${columnNames.customerName}" th:each="allProducesInvoiceCode,stat: ${customerName}" th:text="${allProducesInvoiceCode[0]}"  th:href="@{/scheduleOneSearch/{id}-{searchType}(id=${allProducesInvoiceCode[1]},searchType='CUSTOMER')}" ></a>
+                            <a th:if="${columnarrayList} == ${columnNames.patternName}" th:each="allProducesInvoiceCode,stat: ${patternName}" th:text="${allProducesInvoiceCode}"  th:href="@{/scheduleOneSearch/{id}-{searchType}(id=${allProducesInvoiceCode},searchType='PATTERN')}" ></a>
+                            <a th:if="${columnarrayList} == ${columnNames.billingMonth}" th:each="allProducesInvoiceCode,stat: ${billingMonth}" th:text="${#dates.format(allProducesInvoiceCode,'yyyy/MM')}"  th:href="@{/scheduleOneSearch/{id}-{searchType}(id=${allProducesInvoiceCode},searchType='BILLING')}" ></a>
+                            <a th:if="${columnarrayList} == ${columnNames.bookingNo}" th:each="allProducesInvoiceCode,stat: ${bookingNo}" th:text="${allProducesInvoiceCode}"  th:href="@{/scheduleOneSearch/{id}-{searchType}(id=${allProducesInvoiceCode},searchType='BOOKING')}" ></a>
+                            <a th:if="${columnarrayList} == ${columnNames.poNO}" th:each="allProducesInvoiceCode,stat: ${poNO}" th:text="${allProducesInvoiceCode}"  th:href="@{/scheduleOneSearch/{id}-{searchType}(id=${allProducesInvoiceCode},searchType='PONO')}" ></a>
+                            <a th:if="${columnarrayList} == ${columnNames.shippingAgency}" th:each="allProducesInvoiceCode,stat: ${shippingAgency}" th:text="${allProducesInvoiceCode}"  th:href="@{/scheduleOneSearch/{id}-{searchType}(id=${allProducesInvoiceCode},searchType='SHIPPING')}" ></a>
+                            <a th:if="${columnarrayList} == ${columnNames.exportInport}" th:each="allProducesInvoiceCode,stat: ${exportInport}" th:text="${allProducesInvoiceCode.type}"  th:href="@{/scheduleOneSearch/{id}-{searchType}(id=${allProducesInvoiceCode.name},searchType='EXPORTINPORT')}" ></a>
+                            <a th:if="${columnarrayList} == ${columnNames.incoterms}" th:each="allProducesInvoiceCode,stat: ${incoterms}" th:text="${allProducesInvoiceCode}"  th:href="@{/scheduleOneSearch/{id}-{searchType}(id=${allProducesInvoiceCode},searchType='INCOTERMS')}" ></a>
+                            <a th:if="${columnarrayList} == ${columnNames.shipName}" th:each="allProducesInvoiceCode,stat: ${shipName}" th:text="${allProducesInvoiceCode}"  th:href="@{/scheduleOneSearch/{id}-{searchType}(id=${allProducesInvoiceCode},searchType='SHIPNAME')}" ></a>
+                            <a th:if="${columnarrayList} == ${columnNames.voyNo}" th:each="allProducesInvoiceCode,stat: ${voyNo}" th:text="${allProducesInvoiceCode}"  th:href="@{/scheduleOneSearch/{id}-{searchType}(id=${allProducesInvoiceCode},searchType='VOY')}" ></a>
+
+<!--                            <a th:if="${columnarrayList} == 'インボイス No'" th:each="allProducesInvoiceCode,stat: ${allProducesInvoiceCode}" th:text="${allProducesInvoiceCode.invoiceCode}"  th:href="@{/scheduleOneSearch/{id}-{searchType}(id=${allProducesInvoiceCode.invoiceCode},searchType='INVOICECODE')}" ></a>-->
+                            <a th:if="${columnarrayList} == ${columnNames.packing}" th:each="allProducesInvoiceCode,stat: ${packing}" th:text="${allProducesInvoiceCode}"  th:href="@{/scheduleOneSearch/{id}-{searchType}(id=${allProducesInvoiceCode},searchType='PACKING')}"></a>
+                            <a th:if="${columnarrayList} == ${columnNames.transportMode}" th:each="allProducesInvoiceCode,stat: ${transportMode}" th:text="${allProducesInvoiceCode.type}"  th:href="@{/scheduleOneSearch/{id}-{searchType}(id=${allProducesInvoiceCode.name},searchType='TRANSPORTMODE')}"></a>
+                            <a th:if="${columnarrayList} == ${columnNames.fourtyf}" th:each="allProducesInvoiceCode,stat: ${fourtyf}" th:text="${allProducesInvoiceCode}"  th:href="@{/scheduleOneSearch/{id}-{searchType}(id=${allProducesInvoiceCode},searchType='FOURTY')}"></a>
+                            <a th:if="${columnarrayList} == ${columnNames.twentyf}" th:each="allProducesInvoiceCode,stat: ${twentyf}" th:text="${allProducesInvoiceCode}"  th:href="@{/scheduleOneSearch/{id}-{searchType}(id=${allProducesInvoiceCode},searchType='TWENTY')}"></a>
+                            <a th:if="${columnarrayList} == ${columnNames.invoicePrice}" th:each="allProducesInvoiceCode,stat: ${invoicePrice}" th:text="${allProducesInvoiceCode}"  th:href="@{/scheduleOneSearch/{id}-{searchType}(id=${allProducesInvoiceCode},searchType='INVOICEPRICE')}" ></a>
+                            <a th:if="${columnarrayList} == ${columnNames.blawbNo}" th:each="allProducesInvoiceCode,stat: ${blawbNo}" th:text="${allProducesInvoiceCode}"  th:href="@{/scheduleOneSearch/{id}-{searchType}(id=${allProducesInvoiceCode},searchType='BLAWB')}" ></a>
+                            <a th:if="${columnarrayList} == ${columnNames.departurePort}" th:each="allProducesInvoiceCode,stat: ${departurePort}" th:text="${allProducesInvoiceCode[0]}"  th:href="@{/scheduleOneSearch/{id}-{searchType}(id=${allProducesInvoiceCode[1]},searchType='DEPARTURE')}" ></a>
+                            <a th:if="${columnarrayList} == ${columnNames.arrivalPort}" th:each="allProducesInvoiceCode,stat: ${arrivalPort}" th:text="${allProducesInvoiceCode[0]}"  th:href="@{/scheduleOneSearch/{id}-{searchType}(id=${allProducesInvoiceCode[1]},searchType='ARRIVAL')}" ></a>
+                            <a th:if="${columnarrayList} == ${columnNames.cut}" th:each="allProducesInvoiceCode,stat: ${cut}" th:text="${allProducesInvoiceCode}"  th:href="@{/scheduleOneSearch/{id}-{searchType}(id=${allProducesInvoiceCode},searchType='CUT')}" ></a>
+
+                            <a th:if="${columnarrayList} == ${columnNames.etd}" th:each="allProducesInvoiceCode,stat: ${etd}" th:text="${#dates.format(allProducesInvoiceCode,'yyyy/MM/dd')}"  th:href="@{/scheduleOneSearch/{id}-{searchType}(id=${allProducesInvoiceCode},searchType='ETD')}" ></a>
+                            <a th:if="${columnarrayList} == ${columnNames.eta}" th:each="allProducesInvoiceCode,stat: ${eta}" th:text="${#dates.format(allProducesInvoiceCode,'yyyy/MM/dd')}"  th:href="@{/scheduleOneSearch/{id}-{searchType}(id=${allProducesInvoiceCode},searchType='ETA')}" ></a>
+                            <a th:if="${columnarrayList} == ${columnNames.anAdvanceFee}" th:each="allProducesInvoiceCode,stat: ${anAdvanceFee}" th:text="${allProducesInvoiceCode}"  th:href="@{/scheduleOneSearch/{id}-{searchType}(id=${allProducesInvoiceCode},searchType='ADVANCEFEE')}" ></a>
+                            <a th:if="${columnarrayList} == ${columnNames.supplierName}" th:each="allProducesInvoiceCode,stat: ${supplierName}" th:text="${allProducesInvoiceCode}"  th:href="@{/scheduleOneSearch/{id}-{searchType}(id=${allProducesInvoiceCode},searchType='SUPPLIERNAME')}" ></a>
+                            <a th:if="${columnarrayList} == ${columnNames.representativeItem}" th:each="allProducesInvoiceCode,stat: ${representativeItem}" th:text="${allProducesInvoiceCode}"  th:href="@{/scheduleOneSearch/{id}-{searchType}(id=${allProducesInvoiceCode},searchType='REPRESENTATIVE')}" ></a>
+                            <a th:if="${columnarrayList} == ${columnNames.freightKg}" th:each="allProducesInvoiceCode,stat: ${freightKg}" th:text="${allProducesInvoiceCode}"  th:href="@{/scheduleOneSearch/{id}-{searchType}(id=${allProducesInvoiceCode},searchType='KG')}" ></a>
+                            <a th:if="${columnarrayList} == ${columnNames.freightM3}" th:each="allProducesInvoiceCode,stat: ${freightM3}" th:text="${allProducesInvoiceCode}"  th:href="@{/scheduleOneSearch/{id}-{searchType}(id=${allProducesInvoiceCode},searchType='M3')}" ></a>
+                            <a th:if="${columnarrayList} == ${columnNames.ctsNumber}" th:each="allProducesInvoiceCode,stat: ${ctsNumber}" th:text="${allProducesInvoiceCode}"  th:href="@{/scheduleOneSearch/{id}-{searchType}(id=${allProducesInvoiceCode},searchType='CTS')}" ></a>
+                            <a th:if="${columnarrayList} == ${columnNames.size}" th:each="allProducesInvoiceCode,stat: ${size}" th:text="${allProducesInvoiceCode}"  th:href="@{/scheduleOneSearch/{id}-{searchType}(id=${allProducesInvoiceCode},searchType='SIZE')}" ></a>
+                            <a th:if="${columnarrayList} == ${columnNames.rtShip}" th:each="allProducesInvoiceCode,stat: ${rtShip}" th:text="${allProducesInvoiceCode}"  th:href="@{/scheduleOneSearch/{id}-{searchType}(id=${allProducesInvoiceCode},searchType='RTSHIP')}" ></a>
+
+                            <a th:if="${columnarrayList} == ${columnNames.vwAir}" th:each="allProducesInvoiceCode,stat: ${vwAir}" th:text="${allProducesInvoiceCode}"  th:href="@{/scheduleOneSearch/{id}-{searchType}(id=${allProducesInvoiceCode},searchType='VW')}" ></a>
+                            <a th:if="${columnarrayList} == ${columnNames.hlBoxesNumber}" th:each="allProducesInvoiceCode,stat: ${hlBoxesNumber}" th:text="${allProducesInvoiceCode}"  th:href="@{/scheduleOneSearch/{id}-{searchType}(id=${allProducesInvoiceCode},searchType='HLBOX')}" ></a>
+                            <a th:if="${columnarrayList} == ${columnNames.moneyOrder}" th:each="allProducesInvoiceCode,stat: ${moneyOrder}" th:text="${allProducesInvoiceCode}"  th:href="@{/scheduleOneSearch/{id}-{searchType}(id=${allProducesInvoiceCode},searchType='MONEYORDER')}" ></a>
+                            <a th:if="${columnarrayList} == ${columnNames.inportTaxAdvanceAmount}" th:each="allProducesInvoiceCode,stat: ${inportTaxAdvanceAmount}" th:text="${allProducesInvoiceCode}"  th:href="@{/scheduleOneSearch/{id}-{searchType}(id=${allProducesInvoiceCode},searchType='INPORTTAX')}" ></a>
+                            <a th:if="${columnarrayList} == ${columnNames.remarks}" th:each="allProducesInvoiceCode,stat: ${remarks}" th:text="${allProducesInvoiceCode}"  th:href="@{/scheduleOneSearch/{id}-{searchType}(id=${allProducesInvoiceCode},searchType='REMARKS')}" ></a>
+                            <a th:if="${columnarrayList} == ${columnNames.declarationDate}" th:each="allProducesInvoiceCode,stat: ${declarationDate}" th:text="${#dates.format(allProducesInvoiceCode,'yyyy/MM/dd')}"  th:href="@{/scheduleOneSearch/{id}-{searchType}(id=${allProducesInvoiceCode},searchType='DECLARATION')}" ></a>
+                            <a th:if="${columnarrayList} == ${columnNames.inspectionDate}" th:each="allProducesInvoiceCode,stat: ${inspectionDate}" th:text="${#dates.format(allProducesInvoiceCode,'yyyy/MM/dd')}"  th:href="@{/scheduleOneSearch/{id}-{searchType}(id=${allProducesInvoiceCode},searchType='INSPECTION')}" ></a>
+                            <a th:if="${columnarrayList} == ${columnNames.deliveryDateAndTime}" th:each="allProducesInvoiceCode,stat: ${deliveryDateAndTime}" th:text="${#dates.format(allProducesInvoiceCode,'yyyy/MM/dd')}"  th:href="@{/scheduleOneSearch/{id}-{searchType}(id=${allProducesInvoiceCode},searchType='DELIVERY')}" ></a>
+                            <a th:if="${columnarrayList} == ${columnNames.possiblePickUpDate}" th:each="allProducesInvoiceCode,stat: ${possiblePickUpDate}" th:text="${#dates.format(allProducesInvoiceCode,'yyyy/MM/dd')}"  th:href="@{/scheduleOneSearch/{id}-{searchType}(id=${allProducesInvoiceCode},searchType='POSSIBLE')}" ></a>
+                            <a th:if="${columnarrayList} == ${columnNames.pickUpDate}" th:each="allProducesInvoiceCode,stat: ${pickUpDate}" th:text="${#dates.format(allProducesInvoiceCode,'yyyy/MM/dd')}"  th:href="@{/scheduleOneSearch/{id}-{searchType}(id=${allProducesInvoiceCode},searchType='PICKUP')}" ></a>
+                            <a th:if="${columnarrayList} == ${columnNames.containerNo}" th:each="allProducesInvoiceCode,stat: ${containerNo}" th:text="${allProducesInvoiceCode}"  th:href="@{/scheduleOneSearch/{id}-{searchType}(id=${allProducesInvoiceCode},searchType='CONTAINER')}" ></a>
+                            <a th:if="${columnarrayList} == ${columnNames.cargoInsurance}" th:each="allProducesInvoiceCode,stat: ${cargoInsurance}" th:text="${allProducesInvoiceCode}"  th:href="@{/scheduleOneSearch/{id}-{searchType}(id=${allProducesInvoiceCode},searchType='INSURANCE')}" ></a>
+                            <a th:if="${columnarrayList} == ${columnNames.logisticsCost}" th:each="allProducesInvoiceCode,stat: ${logisticsCost}" th:text="${allProducesInvoiceCode}"  th:href="@{/scheduleOneSearch/{id}-{searchType}(id=${allProducesInvoiceCode},searchType='LOGISTIC')}" ></a>
+                            <a th:if="${columnarrayList} == ${columnNames.freeTime}" th:each="allProducesInvoiceCode,stat: ${freeTime}" th:text="${#dates.format(allProducesInvoiceCode,'yyyy/MM/dd')}   "  th:href="@{/scheduleOneSearch/{id}-{searchType}(id=${allProducesInvoiceCode},searchType='FREETIME')}" ></a>
+                        </div>
+                    </th>
+                    <th th:text="#{chat}" style="vertical-align: middle;">チャット</th >
+                    <th style="width:61px; text-align:center;vertical-align: middle;" th:each="dateList,stat: ${dateList}" >
+                        <span style="cursor:pointer;" class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" th:data-bs-title="${#dates.format(dateList,'yyyy/MM/dd')}" th:text="${#dates.format(dateList,'MM/dd')}"  ></span>
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="allProducts,stat: ${allProducts}" >
+<!--                    <td th:text="${allProducts.invoiceCode}" href="#test-popup" class="open-popup-link table_row" scope="row" style=" position:sticky; left:-1px;background-color:white;"></td>-->
+                    <td style="background-color: #e8e7e7" class="table_row  column-sticky"><a th:text="${allProducts.invoiceCode}"  type="button" class="btn btn-outline-white invoice-link  " scope="row" style="background-color: #e8e7e7 !important;border-radius: 7px;width:100%;"  th:href="@{/scheduletwo/{id}(id=${allProducts.invoiceCode})}" ></a></td>
+
+                    <td th:if="${allProducts.customerName } != null"  th:text="${allProducts.customerName}" ></td>
+                    <td th:if="${allProducts.patternName } != null"  th:text="${allProducts.patternName}" ></td>
+                    <td th:if="${showBillingMonthFlag } != 0"  th:text="${#dates.format(allProducts.billingMonth,'yyyy/MM')}" ></td>
+                    <td th:if="${allProducts.bookingNo } != null"  th:text="${allProducts.bookingNo}" ></td>
+                    <td th:if="${allProducts.poNO } != null"  th:text="${allProducts.poNO}" ></td>
+                    <td th:if="${allProducts.shippingAgency } != null"  th:text="${allProducts.shippingAgency}" ></td>
+                    <td th:if="${allProducts.exportInport } != null"  th:text="${allProducts.exportInport}" ></td>
+                    <td th:if="${allProducts.incoterms } != null"  th:text="${allProducts.incoterms}" ></td>
+                    <td th:if="${allProducts.shipName } != null"  th:text="${allProducts.shipName}" ></td>
+                    <td th:if="${allProducts.voyNo } != null"  th:text="${allProducts.voyNo}" ></td>
+<!--                    <td th:if="${allProducts.invoiceCode } != null"  th:text="${allProducts.invoiceCode}" ></td>-->
+                    <td th:if="${allProducts.packing } != null"  th:text="${allProducts.packing}" ></td>
+                    <td th:if="${allProducts.transportMode } != null"  th:text="${allProducts.transportMode}" ></td>
+                    <td th:if="${allProducts.fourtyf } != null"  th:text="${allProducts.fourtyf}" ></td>
+                    <td th:if="${allProducts.twentyf } != null"  th:text="${allProducts.twentyf}" ></td>
+                    <td th:if="${allProducts.invoicePrice } != null"  th:text="${allProducts.invoicePrice}" ></td>
+                    <td th:if="${allProducts.blawbNo } != null"  th:text="${allProducts.blawbNo}" ></td>
+                    <td th:if="${allProducts.departurePort } != null"  th:text="${allProducts.departurePort}" ></td>
+                    <td th:if="${allProducts.arrivalPort } != null"  th:text="${allProducts.arrivalPort}" ></td>
+<!--                    <td th:if="${allProducts.cut } != null"  th:text="${allProducts.cut}" ></td>-->
+                    <td th:if="${showCutFlag } != 0"  th:text="${#dates.format(allProducts.cut,'yyyy/MM/dd')}" ></td>
+
+                    <td th:if="${showEtdFlag } != 0"  th:text="${#dates.format(allProducts.etd,'yyyy/MM/dd')}" ></td>
+                    <td th:if="${showEtaFlag } != 0"   th:text="${#dates.format(allProducts.eta,'yyyy/MM/dd')}" ></td>
+                    <td th:if="${allProducts.anAdvanceFee } != null"  th:text="${allProducts.anAdvanceFee}" ></td>
+                    <td th:if="${allProducts.supplierName } != null"  th:text="${allProducts.supplierName}" ></td>
+                    <td th:if="${allProducts.representativeItem } != null"  th:text="${allProducts.representativeItem}" ></td>
+                    <td th:if="${allProducts.freightKg } != null"  th:text="${allProducts.freightKg}" ></td>
+                    <td th:if="${allProducts.freightM3 } != null"  th:text="${allProducts.freightM3}" ></td>
+                    <td th:if="${allProducts.ctsNumber } != null"  th:text="${allProducts.ctsNumber}" ></td>
+                    <td th:if="${allProducts.size } != null"  th:text="${allProducts.size}" ></td>
+                    <td th:if="${allProducts.rtShip } != null"  th:text="${allProducts.rtShip}" ></td>
+
+                    <td th:if="${allProducts.vwAir } != null"  th:text="${allProducts.vwAir}" ></td>
+                    <td th:if="${allProducts.hlBoxesNumber } != null"  th:text="${allProducts.hlBoxesNumber}" ></td>
+                    <td th:if="${allProducts.moneyOrder } != null"  th:text="${allProducts.moneyOrder}" ></td>
+                    <td th:if="${allProducts.inportTaxAdvanceAmount } != null"  th:text="${allProducts.inportTaxAdvanceAmount}" ></td>
+                    <td th:if="${allProducts.remarks } != null"  th:text="${allProducts.remarks}" ></td>
+                    <td th:if="${showDeclarationDateFlag } != 0"  th:text="${#dates.format(allProducts.declarationDate,'yyyy/MM/dd')}" ></td>
+                    <td th:if="${showInspectionDateFlag } != 0"  th:text="${#dates.format(allProducts.inspectionDate,'yyyy/MM/dd')}" ></td>
+                    <td th:if="${showDeliveryDateFlag } != 0"  th:text="${#dates.format(allProducts.deliveryDateAndTime,'yyyy/MM/dd')}" ></td>
+                    <td th:if="${showpossiblePickUpDateFlag } != 0"  th:text="${#dates.format(allProducts.possiblePickUpDate,'yyyy/MM/dd')}" ></td>
+                    <td th:if="${showPickUpDateFlag } != 0"  th:text="${#dates.format(allProducts.pickUpDate,'yyyy/MM/dd')}" ></td>
+
+                    <td th:if="${allProducts.containerNo } != null"  th:text="${allProducts.containerNo}" ></td>
+                    <td th:if="${allProducts.cargoInsurance } != null"  th:text="${allProducts.cargoInsurance}" ></td>
+                    <td th:if="${allProducts.logisticsCost } != null"  th:text="${allProducts.logisticsCost}" ></td>
+                    <td th:if="${showFreeTimeFlag } != 0"  th:text="${#dates.format(allProducts.freeTime,'yyyy/MM/dd')}" ></td>
+
+                    <td th:if="${#lists.contains(chatInvoiceList, allProducts.invoiceCode)}" th:id="'readStatus-'+${allProducts.invoiceCode}"  style="text-align:center; background-color:#07c14e;color:white;" ><a  th:id="'invoice-'+${allProducts.invoiceCode}" th:href="@{/scheduletwo/{id}(id=${allProducts.invoiceCode})}" type="button" class="btn btn-outline-white approve chat " th:text="#{read}" style="border-radius:10px; height:35px;">既読</a></td>
+                    <td th:if="${!#lists.contains(chatInvoiceList, allProducts.invoiceCode)}" th:id="'readStatus-'+${allProducts.invoiceCode}"  style="text-align:center; background-color:#5db4ff;color:white;" ><a  th:id="'invoice-'+${allProducts.invoiceCode}" th:href="@{/scheduletwo/{id}(id=${allProducts.invoiceCode})}" type="button" class="btn btn-outline-white approve chat " th:text="#{noChat}" style="border-radius:10px; height:35px;">無い</a></td>
+
+
+                    <td th:each="dateList,stat: ${dateList}" style="">
+                        <div th:if="${(#dates.format(allProducts.declarationDate,'MM/dd') == #dates.format(dateList,'MM/dd'))}"  th:attr="class=${(!allProducts.scheduledatesupdatestatus) && (!allProducts.declarationDateUpdateStatus)  ? 'schedule-date declaration warningSign ' : 'schedule-date declaration '}" >申告</div>
+                        <div th:if="${(#dates.format(allProducts.inspectionDate,'MM/dd') == #dates.format(dateList,'MM/dd'))}"  th:attr="class=${(!allProducts.scheduledatesupdatestatus ) && (!allProducts.inspectiondateupdatestatus)  ? 'schedule-date inspection warningSign' : 'schedule-date inspection '}"  >検査</div>
+                        <div th:if="${(#dates.format(allProducts.deliveryDateAndTime,'MM/dd') == #dates.format(dateList,'MM/dd'))}"  th:attr="class=${(!allProducts.scheduledatesupdatestatus) && (!allProducts.deliverydateupdatestatus)  ? 'schedule-date delivery warningSign' : 'schedule-date delivery '}"  >配送</div>
+                        <div th:if="${(#dates.format(allProducts.possiblePickUpDate,'MM/dd') == #dates.format(dateList,'MM/dd'))}"  th:attr="class=${(!allProducts.scheduledatesupdatestatus) && (!allProducts.possiblepickupdateupdatestatus)  ? 'schedule-date possible-pickup warningSign' : 'schedule-date possible-pickup '}"  >引取</div>
+                        <div th:if="${(#dates.format(allProducts.pickUpDate,'MM/dd') == #dates.format(dateList,'MM/dd'))}"  th:attr="class=${(!allProducts.scheduledatesupdatestatus) && (!allProducts.pickupdateupdatestatus)  ? 'schedule-date pickup warningSign' : 'schedule-date pickup '}"  >集荷</div>
+                        <div th:if="${(#dates.format(allProducts.freeTime,'MM/dd') == #dates.format(dateList,'MM/dd'))}"  th:attr="class=${(!allProducts.scheduledatesupdatestatus) && (!allProducts.freedateupdatestatus)  ? 'schedule-date freeTime warningSign' : 'schedule-date freeTime '}" >自由</div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div th:if="${#lists.size(allProducts)} == 0" class="box box-4 container mt-5 ms-0 me-0 mb-5 font24">
+    <div class="box-content ps-0 pe-0 text-center"  >
+        <h3>設定したスケジュールがありません。</h3>
+    </div>
+</div>
+
+<input hidden th:value="${companyCode}" id="companyCode">
+<input hidden th:value="${loginUserCode}" id="loginUserCode">
+
+
+<script>
+
+    var searchType = "[[${searchType}]]"
+    selectSearchType(searchType);
+
+    function submitForm(){
+        let flag = false
+        let code = document.getElementById('invoice-code-input').value;
+        let errormsg = document.getElementById('invoice-error-msg')
+        if(code == ''){
+            // show null errmsg
+            errormsg.innerHTML = "invoice code を入力してください"
+            errormsg.style.display = ""
+        }else{
+            var slides = document.getElementsByClassName("invoice-link");
+            for (var i = 0; i < slides.length; i++) {
+                if(code == slides.item(i).innerHTML){
+                    flag = true
+                }
+            }
+            if(flag){
+                document.getElementById("searchForm").submit();
+            }else{
+                // show no invoie code errmsg
+                errormsg.innerHTML = "invoice code が間違っています。"
+                errormsg.style.display = ""
+            }
+        }
+
+
+    }
+
+    function myFunction(dropdownId) {
+        var slides = document.getElementsByClassName("dropDown");
+        for (var i = 0; i < slides.length; i++) {
+            if(slides.item(i).id != dropdownId){
+                slides.item(i).style.display = "none"
+            }
+        }
+        var element = document.getElementById(dropdownId)
+
+        if(element.style.display == "none"){
+            element.style.display = "block"
+        }else{
+            element.style.display = "none"
+        }
+    }
+
+    function filterFunction(dropdownId,inputId) {
+        var input, filter, ul, li, a, i;
+        input = document.getElementById(inputId);
+        filter = input.value.toUpperCase();
+        div = document.getElementById(dropdownId);
+        a = div.getElementsByTagName("a");
+        for (i = 0; i < a.length; i++) {
+            txtValue = a[i].textContent || a[i].innerText;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                a[i].style.display = "";
+            } else {
+                a[i].style.display = "none";
+            }
+        }
+    }
+
+    $('.open-popup-link').magnificPopup({
+        type:'inline',
+        midClick: true // Allow opening popup on middle mouse click. Always set it to true if you don't provide alternative source in href.
+    });
+
+
+    window.onload = function() {
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+        document.getElementById("scheduleMenu").classList.add("active");
+        var userControlFlag = "[[${userControlFlag.scheduleFlag}]]";
+        if(userControlFlag == '2'){
+            $("input").prop("disabled", true);
+            $("select").prop("disabled", true);
+            $("button").prop("disabled", true);
+            $(".dropbtn").css('pointer-events','none');
+            $(".chat").css('pointer-events','none');
+            $(".invoice-link").css('pointer-events','none');
+            $(".csv-btn").css('pointer-events','none');
+        }
+        let arrivalPortCode = "[[${arrivalPortCode}]]"
+        let departurePortCode = "[[${departurePortCode}]]"
+        selectComboBox("#arrivalPort",arrivalPortCode)
+        selectComboBox("#departurePort",departurePortCode)
+
+    };
+    function selectComboBox(id,value){
+        Array.from(document.querySelector(id).options).forEach(function(option_element) {
+            if(option_element.value == value){
+                option_element.selected = true;
+            }
+        });
+    }
+    function search(){
+        let date1 = document.getElementById('startDate').value;
+        let date2 = document.getElementById('endDate').value;
+        let a = moment(date1,'YYYY/MM/DD');
+        let b = moment(date2,'YYYY/MM/DD');
+        let diffDays = b.diff(a, 'days');
+        document.getElementById('date_count').value = diffDays
+
+        let checkDateFilter = checkDateError("startDate","endDate")
+        let checkDeclarationDate = checkDateError("declarationStartDate","declarationEndDate")
+        let checkDelivaryDate = checkDateError("deliveryStartDate","deliveryEndDate")
+        let checkInspectionDate = checkDateError("inspectionStartDate","inspectionEndDate")
+        let checkPossiblePickUpDate = checkDateError("possiblePickUpStartDate","possiblePickUpEndDate")
+        let checkPickUpDate = checkDateError("pickUpStartDate","pickUpEndDate")
+        let checkFreeTimeDate = checkDateError("freeTimeStartDate","freeTimeEndDate")
+
+        if(checkDateFilter && checkDeclarationDate &&checkDelivaryDate &&checkInspectionDate &&checkPossiblePickUpDate &&checkPickUpDate &&checkFreeTimeDate ){
+            document.getElementById('sub').submit();
+        }
+    }
+
+    var noEndDateErrMsg = "no end date"
+    var noStartDateErrMsg = "no start date"
+    var invalidEndDateErrMsg = "end date is larger than start date"
+    if("[[${languageOption}]]" == 0){
+         noEndDateErrMsg = "終了日がありません。"
+         noStartDateErrMsg = "開始日がありません。"
+         invalidEndDateErrMsg = "終了日が開始日よりも後です"
+    }
+
+    function checkDateError(startId,endId){
+
+        let startDate = document.getElementById(startId).value;
+        let endDate = document.getElementById(endId).value;
+        let errorMsg = document.getElementById(endId+"ErrMsg")
+        let errorMsgElement = document.getElementById(endId+"Err")
+
+        let checkFlag = true
+
+        if(startDate && !endDate){
+            checkFlag = false
+            errorMsg.textContent = noEndDateErrMsg
+        }else if(!startDate && endDate){
+            checkFlag = false
+            errorMsg.textContent = noStartDateErrMsg
+        }else if(startDate && endDate){
+            let s = moment(startDate,'YYYY/MM/DD');
+            let e = moment(endDate,'YYYY/MM/DD');
+            if(!e.isSameOrAfter(s)){
+                checkFlag = false
+                errorMsg.textContent = invalidEndDateErrMsg
+            }
+        }
+        if(!checkFlag){
+            errorMsgElement.style.display = ""
+        }
+        return checkFlag
+    }
+
+    function openCalander(a,errorMsgElementId){
+        var date = a;
+        const myDatePicker = MCDatepicker.create({
+            el: date,
+            closeOnBlur: true,
+            dateFormat: 'YYYY/MM/DD',
+            bodyType: 'inline',
+            theme: {
+                display: {
+                    foreground: 'rgba(255, 255, 255, 0.8)',
+                    background: '#18477E'
+                },
+                main_background: '#fff',
+                weekday:{
+                    foreground:'#18477E'
+                },
+                date:{
+                    active:{
+                        picked:{
+                            background:'#18477E'
+                        }
+                    }
+                },
+                button:{
+                    success:{
+                        foreground:'#18477E'
+                    }
+                },
+            },
+        });
+        myDatePicker.onOpen(()=>{
+            document.getElementById(errorMsgElementId).style.display = "none";
+        })
+        myDatePicker.open();
+
+    }
+
+    function csvoutput(){
+        // $.post("/scheduleCsvOutput")
+        document.getElementById("scheduleCsvForm")
+    }
+
+    function clearSearchInputFields(){
+        $('.form__field').each(function() {
+            $(this).val('');
+        });
+        let slides = document.getElementsByClassName("form-select");
+        for (let i = 0; i < slides.length; i++) {
+            slides.item(i).selectedIndex = "0";
+        }
+        let errorMsg = document.getElementsByClassName("errorMsg");
+        for (let j = 0; j < errorMsg.length; j++) {
+            errorMsg.item(j).style.display = "none";
+        }
+    }
+    function downloadCSV(url){
+        const tag = document.createElement("a");
+        tag.href = url;
+        tag.click();
+    }
+</script>
+</body>
+<script src="../js/listenRes.js"></script>
+
+<script>
+
+    const warningSigns = document.querySelectorAll('.warningSign');
+
+    // Loop through each warning sign
+    warningSigns.forEach(sign => {
+        // Create a new div element
+        const newDiv = document.createElement('div');
+        // Set the div's text content to "Warning!"
+        newDiv.textContent = '!';
+        // Add a class to the div
+        newDiv.classList.add('bg-danger');
+        newDiv.classList.add('mt-1');
+        newDiv.classList.add('text-center');
+
+        // Append the div to the parent element
+        sign.parentNode.appendChild(newDiv);
+    });
+</script>
+
+</html>

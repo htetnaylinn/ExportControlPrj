@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="#{lblCountryMasterTitle}"></title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/countryMaster.css">
+    <link href='https://fonts.googleapis.com/css?family=Anton' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Neucha' rel='stylesheet' type='text/css'>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/magnific-popup.css">
+    <link rel="stylesheet" href="../css/iziToast.min.css">
+    <link href="../css/pagination.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+            crossorigin="anonymous"></script>
+    <script src="../js/common.js"></script>
+    <script src="../js/ajaxMessage/passwordChangeErrorMessages.js"></script>
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js" type="text/javascript"></script>
+    <script src="https://cdn.datatables.net/fixedcolumns/4.0.2/js/dataTables.fixedColumns.min.js"></script>
+    <script src="../js/jquery.magnific-popup.js"></script>
+    <script src="../js/jquery.magnific-popup.min.js"></script>
+    <script src="../js/iziToast.min.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+</head>
+<body>
+
+<!--navigation-->
+<th:block :: header th:include="@{/menu.html}"></th:block>
+
+<!--商品マスタ-->
+<div class="box box-4 container mt-5">
+    <div class="box-content">
+        <h2 th:text="#{lblCountryMasterTitle}"></h2>
+
+        <form class="generalForm" th:action="@{/searchCountryMaster}" method="GET" novalidate>
+            <div class="row mt-5">
+                <div class="col-xl-6 col-lg-6 col-sm-6 col-12">
+                    <div class="row">
+                        <label class="col-3 label text-info text-center mt-2 "
+                               th:text="#{lblCountryName} + ':'"></label>
+                        <div class="col-9">
+                            <select class="form-select" aria-label="Default select example" name="countryName"
+                                    id='countryName'>
+                                <option th:text="${CountryName}" th:value="${CountryName}" id="selectedValueId">
+                                <option th:each="CountryNameList :${CountryNameList}"
+                                        th:text="${CountryNameList.countryName}"
+                                        th:value="${CountryNameList.countryName}">
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="row mt-5 justify-content-end ">
+                <button type="submit" class="btn btn-secondary btn-xs  col-2 mt-3"
+                        style="width:102px;margin-right:30px;" th:text="#{btnSearch}">
+                </button>
+                <a type="button" class="btn btn-secondary btn-xs  col-2 mt-3" style="width:102px;"
+                   th:href="@{/newCountryMaster}" th:text="#{btnNewReg}"></a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<div id="test-popup" class="box box-4 container mt-5 info-popup-width mfp-hide info-popup-position "
+     style="position:fixed;top:50%;left:50%;transform: translate(-50%, -50%);z-index:100;">
+    <div class="box-content">
+        <h2 th:text="#{lblCountryUpdate}"></h2>
+
+        <form id='countryForm' th:action="@{/updateCountryMaster}" method="POST">
+            <div class="row mt-5">
+                <div class="col-12">
+                    <div class="row">
+                        <label class="col-6 label text-info text-center mt-2 "
+                               th:text="#{lblCountryCode} + ':'"></label>
+                        <div class="form__group field col-6">
+                            <input type="input" class="form__field w-100" name="countryCode" id='country_code' required
+                                   readonly/>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="row">
+                        <label class="col-6 label text-info text-center mt-2 "
+                               th:text="#{lblCountryName}  + ':'"></label>
+                        <div class="form__group field col-6">
+                            <input autocomplete="false" type="input" class="form__field w-100" name="countryName"
+                                   id='country_name' maxlength="250" oninput="inputChange('countryNameErr')"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-1 margin-xs">
+                <div class="col-12" id="countryNameErr" style="visibility:hidden">
+                    <div class="row">
+                        <label class="col-6 label text-info text-center mt-2 "></label>
+                        <div class="form__group field col-6">
+                            <span id="countryNameErrMsg" style="color:red;"></span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="row mt-5 justify-content ">
+                <button type="button" onclick="updateCountry()" class="btn btn-secondary  col-2 mt-3"
+                        style="width:102px;" th:text="#{btnUpdate}"></button>
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!--table-->
+
+<div class="box box-4 container mt-5 ms-0 me-0 mb-5 wrap">
+    <div class="box-content ps-0 pe-0">
+        <div style="overflow: scroll;">
+            <table id="tableId" class="table table-striped table-bordered text-center table-width">
+                <thead>
+                <tr>
+                    <th scope="col">No</th>
+                    <th scope="col" th:text="#{lblCountryCode}"></th>
+                    <th scope="col" th:text="#{lblCountryName}"></th>
+                    <th scope="col">-</th>
+                    <th scope="col">-</th>
+
+
+                </tr>
+                </thead>
+                <tbody>
+                <tr class="align-middle" th:each="CountryList,stat: ${CountryList}">
+                    <td class="text-center" id="no" th:text="${stat.count}"></td>
+                    <td class="text-center" th:text="${CountryList.countryCode}"></td>
+                    <td class="text-center" th:text="${CountryList.countryName}"></td>
+                    <td>
+                        <button href="#test-popup"
+                                th:onclick="show([[${CountryList.countryCode}]],[[${CountryList.countryName}]]);"
+                                type="button" class="open-popup-link btn btn-outline-primary btn-sm"
+                                style="border-radius:10px; width:65px;height:35px;" th:text="#{btnEdit}">
+                        </button>
+                    </td>
+
+                    <td>
+                        <button  th:href="'#confirm-popup-'+${stat.count}"  type="button" class="open-popup-link btn btn-outline-danger btn-sm" style="border-radius:10px; width:65px;height:35px" th:text="#{btnDelete}"></button>
+                        <div th:id="'confirm-popup-'+${stat.count}" class="box box-4 container mt-5 delete-popup-width mfp-hide " style="position:fixed;top:43%;left:50%;transform: translate(-50%, -50%);z-index:100;">
+                            <div class="box-content">
+                                <div class="row">
+                                    <h5 class="text-center" th:text="#{msgDeleteMessage}">削除しますか ❔</h5>
+                                </div>
+                                <div class="row justify-content-center mt-4">
+                                    <a class="btn btn-outline-danger "
+                                       style="border-radius:10px; width:65px;height:35px;padding-left: 0;padding-right: 0;"
+                                       th:href="@{/deleteCountryMaster/{countryCode}(countryCode=${CountryList.countryCode})}"
+                                       th:text="#{btnDelete}">
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                    </td>
+
+
+                </tr>
+
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script>
+
+    var selectNo = -1;
+    test("#countryName", "[[${CountryNames}]]", selectNo, "#selectedValueId", "countryName");
+
+    var languageFlag = "[[${languageOption}]]";
+    loadErrorMessage();
+
+    function updateCountry() {
+        let temp5 = "[[${countryNameDeleteFlag0}]]";
+        let temp6 = temp5.substring(1, temp5.length - 1);
+        let countryNameDeleteFlag0 = temp6.split(',');
+        let valid = true;
+        let countryName = document.getElementById('country_name');
+        if(countryName.innerHTML == ''){
+            showErrorMsg("countryNameErr","国名を入力してください。","Please enter the country name .","countryNameErrMsg",languageFlag)
+            valid=false;
+        }
+        for (i = 0; i < countryNameDeleteFlag0.length; i++) {
+
+            if (countryName.value == countryNameDeleteFlag0[i].trim()) {
+                showErrorMsg("countryNameErr", countryNameAlreadyExistErrMsg, countryNameAlreadyExistErrMsg, "countryNameErrMsg", languageFlag);
+                valid = false;
+                break;
+            }
+        }
+
+        if (valid === true) {
+            let form_elem = document.getElementById('countryForm');
+            form_elem.submit();
+        } else if (valid === false) {
+            window.scrollTo(0, 0);
+        }
+    }
+
+    window.onload = function () {
+        document.getElementById("navbarDropdownMenuLink").classList.add("active");
+    };
+
+    function show(countryCode, countryName) {
+
+        document.getElementById("country_code").value = countryCode;
+        document.getElementById("country_name").value = countryName;
+        document.getElementById("countryNameErr").style.visibility = 'hidden';
+    }
+
+    $('.open-popup-link').magnificPopup({
+        type: 'inline',
+        midClick: true // Allow opening popup on middle mouse click. Always set it to true if you don't provide alternative source in href.
+    });
+
+
+    $(document).ready(function () {
+
+        let systemErrMsg = "[[${systemErrorMsg}]]"
+        if (systemErrMsg) {
+            showSystemError(systemErrMsg);
+        }
+
+        var table = $('#tableId').DataTable({
+            searching: false,
+            ordering: false,
+            "lengthChange": false,
+            dom: '<"clear">lfrtp',
+            pagingType: "simple_numbers",
+            pageLength: 10,
+            scrollX: true,
+            language: {
+                "zeroRecords": " ",
+                'paginate': {
+                    'previous': '<span class="prev-icon"><i class="fa fa-backward" aria-hidden="true"></i></span>',
+                    'next': '<span class="next-icon"><i class="fa fa-forward" aria-hidden="true"></i></span>'
+                }
+            }
+
+        });
+    });
+
+
+</script>
+</body>
+</html>

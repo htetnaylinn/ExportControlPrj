@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+  <link rel="stylesheet" href="../css/iziToast.min.css">
+  <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+  <script src="../js/sockjs.min.js"></script>
+  <script src="../js/stomp.min.js"></script>
+  <script src="../js/iziToast.min.js"></script>
+  <script>
+    setInterval(function() {
+      $.ajax({
+        url: "/check-session",
+        method: "GET",
+        contentType: 'application/json; charset=utf-8',
+        success: function(data){
+          console.log("OK")
+        },
+        error: function (data) {
+          window.location.replace("/login");
+        }
+      })
+    }, 1000);
+
+  </script>
+  <style>
+    .pad{
+    padding-left:3px !important;
+    padding-right:10px !important;
+}
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-light  addednav drown sticky-top " style="z-index:1000;" >
+  <div class="container-fluid">
+    <div  id="com_name" class="company_name_style">
+      <label th:if="${languageOption == 0}"  class="my-3 mx-3"   th:text="${loginCompany.companyNameJPN ne null} ? ${loginCompany.companyNameJPN} : '(no content)'"></label>
+      <label th:if="${languageOption == 1}"  class="my-3 mx-3"   th:text="${loginCompany.companyNameENG ne null} ? ${loginCompany.companyNameENG} : '(no content)'"></label>
+    </div>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse justify-content-end" id="navbarNavDropdown">
+      <ul class="navbar-nav " >
+        <li class="nav-item">
+          <a class="nav-link pad  " th:if="${userControlFlag.exportRegistrationFlg} != 3" id="exportMenu" aria-current="page" href="/exportRegistration" th:text="#{exportRegistration}"></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link pad  " id="newRegistration" aria-current="page" href="/newRegistration" th:text="#{patternRegistration}">パターン登録</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link pad  " id="mailCheck" aria-current="page" href="/mailCheck" th:text="#{mailCheck}">パターン登録</a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link pad" th:if="${userControlFlag.scheduleFlag} != 3" id="scheduleMenu" href="/scheduleOne">
+            <span th:text="#{schedule}"></span>
+            <i id ="notificationCircle" class="fa fa-circle text-white" aria-hidden="true"></i>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link pad " id="passwordChange" aria-current="page" href="/passwordChange" th:text="#{changePassword}">パスワード</a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle pad" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false" th:text="#{master}">
+
+          </a>
+          <ul class="dropdown-menu pt-0 pb-0" aria-labelledby="navbarDropdownMenuLink">
+            <li th:if="${userControlFlag.userFlag} != 3" class="w-100"><a style="border-radius:0;" class="dropdown-item" href="/userMaster" th:text="#{userMaster}"></a></li>
+            <li th:if="${userControlFlag.productFlag} != 3" class="w-100"><a style="border-radius:0;" class="dropdown-item" href="/productMaster" th:text="#{productMaster}"></a></li>
+            <li th:if="${userControlFlag.companyFlag} != 3" class="w-100"><a style="border-radius:0;" class="dropdown-item" href="/companyMaster" th:text="#{companyMaster}"></a></li>
+            <li class="w-100"><a style="border-radius:0;" class="dropdown-item" href="/portMaster" th:text="#{portMaster}"></a></li>
+            <li th:if="${userControlFlag.groupFlag} != 3" class="w-100"><a style="border-radius:0;" class="dropdown-item" href="/groupMaster" th:text="#{groupMaster}"></a></li>
+            <li class="w-100"><a style="border-radius:0;" class="dropdown-item" href="/countryMaster" th:text="#{countryMaster}"></a></li>
+<!--            <li class="w-100"><a style="border-radius:0;" class="dropdown-item" href="/priceList" th:text="#{priceList}"></a></li>-->
+            <li th:if="${role} != '1'" class="w-100"><a style="border-radius:0;" class="dropdown-item" href="/mailSetting" th:text="#{lblMailSetting}"></a></li>
+            <li class="w-100"><a style="border-radius:0;" class="dropdown-item" href="/fareMaster" th:text="#{lblFareTitle}"></a></li>
+            <li class="w-100"><a style="border-radius:0;" class="dropdown-item" href="/videoMaster" th:text="#{lblVideoTitle}"></a></li>
+            <li class="w-100"><a style="border-radius:0;" class="dropdown-item" href="/bannerMaster" th:text="#{lblBannerTitle}"></a></li>
+
+
+          </ul>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link  " id="inquiry" href="/inquiry " th:text="#{inquiry}"></a>
+        </li>
+
+<!--        <li class="nav-item disabled" style="pointer-events:none;opacity:0.0;">-->
+<!--          <a class="nav-link" href="#"></a>-->
+<!--        </li>-->
+
+
+        <li class="nav-item d-flex justify-content-center" >
+<!--          <form  method="POST" id="changeLanguageForm">-->
+<!--            <input type="checkbox" id="toggle" name="url" value="entryPage"/>-->
+<!--            <button style="display:none;" type="button" onclick="changeLanguage()" id="change">submit</button>-->
+<!--          </form>-->
+          <label  class="toggleWrapper  mt-2" id="language" onclick="changeLanguage()"  th:text="#{jp}"></label>
+        </li>
+        <li class="" style="padding:9px;" >
+          <a class="logoutIcon" href="/logout"> <i class="fa fa-sign-out" style="font-size:25px" aria-hidden="true"></i></a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+<input hidden th:value="${loginCompany.companyCode}" id="companyCode">
+<input hidden th:value="${loginUserCode}" id="loginUserCode">
+<script>
+
+  function changeLanguage(){
+      $.get('/changeLanguage', function(data){
+
+        console.log(data)
+
+      }).then(()=>{
+        location.reload();
+      })
+    }
+
+
+  $(function() {
+$(window).scroll(function () {
+   if ($(this).scrollTop() > 0) {
+       $('nav').removeClass('addednav')
+      $('nav').addClass('transparent_nav')
+      $('#com_name').removeClass('company_name_style')
+      $('#com_name').addClass('company_name_style_after_scroll')
+   }else if ($(this).scrollTop() == 0) {
+    $('nav').addClass('addednav')
+      $('nav').removeClass('transparent_nav')
+      $('#com_name').removeClass('company_name_style_after_scroll')
+      $('#com_name').addClass('company_name_style')
+   }
+});
+});
+</script>
+
+</body>
+<script src="../js/menuListenRes.js"></script>
+</html>

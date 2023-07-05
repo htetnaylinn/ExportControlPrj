@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" content="width=device-width, initial-scale=1" name="viewport">
+    <title th:text="#{lblCountryMasterDetail}"></title>
+    <link href="../css/style.css" rel="stylesheet">
+    <link href="../css/countryMasterDetail.css" rel="stylesheet">
+    <link href='https://fonts.googleapis.com/css?family=Anton' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Neucha' rel='stylesheet' type='text/css'>
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link crossorigin href="https://fonts.gstatic.com" rel="preconnect">
+    <link href="../css/iziToast.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap" rel="stylesheet">
+    <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" rel="stylesheet">
+    <script crossorigin="anonymous"
+            integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/common.js"></script>
+    <script src="../js/ajaxMessage/passwordChangeErrorMessages.js"></script>
+    <script src="../js/iziToast.min.js"></script>
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+</head>
+<body>
+
+<!--navigation-->
+<th:block :: header th:include="@{/menu.html}"></th:block>
+
+<!--商品マスタ-->
+<div class="box box-4 container mt-5">
+    <div class="box-content">
+        <h2 th:text="#{lblCountryMasterDetail}"></h2>
+
+        <form class="saveCountryMaster" id="generalForm" method="GET" nonvalidate th:action="@{/saveCountryMaster}">
+            <div class="row margin-xs">
+                <div class="col-xl-6 col-lg-6 col-sm-12 col-12">
+                    <div class="row">
+                        <label class="col-3 label text-info text-center mt-2 " th:text="#{lblCountryCode}+':'"></label>
+                        <div class="form__group field col-9">
+                            <input autocomplete="off" class="form__field" id='countryCode'
+                                   maxlength="3" name="countryCode"
+                                   oninput="inputChange('countryNumberErr')" required th:placeholder="#{lblCountryCode}" type="text"/>
+                        </div>
+                        <div class="col-12" id="countryNumberErr" style="visibility:hidden;">
+                            <div class="row">
+                                <label class="col-3 label text-info text-center  "></label>
+                                <div class="form__group field col-9">
+                                    <span class="font24" id="countryNumberErrMsg" style="color:red;"> </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-6 col-lg-6 col-sm-12 col-12   ">
+                    <div class="row">
+                        <label class="col-3 label text-info text-center mt-2 " th:text="#{lblCountryName}+':'"></label>
+                        <div class="form__group field col-9">
+                            <input autocomplete="off" class="form__field" id='countryName'
+                                   name="countryName" oninput="inputChange('countryNameErr')"
+                                   required th:placeholder="#{lblCountryName}"
+                                   maxlength="250" type="text"/>
+                        </div>
+                        <div class="col-12" id="countryNameErr" style="visibility:hidden">
+                            <div class="row">
+                                <label class="col-3 label text-info text-center  "></label>
+                                <div class="form__group field col-9">
+                                    <span class="font24" id="countryNameErrMsg" style="color:red;"> </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form__group field col-9" style="display: none">
+                            <input autocomplete="off" class="form__field" id='update_check' name="updateCheck"
+                                   required type="" value="false"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="row mt-5 justify-content-end ">
+                <button class="btn btn-secondary   col-2 mt-3" id="add" onclick="addCountry()" style="width:106px;margin-right:30px;"
+                        th:text="#{btnReg}" type="button"></button>
+                <button class="btn btn-secondary   col-2 mt-3" onclick="resetListForm($('#generalForm'))" style="width:106px;margin-right:30px;"
+                        th:text="#{btnCancel}" type="button"></button>
+            </div>
+        </form>
+
+    </div>
+
+</div>
+
+
+<!--table-->
+<script>
+
+    var languageFlag = "[[${languageOption}]]";
+    loadErrorMessage();
+    $(document).ready(function () {
+
+        var systemErrMsg = "[[${systemErrorMsg}]]"
+        if (systemErrMsg) {
+            showSystemError(systemErrMsg);
+        }
+    });
+
+    window.onload = function () {
+        document.getElementById("navbarDropdownMenuLink").classList.add("active");
+    };
+
+    function addCountry() {
+
+        let temp1 = "[[${countryCodeDeleteFlag0}]]";
+        let temp2 = temp1.substring(1, temp1.length - 1);
+        let countryCodeDeleteFlag0 = temp2.split(',');
+
+        let temp3 = "[[${countryCodeDeleteFlag1}]]";
+        let temp4 = temp3.substring(1, temp3.length - 1);
+        let countryCodeDeleteFlag1 = temp4.split(',');
+
+        let temp5 = "[[${countryNameDeleteFlag0}]]";
+        let temp6 = temp5.substring(1, temp5.length - 1);
+        let countryNameDeleteFlag0 = temp6.split(',');
+
+        let countryCode = document.getElementById('countryCode');
+        let countryName = document.getElementById('countryName');
+        let add = document.getElementById('add');
+        let updateCheck = document.getElementById('update_check');
+        let valid = true;
+        let regex = /[\u3000-\u303F]|[\u3040-\u309F]|[\u30A0-\u30FF]|[\uFF00-\uFFEF]|[\u4E00-\u9FAF]|[\u2605-\u2606]|[\u2190-\u2195]|\u203B/g;
+
+        if (countryName.value == "") {
+            showErrorMsg("countryNameErr", countryNameEnterEmptyErrMsg, countryNameEnterEmptyErrMsg, "countryNameErrMsg", languageFlag);
+            add.type = "button";
+            valid = false;
+        }
+
+        if (countryCode.value == "") {
+            showErrorMsg("countryNumberErr", countryCodeEmptyErrMsg, countryCodeEmptyErrMsg, "countryNumberErrMsg", languageFlag);
+            add.type = "button";
+            valid = false;
+        } else if (regex.test(countryCode.value)) {
+            showErrorMsg("countryNumberErr", countryCodeJpnCharacterErrMsg, countryCodeJpnCharacterErrMsg, "countryNumberErrMsg", languageFlag);
+            add.type = "button";
+            valid = false;
+        } else if (!countryCode.value.match("[0-9]{3}")) {
+            showErrorMsg("countryNumberErr", countryCodeJpnCharacterErrMsg, countryCodeJpnCharacterErrMsg, "countryNumberErrMsg", languageFlag);
+            add.type = "button";
+            valid = false;
+        } else {
+            for (i = 0; i < countryCodeDeleteFlag0.length; i++) {
+
+                if (countryCode.value == countryCodeDeleteFlag0[i].trim()) {
+                    showErrorMsg("countryNumberErr", countryCodeAlreadyExistErrMsg, countryCodeAlreadyExistErrMsg, "countryNumberErrMsg", languageFlag);
+                    add.type = "button";
+                    valid = false;
+                    break;
+                }
+            }
+        }
+        for (i = 0; i < countryNameDeleteFlag0.length; i++) {
+
+            if (countryName.value.trim().toLocaleUpperCase() == countryNameDeleteFlag0[i].trim().toLocaleUpperCase()) {
+                showErrorMsg("countryNameErr", countryNameAlreadyExistErrMsg, countryNameAlreadyExistErrMsg, "countryNameErrMsg", languageFlag);
+                add.type = "button";
+                valid = false;
+                break;
+            }
+        }
+
+        if (valid == true) {
+            for (i = 0; i < countryCodeDeleteFlag1.length; i++) {
+                if (countryCode.value == countryCodeDeleteFlag1[i].trim()) {
+                    updateCheck.value = "true";
+                }
+            }
+            document.querySelector(".saveCountryMaster").submit();
+        }
+    }
+</script>
+</body>
+</html>

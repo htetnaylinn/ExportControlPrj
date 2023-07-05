@@ -1,0 +1,1444 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{patternRegistration}"></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=0">
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+            crossorigin="anonymous"></script>
+    <script src="../js/common.js"></script>
+    <script src="../js/ajaxMessage/passwordChangeErrorMessages.js"></script>
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script th:if="${languageOption} == 0" src="../js/calendarJp.js"></script>
+    <script th:if="${languageOption} == 1" src="../js/calendarEn.js"></script>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css"/>
+    <link href="https://cdn.jsdelivr.net/npm/mc-datepicker/dist/mc-calendar.min.css" rel="stylesheet"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+</head>
+<style>
+    #table_size {
+
+        table-layout: fixed !important;
+        width: max-content !important;
+    }
+    /*.label-center {*/
+    /*    text-align: center;*/
+    /*    vertical-align: middle;*/
+    /*}*/
+</style>
+<body>
+<th:block :: header th:include="@{/menu.html}"></th:block>
+<!--navigation-->
+<form id="exportRegistrationForm" th:action="@{/savePatternRegistration}" method="POST" nonvalidate class=""
+      th:object="${exportObj}">
+    <div class="box box-4 container mt-xl-5 mt-lg-5 mt-md-2 mt-sm-2 mt-2 p-xl-5 p-lg-5 p-md-2 p-sm-1 p-1" data-aos="fade-up">
+        <div class="box-content p-xl-5 p-lg-5 p-md-2 p-sm-2 p-2">
+            <h2 th:text="#{patternRegistration}"></h2>
+            <div class="row mt-5 margin-xs">
+                <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                    <div class="row">
+                        <label class="font24 col-3 label text-info text-end mt-2 " th:text="#{lblCustomerName}+':'"></label>
+                        <div class="col-9">
+                            <select class="form-select" name="customerName" aria-label="Default select example">
+                                <option value=""></option>
+                                <option th:each="company : ${customerList}"
+                                        th:text="${languageOption}== 0? ${company.companyNameJPN}: ${company.companyNameENG}"
+                                        th:value="${company.companyCode}"></option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 mt-xl-0 mt-lg-0 mt-md-2 mt-sm-2 mt-2">
+                    <div class="row">
+                        <label class="font24 col-3 label text-info text-end mt-2" th:text="#{lblPatternName}+':'"></label>
+                        <div class="col-9">
+                            <input aria-label="" type="text" class="form__field w-100" placeholder="" name="patternName"
+                                   id='patternName' oninput="inputChange('patternNameErr')"/>
+                        </div>
+                        <div class="col-12" id="patternNameErr" style="visibility:hidden;">
+                            <div class="row margin-xs">
+                                <label class="col-3 label text-info text-end mt-2"></label>
+                                <div class="col-9">
+                                    <span class="font24" id="patternNameErrMsg" style="color:red;"> </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+<!--            first line-->
+            <div class="row margin-xs">
+                <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 col-12">
+                    <div class="row">
+                        <label class="font24 col-xl-6 col-lg-6 col-md-4 col-sm-4 col-4 label text-info text-end mt-2" th:text="#{lblInvoiceNo}+':'"></label>
+                        <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                            <input aria-label="" type="text" class="form__field w-100" placeholder=""
+                                   name="invoiceCode" maxlength="10"
+                                   id='invoiceCode' oninput="inputChange('invoiceCodeErr')" required/>
+                        </div>
+                        <div class="col-12" id="invoiceCodeErr" style="visibility:hidden;">
+                            <div class="row">
+                                <label class="col-xl-6 col-lg-6 col-md-4 col-sm-4 col-4 label text-info text-center  "></label>
+                                <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                                    <span class="font24" id="invoiceCodeErrMsg" style="color:red;"> </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 col-12 mt-xl-0 mt-lg-0 mt-md-2 mt-sm-2 mt-2">
+                    <div class="row">
+                        <label class="font24 col-xl-6 col-lg-6 col-md-4 col-sm-4 col-4 label label text-info text-end mt-2 ">bookingNo:</label>
+                        <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                            <input aria-label="" autocomplete="off" type="text" class="form__field w-100" placeholder=""
+                                   name="bookingNo" id='bookingNo' oninput="inputChange('bookingNoErr')"
+                                   maxlength="10" required/>
+                        </div>
+                        <div class="col-12" id="bookingNoErr" style="visibility:hidden;">
+                            <div class="row">
+                                <label class="col-xl-6 col-lg-6 col-md-4 col-sm-4 col-4 label text-info text-end mt-2 "></label>
+                                <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                                    <span class="font24" id="bookingNoErrMsg" style="color:red;"> </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 col-12 mt-xl-0 mt-lg-0 mt-md-2 mt-sm-2 mt-2">
+                    <div class="row">
+                        <label class="font24 col-xl-6 col-lg-6 col-md-4 col-sm-4 col-4 label text-info text-end mt-2 ">po:</label>
+                        <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                            <input aria-label="" autocomplete="off"
+                                   type="text" class="form__field w-100" placeholder=""
+                                   name="poNO" id='poNo' oninput="inputChange('poNoErr')"
+                                   maxlength="10" required/>
+                        </div>
+                        <div class="col-12" id="poNoErr" style="visibility:hidden;">
+                            <div class="row">
+                                <label class="col-xl-6 col-lg-6 col-md-4 col-sm-4 col-4 label text-info text-end mt-2 "></label>
+                                <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                                    <span class="font24" id="poNoErrMsg" style="color:red;"> </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- error message Start-->
+            <!-- error message End-->
+
+<!--            second line-->
+            <div class="row mt-3 margin-xs">
+                <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 col-12">
+                    <div class="row">
+                        <label class="font24 col-xl-6 col-lg-6 col-md-4 col-sm-4 col-4 label text-info text-end mt-2 "
+                               th:text="#{lblShippingAgency}+':'">船社代理店:</label>
+                        <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                            <input aria-label="" type="text" class="form__field w-100" placeholder=""
+                                   name="shippingAgency" id='shippingAgency' maxlength="10"
+                                   oninput="inputChange('shippingAgencyErr')"
+                                   required/>
+                        </div>
+                        <div class="col-12" id="shippingAgencyErr" style="visibility:hidden;">
+                            <div class="row">
+                                <label class="col-xl-6 col-lg-6 col-md-4 col-sm-4 col-4 label text-info text-center  "></label>
+                                <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                                    <span class="font24" id="shippingAgencyErrMsg" style="color:red;"> </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 col-12 mt-xl-0 mt-lg-0 mt-md-3 mt-sm-3 mt-3">
+                    <div class="row">
+                        <label class="font24 col-xl-6 col-lg-6 col-md-4 col-sm-4 col-4 label text-info text-end mt-2 " th:text="#{lblExportOrImport}+':'"></label>
+                        <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                            <select onchange="inputChange('exportInportErr')" class="form-select" name="exportInport"
+                                    aria-label="Default select example"
+                                    id="exportInport">
+                                <option value=""></option>
+                                <option th:each="exportType : ${ExportType}"
+                                        th:text="${exportType.type}"
+                                        th:value="${exportType.name}"></option>
+                            </select>
+                        </div>
+                        <div class="col-12" id="exportInportErr" style="visibility:hidden;">
+                            <div class="row">
+                                <label class="col-xl-6 col-lg-6 col-md-4 col-sm-4 col-4 label text-info text-end mt-2 "></label>
+                                <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                                    <span class="font24" id="exportInportErrMsg" style="color:red;"> </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 col-12 mt-xl-0 mt-lg-0 mt-md-2 mt-sm-2 mt-2">
+                    <div class="row">
+                        <label class="font24 col-xl-6 col-lg-6 col-md-4 col-sm-4 col-4 label text-info text-end mt-2 ">Incoterms:</label>
+                        <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                            <input aria-label="" type="text" class="form__field w-100" placeholder="" name="incoterms"
+                                   id='incoterms' oninput="inputChange('incotermsErr')" required/>
+                        </div>
+                        <div class="col-12" id="incotermsErr" style="visibility:hidden;">
+                            <div class="row">
+                                <label class="col-xl-6 col-lg-6 col-md-4 col-sm-4 col-4 label text-info text-end mt-2 "></label>
+                                <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                                    <span class="font24" id="incotermsErrMsg" style="color:red;"> </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+<!--            third line-->
+            <div class="row mt-3 margin-xs">
+                <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 col-12 ">
+                    <div class="row">
+                        <label class="font24 col-xl-6 col-lg-6 col-md-4 col-sm-4 col-4 label text-info text-end mt-2 " th:text="#{lblShipName}+':'"></label>
+                        <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                            <input aria-label="" type="text" class="form__field w-100" placeholder="" name="shipName"
+                                   id='shipName' oninput="inputChange('shipNameErr')" required/>
+                        </div>
+                        <div class="col-12" id="shipNameErr" style="visibility:hidden;">
+                            <div class="row">
+                                <label class="col-xl-6 col-lg-6 col-md-4 col-sm-4 col-4 label text-info text-center  "></label>
+                                <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                                    <span class="font24" id="shipNameErrMsg" style="color:red;"> </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 col-12 mt-xl-0 mt-lg-0 mt-md-2 mt-sm-2 mt-2">
+                    <div class="row">
+                        <label class="font24 col-xl-6 col-lg-6 col-md-4 col-sm-4 col-4 label text-info text-end mt-2 ">VOY No:</label>
+                        <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                            <input aria-label="" type="text" class="form__field w-100" placeholder="" name="voyNo"
+                                   id='voyNo' oninput="inputChange('voyNoErr')" required/>
+                        </div>
+                        <div class="col-12" id="voyNoErr" style="visibility:hidden;">
+                            <div class="row">
+                                <label class="col-xl-6 col-lg-6 col-md-4 col-sm-4 col-4 label text-info text-end mt-2 "></label>
+                                <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                                    <span class="font24" id="voyNoErrMsg" style="color:red;"> </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 col-12 mt-xl-0 mt-lg-0 mt-md-2 mt-sm-2 mt-2">
+                    <div class="row">
+                        <label class="font24 col-xl-6 col-lg-6 col-md-4 col-sm-4 col-4 label text-info text-end mt-2 " th:text="#{lblBillingMonth}+':'"></label>
+                        <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                            <input readonly aria-label="" autocomplete="off" type="text" class="form__field w-100" placeholder=""
+                                   name="billingMonth" id='billingMonth'
+                                   onfocus="selectMonth('#billingMonth','billingMonthErr')"
+                                   required/>
+                        </div>
+                        <div class="col-12" id="billingMonthErr" style="visibility:hidden;">
+                            <div class="row">
+                                <label class="col-xl-6 col-lg-6 col-md-4 col-sm-4 col-4 label text-info text-end mt-2 "></label>
+                                <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                                    <span class="font24" id="billingMonthErrMsg" style="color:red;"> </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- error message Start-->
+            <!-- error message End-->
+<!--            fourth line-->
+            <div class="row mt-3 margin-xs">
+                <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 col-12">
+                    <div class="row">
+                        <label class="font24 col-xl-6 col-lg-6 col-md-4 col-sm-4 col-4 label text-info text-end mt-2 " th:text="#{lblPacking}+':'"></label>
+                        <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                            <input aria-label="" type="text" class="form__field w-100" placeholder="" name="packing"
+                                   id='packing' oninput="inputChange('packingErr')" required/>
+                        </div>
+                        <div class="col-12" id="packingErr" style="visibility:hidden;">
+                            <div class="row">
+                                <label class="col-xl-6 col-lg-6 col-md-4 col-sm-4 col-4 label text-info text-center  "></label>
+                                <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                                    <span class="font24" id="packingErrMsg" style="color:red;"> </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 col-12 mt-xl-0 mt-lg-0 mt-md-2 mt-sm-2 mt-3">
+                    <div class="row">
+                        <label class="font24 col-xl-6 col-lg-6 col-md-4 col-sm-4 col-4 label text-info text-end mt-2 " th:text="#{lblTransportMode}+':'"></label>
+                        <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                            <select onchange="inputChange('transportModeErr')" class="form-select" name="transportMode"
+                                    aria-label="Default select example"
+                                    id="transportMode">
+                                <option value=""></option>
+                                <option th:each="transportType : ${TransportType}"
+                                        th:text="${transportType.type}"
+                                        th:value="${transportType.name}"></option>
+                            </select>
+                        </div>
+                        <div class="col-12" id="transportModeErr" style="visibility:hidden;">
+                            <div class="row">
+                                <label class="col-xl-6 col-lg-6 col-md-4 col-sm-4 col-4 label text-info text-end mt-2 "></label>
+                                <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                                    <span class="font24" id="transportModeErrMsg" style="color:red;"> </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 col-12 mt-xl-0 mt-lg-0 mt-md-2 mt-sm-2 mt-2">
+                    <div class="row">
+                        <label class="font24 col-xl-6 col-lg-6 col-md-4 col-sm-4 col-4 label text-info text-end mt-2 ">40f:</label>
+                        <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                            <input aria-label="" type="text" class="form__field w-100" placeholder=""
+                                   name="fourtyf" id='fortyF' oninput="inputChange('fortyFErr')" required/>
+                        </div>
+                        <div class="col-12" id="fortyFErr" style="visibility:hidden;">
+                            <div class="row">
+                                <label class="col-xl-6 col-lg-6 col-md-4 col-sm-4 col-4 label text-info text-end mt-2 "></label>
+                                <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                                    <span class="font24" id="fortyFErrMsg" style="color:red;"> </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- error message Start-->
+            <!-- error message End-->
+<!--            fifth line-->
+            <div class="row mt-3 margin-xs">
+                <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 col-12">
+                    <div class="row">
+                        <label class="font24 col-xl-6 col-lg-6 col-md-4 col-sm-4 col-4 label text-info text-end mt-2 ">BL No AWB No:</label>
+                        <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                            <input aria-label="" type="text" class="form__field w-100" placeholder="" name="blawbNo"
+                                   id='blawbNo' oninput="inputChange('blawbNoErr')" required/>
+                        </div>
+                        <div class="col-12" id="blawbNoErr" style="visibility:hidden;">
+                            <div class="row">
+                                <label class="col-xl-6 col-lg-6 col-md-4 col-sm-4 col-4 label text-info text-center  "></label>
+                                <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                                    <span class="font24" id="blawbNoErrMsg" style="color:red;"> </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 col-12 mt-xl-0 mt-lg-0 mt-md-2 mt-sm-2 mt-2">
+                    <div class="row">
+                        <label class="font24 col-xl-6 col-lg-6 col-md-4 col-sm-4 col-4 label text-info text-end mt-2 " th:text="#{lblInvoicePrice}+':'"></label>
+                        <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                            <input aria-label="" type="text" class="form__field w-100" placeholder=""
+                                   name="invoicePrice" id='invoicePrice' oninput="inputChange('invoicePriceErr')"
+                                   required/>
+                        </div>
+                        <div class="col-12" id="invoicePriceErr" style="visibility:hidden;">
+                            <div class="row">
+                                <label class="col-xl-6 col-lg-6 col-md-4 col-sm-4 col-4 label text-info text-end mt-2 "></label>
+                                <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                                    <span class="font24" id="invoicePriceErrMsg" style="color:red;"> </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 col-12 mt-xl-0 mt-lg-0 mt-md-2 mt-sm-2 mt-2">
+                    <div class="row">
+                        <label class="font24 col-xl-6 col-lg-6 col-md-4 col-sm-4 col-4 label text-info text-end mt-2 ">20f:</label>
+                        <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                            <input aria-label="" type="text" class="form__field w-100" placeholder="" name="twentyf"
+                                   id='twentyf' oninput="inputChange('twentyfErr')" required/>
+                        </div>
+                        <div class="col-12" id="twentyfErr" style="visibility:hidden;">
+                            <div class="row">
+                                <label class="col-xl-6 col-lg-6 col-md-4 col-sm-4 col-4 label text-info text-end mt-2 "></label>
+                                <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                                    <span class="font24" id="twentyfErrMsg" style="color:red;"> </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- error message Start-->
+            <!-- error message End-->
+<!--            sixth line-->
+            <div class="row mt-3 margin-xs">
+                <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 col-12">
+                    <div class="row">
+                        <label class="font24 col-xl-6 col-lg-6 col-md-4 col-sm-4 col-4 label text-info text-end mt-2 " th:text="#{lblDeparturePort}+':'"></label>
+                        <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                            <select class="form-select" name="departurePort" aria-label="Default select example"
+                                    id="departurePort" onchange="inputChange('departurePortErr')">
+                                <option value=""></option>
+                                <option th:each="port : ${portList}"
+                                        th:text="${port.portName}"
+                                        th:value="${port.portCode}">
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-12" id="departurePortErr" style="visibility:hidden;">
+                            <div class="row">
+                                <label class="col-xl-6 col-lg-6 col-md-4 col-sm-4 col-4 label text-info text-center  "></label>
+                                <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                                    <span  class="font24" id="departurePortErrMsg" style="color:red;"> </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 col-12 mt-xl-0 mt-lg-0 mt-md-2 mt-sm-2 mt-3">
+                    <div class="row">
+                        <label class="font24 col-xl-6 col-lg-6 col-md-4 col-sm-4 col-4 label text-info text-end mt-2 "
+                               th:text="#{lblArrivalPort}+':'">到着港:</label>
+                        <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                            <select class="form-select" name="arrivalPort" aria-label="Default select example"
+                                    id="arrivalPort" onchange="inputChange('arrivalPortErr')">
+                                <option value=""></option>
+                                <option th:each="port : ${portList}"
+                                        th:text="${port.portName}"
+                                        th:value="${port.portCode}"></option>
+                            </select>
+                        </div>
+                        <div class="col-12" id="arrivalPortErr" style="visibility:hidden;">
+                            <div class="row">
+                                <label class="col-xl-6 col-lg-6 col-md-4 col-sm-4 col-4 label text-info text-end mt-2 "></label>
+                                <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                                    <span class="font24" id="arrivalPortErrMsg" style="color:red;"> </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 col-12 mt-xl-0 mt-lg-0 mt-md-2 mt-sm-2 mt-2">
+                    <div class="row">
+                        <label class="font24 col-xl-6 col-lg-6 col-md-4 col-sm-4 col-4 label text-info text-end mt-2 ">cut:</label>
+                        <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                            <!--                            <input aria-label="" type="text" class="form__field w-100" placeholder="" name="cut"-->
+                            <!--                                   id='cut' oninput="inputChange('cutErr')" required/>-->
+                            <input readonly aria-label="" autocomplete="off" type="text" class="form__field w-100" placeholder=""
+                                   name="cut" id='cut'
+                                   onfocus="openCalander('#cut','cutErr')"
+                                   required/>
+                        </div>
+                        <div class="col-12" id="cutErr" style="visibility:hidden;">
+                            <div class="row">
+                                <label class="col-xl-6 col-lg-6 col-md-4 col-sm-4 col-4 label text-info text-end mt-2 "></label>
+                                <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                                    <span class="font24" id="cutErrMsg" style="color:red;"> </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- error message Start-->
+            <!-- error message End-->
+        </div>
+    </div>
+
+<!--    next-->
+    <div class="box box-4 container mt-5 mb-5" style="padding-bottom:30px; background-color:#e0f8f8;">
+        <div class="box-content p-xl-5 p-lg-5 p-md-3 p-sm-3 p-3">
+
+            <!--pagination-->
+            <div class="row justify-content-center mb-3 mt-3">
+                <div class="col-8 text-center">
+                    <span style="font-size:22px; color:#2b2f33;" th:text="#{lblConfirm}+':'"></span>
+                </div>
+            </div>
+            <div class="row mt-1">
+                <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                    <div class="row">
+                        <label class="font24 col-xl-3 col-lg-3 col-md-3 col-sm-3 col-3 label text-info text-end mt-2 ">ETD:</label>
+                        <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                            <input readonly aria-label="" autocomplete="off" type="text" class="form__field w-100" placeholder=""
+                                   name="etd" id='etd'
+                                   onfocus="openCalander('#etd','etdErr')"
+                                   required/>
+                        </div>
+                        <div class="col-12" id="etdErr" style="visibility:hidden;">
+                            <div class="row">
+                                <label class="col-xl-3 col-lg-3 col-md-3 col-sm-3 col-3 label text-info text-center  "></label>
+                                <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                                    <span class="font24" id="etdErrMsg" style="color:red;"> </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 mt-xl-0 mt-lg-0 mt-md-2 mt-sm-2 mt-2">
+                    <div class="row">
+                        <label class="font24 col-xl-3 col-lg-3 col-md-3 col-sm-3 col-3 label text-info text-end mt-2 ">ETA:</label>
+                        <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                            <input readonly aria-label="" autocomplete="off" type="text" class="form__field w-100" placeholder=""
+                                   name="eta" id='eta'
+                                   onfocus="openCalander('#eta','etaErr')"
+                                   required/>
+                        </div>
+                        <div class="col-12" id="etaErr" style="visibility:hidden;">
+                            <div class="row">
+                                <label class="col-xl-3 col-lg-3 col-md-3 col-sm-3 col-3 label text-info text-end mt-2 "></label>
+                                <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                                    <span class="font24" id="etaErrMsg" style="color:red;"> </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+<!--        next-->
+        <div class="box-content mt-3 p-xl-5 p-lg-5 p-md-2 p-sm-2 p-2">
+            <div class="row mt-3">
+                <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 col-12">
+                    <div class="row">
+                        <label class="font24 col-xl-6 col-lg-6 col-md-4 col-sm-4 col-4 label text-info text-end mt-2 " th:text="#{lblAnAdvanceFee}+':'"></label>
+                        <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                            <input aria-label="" type="text" class="form__field w-100" placeholder=""
+                                   name="anAdvanceFee" id='anAdvanceFee'
+                                   oninput="inputChange('anAdvanceFeeErr')" required/>
+                        </div>
+                        <div class="col-12" id="anAdvanceFeeErr" style="visibility:hidden;">
+                            <div class="row">
+                                <label class="col-xl-6 col-lg-6 col-md-4 col-sm-4 col-4 label text-info text-center  "></label>
+                                <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                                    <span class="font24" id="anAdvanceFeeErrMsg" style="color:red;"> </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 col-12 mt-xl-0 mt-lg-0 mt-md-2 mt-sm-2 mt-2">
+                    <div class="row">
+                        <label class="font24 col-xl-6 col-lg-6 col-md-4 col-sm-4 col-4 label text-info text-end mt-2 " th:text="#{lblSupplierName}+':'"></label>
+                        <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                            <input aria-label="" type="text" class="form__field w-100" placeholder=""
+                                   name="supplierName" id='supplierName'
+                                   oninput="inputChange('supplierNameErr')" required/>
+                        </div>
+                        <div class="col-12" id="supplierNameErr" style="visibility:hidden;">
+                            <div class="row">
+                                <label class="col-xl-6 col-lg-6 col-md-4 col-sm-4 col-4 label text-info text-end mt-2 "></label>
+                                <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                                    <span class="font24" id="supplierNameErrMsg" style="color:red;"> </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 col-12 mt-xl-0 mt-lg-0 mt-md-2 mt-sm-2 mt-2">
+                    <div class="row">
+                        <label class="font24 col-xl-6 col-lg-6 col-md-4 col-sm-4 col-4  label text-info text-end mt-2 " th:text="#{lblRepItem}+':'"></label>
+                        <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                            <input aria-label="" type="text" class="form__field w-100" placeholder=""
+                                   name="representativeItem" id='representativeItem'
+                                   oninput="inputChange('representativeItemErr')" required/>
+                        </div>
+                        <div class="col-12" id="representativeItemErr" style="visibility:hidden;">
+                            <div class="row">
+                                <label class="col-xl-6 col-lg-6 col-md-4 col-sm-4 col-4 label text-info text-end mt-2 "></label>
+                                <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                                    <span class="font24" id="representativeItemErrMsg" style="color:red;"> </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+<!--            second line-->
+            <div class="row mt-3">
+                <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 col-12">
+                    <div class="row">
+                        <label class="font24 col-xl-6 col-lg-6 col-md-4 col-sm-4 col-4 label text-info text-end mt-2 " th:text="#{lblCargoKg}+':'"></label>
+                        <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                            <input aria-label="" type="text" class="form__field w-100" placeholder="" name="freightKg"
+                                   id='freightKg' oninput="inputChange('freightKgErr')" required/>
+                        </div>
+                        <div class="col-12" id="freightKgErr" style="visibility:hidden;">
+                            <div class="row">
+                                <label class="col-xl-6 col-lg-6 col-md-4 col-sm-4 col-4 label text-info text-center  "></label>
+                                <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                                    <span class="font24" id="freightKgErrMsg" style="color:red;"> </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 col-12 mt-xl-0 mt-lg-0 mt-md-2 mt-sm-2 mt-2">
+                    <div class="row">
+                        <label class="font24 col-xl-6 col-lg-6 col-md-4 col-sm-4 col-4 label text-info text-end mt-2 " th:text="#{lblCargoM3}+':'"></label>
+                        <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                            <input aria-label="" type="text" class="form__field w-100" placeholder="" name="freightM3"
+                                   id='freightM3' oninput="inputChange('freightM3Err')" required/>
+                        </div>
+                        <div class="col-12" id="freightM3Err" style="visibility:hidden;">
+                            <div class="row">
+                                <label class="col-xl-6 col-lg-6 col-md-4 col-sm-4 col-4 label text-info text-end mt-2 "></label>
+                                <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                                    <span class="font24" id="freightM3ErrMsg" style="color:red;"> </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 col-12 mt-xl-0 mt-lg-0 mt-md-2 mt-sm-2 mt-2">
+                    <div class="row">
+                        <label class="font24 col-xl-6 col-lg-6 col-md-4 col-sm-4 col-4 label text-info text-end mt-2 " th:text="#{lblCTSNo}+':'"></label>
+                        <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                            <input aria-label="" type="text" class="form__field w-100" placeholder="" name="ctsNumber"
+                                   id='ctsNumber' oninput="inputChange('ctsNumberErr')" required/>
+                        </div>
+                        <div class="col-12" id="ctsNumberErr" style="visibility:hidden;">
+                            <div class="row">
+                                <label class="col-xl-6 col-lg-6 col-md-4 col-sm-4 col-4 label text-info text-end mt-2 "></label>
+                                <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                                    <span class="font24" id="ctsNumberErrMsg" style="color:red;"> </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+<!--            third line-->
+            <div class="row mt-3">
+                <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 col-12">
+                    <div class="row">
+                        <label class="font24 col-xl-6 col-lg-6 col-md-4 col-sm-4 col-4 label text-info text-end mt-2 " th:text="#{lblSize}+':'"></label>
+                        <div class="form__group field  col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                            <input aria-label="" type="text" class="form__field w-100" placeholder="" name="size"
+                                   id='size' oninput="inputChange('sizeErr')" required/>
+                        </div>
+                        <div class="col-12">
+                            <div class="row" id="sizeErr">
+                                <label class="col-xl-6 col-lg-6 col-md-4 col-sm-4 col-4 label text-info text-end mt-2 "></label>
+                                <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                                    <span class="font24" id="sizeErrMsg" style="color:red;"> </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+<!--        next-->
+        <div class="box-content mt-3">
+            <div class="row mt-1">
+                <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                    <div class="row">
+                        <label class="font24 col-xl-3 col-lg-3 col-md-3 col-sm-3 col-3 label text-info text-end mt-2 ">RT(ship):</label>
+                        <div class="form__group field col-xl-9 col-lg-9 col-md-9 col-sm-9 col-9">
+                            <input aria-label="" type="text" class="form__field w-100" th:placeholder="#{autoCalculate}"
+                                   name="rtShip" id='rtShip' required/>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                    <div class="row">
+                        <label class="font24 col-xl-3 col-lg-3 col-md-3 col-sm-3 col-3 label text-info text-end mt-2 ">VW(air):</label>
+                        <div class="form__group field col-xl-9 col-lg-9 col-md-9 col-sm-9 col-9">
+                            <input aria-label="" type="text" class="form__field w-100" th:placeholder="#{autoCalculate}"
+                                   name="vwAir" id='vwAir' required/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<!--        next-->
+    <div class="box box-4 container mt-1 mb-5" style="padding-bottom:30px; background-color:#e0f8f8;">
+        <div class="box-content p-xl-5 p-lg-5 p-md-3 p-sm-3 p-3 ">
+            <div class="row mt-1">
+                <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 col-12">
+                    <div class="row">
+                        <label class="font24 col-xl-6 col-lg-6 col-md-4 col-sm-4 col-4 label text-info text-end mt-2 " th:text="#{lblPackingBox}+':'"></label>
+                        <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                            <input aria-label="" type="text" class="form__field w-100" placeholder=""
+                                   name="hlBoxesNumber" id='hlBoxesNumber'
+                                   oninput="inputChange('hlBoxesNumberErr')" required/>
+                        </div>
+                        <div class="col-12" id="hlBoxesNumberErr" style="visibility:hidden;">
+                            <div class="row">
+                                <label class="col-xl-6 col-lg-6 col-md-4 col-sm-4 col-4 label text-info text-center  "></label>
+                                <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                                    <span class="font24" id="hlBoxesNumberErrMsg" style="color:red;"> </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 col-12 mt-xl-0 mt-lg-0 mt-md-2 mt-sm-2 mt-2">
+                    <div class="row">
+                        <label class="font24 col-xl-6 col-lg-6 col-md-4 col-sm-4 col-4 label text-info text-end mt-2 " th:text="#{lblMoneyOrder}+':'"></label>
+                        <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                            <input aria-label="" type="text" class="form__field w-100" placeholder=""
+                                   name="moneyOrder"
+                                   id='moneyOrder' oninput="inputChange('moneyOrderErr')" required/>
+                        </div>
+                        <div class="col-12" id="moneyOrderErr" style="visibility:hidden;">
+                            <div class="row">
+                                <label class="col-xl-6 col-lg-6 col-md-4 col-sm-4 col-4 label text-info text-end mt-2 "></label>
+                                <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                                    <span class="font24" id="moneyOrderErrMsg" style="color:red;"> </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 col-12 mt-xl-0 mt-lg-0 mt-md-2 mt-sm-2 mt-2">
+                    <div class="row">
+                        <label class="font24 col-xl-6 col-lg-6 col-md-4 col-sm-4 col-4 label text-info text-end mt-2 " th:text="#{lblImportAmt}+':'"></label>
+                        <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                            <input aria-label="" type="text" class="form__field w-100" placeholder=""
+                                   name="inportTaxAdvanceAmount" id='inportTaxAdvanceAmount'
+                                   oninput="inputChange('inportTaxAdvanceAmountErr')" required/>
+                        </div>
+                        <div class="col-12" id="inportTaxAdvanceAmountErr" style="visibility:hidden;">
+                            <div class="row">
+                                <label class="col-xl-6 col-lg-6 col-md-4 col-sm-4 col-4 label text-info text-end mt-2 "></label>
+                                <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                                    <span class="font24" id="inportTaxAdvanceAmountErrMsg" style="color:red;"> </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- error message Start-->
+            <!-- error message End-->
+
+            <div class="row mt-xl-5 mt-lg-5 mt-md-1 mt-sm-1 mt-1">
+                <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 col-12">
+                    <div class="row">
+                        <label class="font24 col-xl-6 col-lg-6 col-md-4 col-sm-4 col-4 label text-info text-end mt-2 " th:text="#{lblRemark}+':'"></label>
+                        <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                            <input aria-label="" type="text" class="form__field w-100" placeholder="" name="remarks"
+                                   id='remarks' required/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+<!--        next-->
+        <div class="box-content mt-3 p-xl-5 p-lg-5 p-md-3 p-sm-3 p-3">
+            <!--pagination-->
+            <div class="row justify-content-center mb-3 mt-3">
+                <div class="col-8 text-center">
+                    <span style="font-size:22px; color:#2b2f33;" th:text="#{lblConfirm}+':'"></span>
+                </div>
+            </div>
+
+            <div class="row mt-xl-5 mt-lg-5 mt-md-1 mt-sm-1 mt-1">
+                <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                    <div class="row">
+                        <label class="col-3 font24 label text-info text-end mt-2 " th:text="#{lblDeclarationDt}+':'"></label>
+                        <div class="col-9">
+                            <input readonly aria-label="" autocomplete="off" type="text" class="form__field w-100" placeholder=""
+                                   name="declarationDate" id='declarationDate'
+                                   onfocus="openCalander('#declarationDate','declarationDateErr')" required/>
+                        </div>
+                        <div class="col-12" id="declarationDateErr" style="visibility:hidden;">
+                            <div class="row w-100">
+                                <label class="col-3 label text-info text-end mt-2 "></label>
+                                <div class="form__group field col-xl-6 col-lg-6 col-md-9 col-sm-9 col-9">
+                                    <span class="font24" id="declarationDateErrMsg" style="color:red;"> </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                    <div class="row">
+                        <label class="col-3 font24 label text-info text-end mt-2 " th:text="#{lblInspectionDt}+':'"></label>
+                        <div class="col-9">
+                            <input readonly aria-label="" autocomplete="off" type="text" class="form__field w-100" placeholder=""
+                                   name="inspectionDate" id='inspectionDate'
+                                   onfocus="openCalander('#inspectionDate','inspectionDateErr')"
+                                   required/>
+                        </div>
+                        <div class="col-12" id="inspectionDateErr" style="visibility:hidden;">
+                            <div class="row w-100">
+                                <label class="col-3 label text-info text-end mt-2 "></label>
+                                <div class="form__group field col-xl-6 col-lg-6 col-md-9 col-sm-9 col-9">
+                                    <span class="font24" id="inspectionDateErrMsg" style="color:red;"> </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- error start-->
+
+            <!-- error end-->
+
+            <div class="row mt-xl-5 mt-lg-5 mt-md-0 mt-sm-0 mt-0">
+                <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                    <div class="row">
+                        <label class="col-3 font24 label text-info text-end mt-2 " th:text="#{lblDeliveryDate}+':'"></label>
+                        <div class="col-9">
+                            <input readonly aria-label="" autocomplete="off" type="text" class="form__field w-100" placeholder=""
+                                   name="deliveryDateAndTime" id='deliveryDateAndTime'
+                                   onfocus="openCalander('#deliveryDateAndTime','deliveryDateAndTimeErr')" required/>
+                        </div>
+                        <div class="col-12" id="deliveryDateAndTimeErr" style="visibility:hidden;">
+                            <div class="row w-100">
+                                <label class="col-3 label text-info text-end mt-2 "></label>
+                                <div class="form__group field col-xl-6 col-lg-6 col-md-9 col-sm-9 col-9">
+                                    <span class="font24" id="deliveryDateAndTimeErrMsg" style="color:red;"> </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                    <div class="row">
+                        <label class="col-3 font24 label text-info text-end mt-2 "
+                               th:text="#{lblPossiblePickupDate}+':'"></label>
+                        <div class="col-9">
+                            <input readonly aria-label="" autocomplete="off" type="text" class="form__field w-100" placeholder=""
+                                   name="possiblePickUpDate" id='possiblePickUpDate'
+                                   onfocus="openCalander('#possiblePickUpDate','possiblePickUpDateErr')" required/>
+                        </div>
+                        <div class="col-12" id="possiblePickUpDateErr" style="visibility:hidden;">
+                            <div class="row w-100">
+                                <label class="col-3 label text-info text-end mt-2 "></label>
+                                <div class="form__group field col-xl-6 col-lg-6 col-md-9 col-sm-9 col-9">
+                                    <span class="font24" id="possiblePickUpDateErrMsg" style="color:red;"> </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- error start-->
+            <!-- error end-->
+
+            <div class="row mt-xl-5 mt-lg-5 mt-md-0 mt-sm-0 mt-0">
+                <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                    <div class="row">
+                        <label class="col-3 font24 label text-info text-end mt-2 "
+                               th:text="#{lblPickupDate}+':'"></label>
+                        <div class="col-9">
+                            <input readonly aria-label="" autocomplete="off" type="text" class="form__field w-100" placeholder=""
+                                   name="pickUpDate" id='pickUpDate'
+                                   onfocus="openCalander('#pickUpDate','pickUpDateErr')" required/>
+                        </div>
+                        <div class="col-12" id="pickUpDateErr" style="visibility:hidden;">
+                            <div class="row w-100">
+                                <label class="col-3 label text-info text-end mt-2 "></label>
+                                <div class="form__group field col-xl-6 col-lg-6 col-md-9 col-sm-9 col-9">
+                                    <span class="font24" id="pickUpDateErrMsg" style="color:red;"> </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                    <div class="row">
+                        <label class="col-3 font24 label text-info text-end mt-2 "
+                               th:text="#{lblFreeTime}+':'"></label>
+                        <div class="col-9">
+                            <input readonly aria-label="" autocomplete="off" type="text" class="form__field w-100" placeholder=""
+                                   name="freeTime" id='freeTime'
+                                   onfocus="openCalander('#freeTime','freeTimeErr')" required/>
+                        </div>
+                        <div class="col-12" id="freeTimeErr" style="visibility:hidden;">
+                            <div class="row w-100">
+                                <label class="col-3 label text-info text-end mt-2 "></label>
+                                <div class="form__group field col-xl-6 col-lg-6 col-md-9 col-sm-9 col-9">
+                                    <span class="font24" id="freeTimeErrMsg" style="color:red;"> </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- error start-->
+            <!-- error end-->
+
+        </div>
+
+<!--        next-->
+        <div class="box-content mt-3 p-xl-5 p-lg-5 p-md-3 p-sm-3 p-1">
+            <div class="row mt-5">
+                <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                    <div class="row">
+                        <label class="col-3 font24 label text-info text-end mt-2 " th:text="#{lblContainerNo}+':'"></label>
+                        <div class="form__group field col-9">
+                            <input aria-label="" type="text" class="form__field w-100" placeholder="" name="containerNo"
+                                   id='containerNo' required/>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                    <div class="row">
+                        <label class="col-3 font24 label text-info text-end mt-2 " th:text="#{lblCargoInsurance}+':'"></label>
+                        <div class="form__group field col-9">
+                            <input aria-label="" type="text" class="form__field w-100" placeholder=""
+                                   name="cargoInsurance" id='cargoInsurance' required/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-xl-5 mt-lg-5 mt-md-0 mt-sm-0 mt-0">
+                <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                    <div class="row">
+                        <label class="col-3 font24 label text-info text-end mt-2 " th:text="#{lblLogisticsCost}+':'"></label>
+                        <div class="form__group field col-9">
+                            <input aria-label="" type="text" class="form__field w-100" placeholder=""
+                                   name="logisticsCost" id='logisticsCost' oninput="inputChange('logisticsCostErr')"
+                                   required/>
+                        </div>
+                        <div class="col-12">
+                            <div class="row" id="logisticsCostErr" style="visibility:hidden;">
+                                <label class="col-3 label text-info text-end mt-2 "></label>
+                                <div class="form__group field col-xl-6 col-lg-6 col-md-9 col-sm-9 col-9">
+                                    <!--                            <input aria-label="" type="text" class="form__field w-100" placeholder=""-->
+                                    <!--                                   name="logisticsCost" id='logisticsCost' required/>-->
+                                    <span id="logisticsCostErrMsg" style="color:red;"> </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</form>
+<div class=" w-100 m-0 pb-2  fixed-bottom row">
+    <div class="col-12">
+        <div class="row justify-content-center">
+            <div style="
+                 width: inherit;
+                 background: white;
+                 border-radius: 8px;
+                 box-shadow: rgba(136, 165, 191, 0.48) 6px 2px 16px 0px, rgba(255, 255, 255, 0.8) -6px -2px 16px 0px;s
+            ">
+                <a id="saveBtn" onclick="savePatternRegistration()" type="button" class="btn btn-secondary  col-2 m-2"
+                   style="width:122px;" th:text="#{btnReg}"></a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script>
+    AOS.init();
+
+    let next = document.getElementById("next");
+    let prev = document.getElementById("prev");
+
+    window.onload = function () {
+        document.getElementById("newRegistration").classList.add("active");
+
+        let userControlFlag = "[[${userControlFlag.exportRegistrationFlg}]]";
+        if (userControlFlag === '2') {
+            $("input").prop("disabled", true);
+            $("select").prop("disabled", true);
+            $("button").prop("disabled", true);
+            $("#saveBtn").css('pointer-events', 'none');
+        }
+    };
+
+</script>
+
+<script>
+    let languageFlag = "[[${languageOption}]]";
+    loadErrorMessage();
+
+    function savePatternRegistration() {
+        let invoiceCode = document.getElementById('invoiceCode');
+        let bookingNo = document.getElementById('bookingNo');
+        let poNo = document.getElementById('poNo');
+        let patternName = document.getElementById('patternName');
+
+        let shippingAgency = document.getElementById('shippingAgency');
+        let exportInport = document.getElementById('exportInport');
+        let incoterms = document.getElementById('incoterms');
+
+        let shipName = document.getElementById('shipName');
+        let voyNo = document.getElementById('voyNo');
+
+        let packing = document.getElementById('packing');
+        let fortyF = document.getElementById('fortyF');
+
+        let blawbNo = document.getElementById('blawbNo');
+        let invoicePrice = document.getElementById('invoicePrice');
+        let twentyf = document.getElementById('twentyf');
+
+        // let cut = document.getElementById('cut');
+        let billingMonth = document.getElementById('billingMonth');
+        let transportMode = document.getElementById('transportMode');
+
+        let departurePort = document.getElementById('departurePort');
+        let arrivalPort = document.getElementById('arrivalPort');
+        let cut = document.getElementById('cut');
+
+        let etd = document.getElementById('etd');
+        let eta = document.getElementById('eta');
+
+        let anAdvanceFee = document.getElementById('anAdvanceFee');
+        let supplierName = document.getElementById('supplierName');
+        let representativeItem = document.getElementById('representativeItem');
+
+        let freightKg = document.getElementById('freightKg');
+        let freightM3 = document.getElementById('freightM3');
+        let ctsNumber = document.getElementById('ctsNumber');
+
+        let size = document.getElementById('size');
+
+        let hlBoxesNumber = document.getElementById('hlBoxesNumber');
+        let moneyOrder = document.getElementById('moneyOrder');
+        let inportTaxAdvanceAmount = document.getElementById('inportTaxAdvanceAmount');
+
+        let declarationDate = document.getElementById('declarationDate');
+        let inspectionDate = document.getElementById('inspectionDate');
+
+        let possiblePickUpDate = document.getElementById('possiblePickUpDate');
+        let pickUpDate = document.getElementById('pickUpDate');
+        let deliveryDateAndTime = document.getElementById('deliveryDateAndTime');
+        let freeTime = document.getElementById('freeTime');
+        let logisticsCost = document.getElementById('logisticsCost');
+
+        let regex = /[\u3000-\u303F]|[\u3040-\u309F]|[\u30A0-\u30FF]|[\uFF00-\uFFEF]|[\u4E00-\u9FAF]|[\u2605-\u2606]|[\u2190-\u2195]|\u203B/g;
+
+        let temp1 = "[[${patternList}]]";
+        let temp2 = temp1.substring(1, temp1.length - 1);
+        let patternNameList = temp2.split(',');
+
+        let valid = true;
+        if (invoiceCode.value === "") {
+            showErrorMsg("invoiceCodeErr", invoiceCodeEmptyErrMsg, invoiceCodeEmptyErrMsg, "invoiceCodeErrMsg", languageFlag)
+            // add.type = "button";
+            valid = false;
+        }
+
+        if (patternName.value === "") {
+            showErrorMsg("patternNameErr", patternNameEmptyErrMsg, patternNameEmptyErrMsg, "patternNameErrMsg", languageFlag)
+            valid = false;
+        }
+
+        if (bookingNo.value === "") {
+            showErrorMsg("bookingNoErr", bookingNoEmptyErrMsg, bookingNoEmptyErrMsg, "bookingNoErrMsg", languageFlag)
+            // add.type = "button";
+            valid = false;
+        }
+
+        if (poNo.value === "") {
+            showErrorMsg("poNoErr", poNoEmptyErrMsg, poNoEmptyErrMsg, "poNoErrMsg", languageFlag)
+            // add.type = "button";
+        valid = false;
+        }
+
+        if (shippingAgency.value === "") {
+            showErrorMsg("shippingAgencyErr", shippingAgencyEmptyErrMsg, shippingAgencyEmptyErrMsg, "shippingAgencyErrMsg", languageFlag)
+            // add.type = "button";
+            valid = false;
+        }
+
+        if (exportInport.value === "") {
+            showErrorMsg("exportInportErr", tradeEmptyErrMsg, tradeEmptyErrMsg, "exportInportErrMsg", languageFlag)
+            // add.type = "button";
+            valid = false;
+        }
+
+        if (incoterms.value === "") {
+            showErrorMsg("incotermsErr", incotermsEmptyErrMsg, incotermsEmptyErrMsg, "incotermsErrMsg", languageFlag)
+            // add.type = "button";
+            valid = false;
+        }
+
+        if (shipName.value === "") {
+            showErrorMsg("shipNameErr", shipNameEmptyErrMsg, shipNameEmptyErrMsg, "shipNameErrMsg", languageFlag)
+            // add.type = "button";
+            valid = false;
+        }
+
+        if (voyNo.value === "") {
+            showErrorMsg("voyNoErr", VOYNoEmptyErrMsg, VOYNoEmptyErrMsg, "voyNoErrMsg", languageFlag)
+            // add.type = "button";
+            valid = false;
+        }
+
+        if (billingMonth.value === "") {
+            showErrorMsg("billingMonthErr", billingMonthEmptyErrMsg, billingMonthEmptyErrMsg, "billingMonthErrMsg", languageFlag)
+            // add.type = "button";
+            valid = false;
+        }
+
+        if (packing.value == "") {
+            showErrorMsg("packingErr", packingEmptyErrMsg, packingEmptyErrMsg, "packingErrMsg", languageFlag)
+            valid = false;
+        } else if (regex.test(packing.value)) {
+            showErrorMsg("packingErr", packingJpnCharacterErrMsg, packingJpnCharacterErrMsg, "packingErrMsg", languageFlag)
+            valid = false;
+        } else if (!packing.value.match("^[0-9]*$")) {
+            showErrorMsg("packingErr", packingNumberErrMsg, packingNumberErrMsg, "packingErrMsg", languageFlag)
+            valid = false;
+        }
+
+        if (fortyF.value === "") {
+            showErrorMsg("fortyFErr", fortyFEmptyErrMsg, fortyFEmptyErrMsg, "fortyFErrMsg", languageFlag)
+            // add.type = "button";
+            valid = false;
+        } else if (!fortyF.value.match("^[0-9]*$")) {
+            showErrorMsg("fortyFErr", fortyFNumberErrMsg, fortyFNumberErrMsg, "fortyFErrMsg", languageFlag)
+            valid = false;
+        } else if (regex.test(fortyF.value)) {
+            showErrorMsg("fortyFErr", fortyFJpnCharacterErrMsg, fortyFJpnCharacterErrMsg, "fortyFErrMsg", languageFlag)
+            valid = false;
+        }
+
+        if (transportMode.value === "") {
+            showErrorMsg("transportModeErr", transportModeEmptyErrMsg, transportModeEmptyErrMsg, "transportModeErrMsg", languageFlag)
+            // add.type = "button";
+            valid = false;
+        }
+
+        if (blawbNo.value === "") {
+            showErrorMsg("blawbNoErr", blNoAwbNoEmptyErrMsg, blNoAwbNoEmptyErrMsg, "blawbNoErrMsg", languageFlag)
+            // add.type = "button";
+            valid = false;
+        }
+        //
+        if (invoicePrice.value === "") {
+            showErrorMsg("invoicePriceErr", invoicePriceEmptyErrMsg, invoicePriceEmptyErrMsg, "invoicePriceErrMsg", languageFlag)
+            valid = false;
+        } else if (!invoicePrice.value.match("^[0-9]*$")) {
+            showErrorMsg("invoicePriceErr", invoicePriceNumberErrMsg, invoicePriceNumberErrMsg, "invoicePriceErrMsg", languageFlag)
+            valid = false;
+        } else if (regex.test(invoicePrice.value)) {
+            showErrorMsg("invoicePriceErr", invoicePriceJpnCharacterErrMsg, invoicePriceJpnCharacterErrMsg, "invoicePriceErrMsg", languageFlag)
+            valid = false;
+        }
+
+        if (twentyf.value === "") {
+            showErrorMsg("twentyfErr", twentyFEmptyErrMsg, twentyFEmptyErrMsg, "twentyfErrMsg", languageFlag)
+            valid = false;
+        } else if (!twentyf.value.match("^[0-9]*$")) {
+            showErrorMsg("twentyfErr", twentyFNumberErrMsg, twentyFNumberErrMsg, "twentyfErrMsg", languageFlag)
+            valid = false;
+        } else if (regex.test(twentyf.value)) {
+            showErrorMsg("twentyfErr", twentyFJpnCharacterErrMsg, twentyFJpnCharacterErrMsg, "twentyfErrMsg", languageFlag)
+            valid = false;
+        }
+        //
+        if (cut.value === "") {
+            showErrorMsg("cutErr", cutEmptyErrMsg, cutEmptyErrMsg, "cutErrMsg", languageFlag)
+            // add.type = "button";
+            valid = false;
+        }
+
+        if (departurePort.value === "") {
+            showErrorMsg("departurePortErr", departPortEmptyErrMsg, departPortEmptyErrMsg, "departurePortErrMsg", languageFlag)
+            // add.type = "button";
+            valid = false;
+        }
+
+        if (arrivalPort.value === "") {
+            showErrorMsg("arrivalPortErr", arrivalPortEmptyErrMsg, arrivalPortEmptyErrMsg, "arrivalPortErrMsg", languageFlag)
+            // add.type = "button";
+            valid = false;
+        }
+
+        if (etd.value === "") {
+            showErrorMsg("etdErr", etdDateEmptyErrMsg, etdDateEmptyErrMsg, "etdErrMsg", languageFlag)
+            // add.type = "button";
+            valid = false;
+        }
+
+        if (eta.value === "") {
+            showErrorMsg("etaErr", etaDateEmptyErrMsg, etaDateEmptyErrMsg, "etaErrMsg", languageFlag)
+            // add.type = "button";
+            valid = false;
+        }
+
+        if (anAdvanceFee.value === "") {
+            showErrorMsg("anAdvanceFeeErr", anAdvancedFeeEmptyErrMsg, anAdvancedFeeEmptyErrMsg, "anAdvanceFeeErrMsg", languageFlag)
+            valid = false;
+        } else if (!anAdvanceFee.value.match("^[0-9]*$")) {
+            showErrorMsg("anAdvanceFeeErr", anAdvanceFeeNumberErrMsg, anAdvanceFeeNumberErrMsg, "anAdvanceFeeErrMsg", languageFlag)
+            valid = false;
+        } else if (regex.test(anAdvanceFee.value)) {
+            showErrorMsg("anAdvanceFeeErr", anAdvanceFeeJpnCharacterErrMsg, anAdvanceFeeJpnCharacterErrMsg, "anAdvanceFeeErrMsg", languageFlag)
+            valid = false;
+        }
+
+        if (supplierName.value === "") {
+            showErrorMsg("supplierNameErr", supplierEmptyErrMsg, supplierEmptyErrMsg, "supplierNameErrMsg", languageFlag)
+            // add.type = "button";
+            valid = false;
+        }
+
+        if (representativeItem.value === "") {
+            showErrorMsg("representativeItemErr", typeItemEmptyErrMsg, typeItemEmptyErrMsg, "representativeItemErrMsg", languageFlag)
+            // add.type = "button";
+            valid = false;
+        }
+
+        if (freightKg.value === "") {
+            showErrorMsg("freightKgErr", cargoKgEmptyErrMsg, cargoKgEmptyErrMsg, "freightKgErrMsg", languageFlag)
+            valid = false;
+        } else if (!freightKg.value.match("^[0-9]\\d*(\\.\\d+)?$")) {
+            showErrorMsg("freightKgErr", cargoKgNumberErrMsg, cargoKgNumberErrMsg, "freightKgErrMsg", languageFlag)
+            valid = false;
+        } else if (regex.test(freightKg.value)) {
+            showErrorMsg("freightKgErr", cargoKgJpnCharacterErrMsg, cargoKgJpnCharacterErrMsg, "freightKgErrMsg", languageFlag)
+            valid = false;
+        }
+
+        if (freightM3.value === "") {
+            showErrorMsg("freightM3Err", cargoM3EmptyErrMsg, cargoM3EmptyErrMsg, "freightM3ErrMsg", languageFlag)
+            valid = false;
+        } else if (!freightM3.value.match("^[0-9]\\d*(\\.\\d+)?$")) {
+            showErrorMsg("freightM3Err", cargoM3NumberErrMsg, cargoM3NumberErrMsg, "freightM3ErrMsg", languageFlag)
+            valid = false;
+        } else if (regex.test(freightM3.value)) {
+            showErrorMsg("freightM3Err", cargoM3JpnCharacterErrMsg, cargoM3JpnCharacterErrMsg, "freightM3ErrMsg", languageFlag)
+            valid = false;
+        }
+
+        if (ctsNumber.value === "") {
+            showErrorMsg("ctsNumberErr", ctsNosEmptyErrMsg, ctsNosEmptyErrMsg, "ctsNumberErrMsg", languageFlag)
+            valid = false;
+        } else if (!ctsNumber.value.match("^[0-9]*$")) {
+            showErrorMsg("ctsNumberErr", ctsNumberDigitErrMsg, ctsNumberDigitErrMsg, "ctsNumberErrMsg", languageFlag)
+            valid = false;
+        } else if (regex.test(ctsNumber.value)) {
+            showErrorMsg("ctsNumberErr", ctsNumberJpnCharacterErrMsg, ctsNumberJpnCharacterErrMsg, "ctsNumberErrMsg", languageFlag)
+            valid = false;
+        }
+
+        if (size.value === "") {
+            showErrorMsg("sizeErr", sizeEmptyErrMsg, sizeEmptyErrMsg, "sizeErrMsg", languageFlag)
+            // add.type = "button";
+            valid = false;
+        }
+
+        if (hlBoxesNumber.value === "") {
+            showErrorMsg("hlBoxesNumberErr", hlPackBoxEmptyErrMsg, hlPackBoxEmptyErrMsg, "hlBoxesNumberErrMsg", languageFlag)
+            valid = false;
+        } else if (!hlBoxesNumber.value.match("^[0-9]*$")) {
+            showErrorMsg("hlBoxesNumberErr", hlBoxesNumberDigitErrMsg, hlBoxesNumberDigitErrMsg, "hlBoxesNumberErrMsg", languageFlag)
+            valid = false;
+        } else if (regex.test(hlBoxesNumber.value)) {
+            showErrorMsg("hlBoxesNumberErr", hlBoxesNumberJpnCharacterErrMsg, hlBoxesNumberJpnCharacterErrMsg, "hlBoxesNumberErrMsg", languageFlag)
+            valid = false;
+        }
+
+        if (moneyOrder.value === "") {
+            showErrorMsg("moneyOrderErr", exchangeEmptyErrMsg, exchangeEmptyErrMsg, "moneyOrderErrMsg", languageFlag)
+            // add.type = "button";
+            valid = false;
+        } else if (!moneyOrder.value.match("^[0-9]*$")) {
+            showErrorMsg("moneyOrderErr", exchangeNumberErrMsg, exchangeNumberErrMsg, "moneyOrderErrMsg", languageFlag)
+            valid = false;
+        } else if (regex.test(moneyOrder.value)) {
+            showErrorMsg("moneyOrderErr", exchangeJpnCharacterErrMsg, exchangeJpnCharacterErrMsg, "moneyOrderErrMsg", languageFlag)
+            valid = false;
+        }
+
+        if (inportTaxAdvanceAmount.value === "") {
+            showErrorMsg("inportTaxAdvanceAmountErr", advanceAmtEmptyErrMsg, advanceAmtEmptyErrMsg, "inportTaxAdvanceAmountErrMsg", languageFlag)
+            valid = false;
+        } else if (!inportTaxAdvanceAmount.value.match("^[0-9]*$")) {
+            showErrorMsg("inportTaxAdvanceAmountErr", importTaxAdvanceAmountNumberErrMsg, importTaxAdvanceAmountNumberErrMsg, "inportTaxAdvanceAmountErrMsg", languageFlag)
+            valid = false;
+        } else if (regex.test(inportTaxAdvanceAmount.value)) {
+            showErrorMsg("inportTaxAdvanceAmountErr", importTaxAdvanceAmountJpnCharacterErrMsg, importTaxAdvanceAmountJpnCharacterErrMsg, "inportTaxAdvanceAmountErrMsg", languageFlag)
+            valid = false;
+        }
+
+        if (declarationDate.value === "") {
+            showErrorMsg("declarationDateErr", deliveryDtEmptyErrMsg, deliveryDtEmptyErrMsg, "declarationDateErrMsg", languageFlag)
+            // add.type = "button";
+            valid = false;
+        }
+        //
+        if (inspectionDate.value === "") {
+            showErrorMsg("inspectionDateErr", inspectionDtEmptyErrMsg, inspectionDtEmptyErrMsg, "inspectionDateErrMsg", languageFlag)
+            // add.type = "button";
+            valid = false;
+        }
+        //
+        if (deliveryDateAndTime.value === "") {
+            showErrorMsg("deliveryDateAndTimeErr", deliveryDtEmptyErrMsg, deliveryDtEmptyErrMsg, "deliveryDateAndTimeErrMsg", languageFlag)
+            // add.type = "button";
+            valid = false;
+        }
+        //
+        if (possiblePickUpDate.value === "") {
+            showErrorMsg("possiblePickUpDateErr", possiblePickupDtEmptyErrMsg, possiblePickupDtEmptyErrMsg, "possiblePickUpDateErrMsg", languageFlag)
+            // add.type = "button";
+            valid = false;
+        }
+        //
+        if (pickUpDate.value === "") {
+            showErrorMsg("pickUpDateErr", pickupDtEmptyErrMsg, pickupDtEmptyErrMsg, "pickUpDateErrMsg", languageFlag)
+            // add.type = "button";
+            valid = false;
+        }
+
+        if (freeTime.value === "") {
+            showErrorMsg("freeTimeErr", freeTimeEmptyErrMsg, freeTimeEmptyErrMsg, "freeTimeErrMsg", languageFlag)
+            // add.type = "button";
+            valid = false;
+        }
+        if (logisticsCost.value != "") {
+            if (!logisticsCost.value.match("^[0-9]*$")) {
+                showErrorMsg("logisticsCostErr", logisticsCostNumberErrMsg, logisticsCostNumberErrMsg, "logisticsCostErrMsg", languageFlag)
+                valid = false;
+            } else if (regex.test(logisticsCost.value)) {
+                showErrorMsg("logisticsCostErr", logisticsCostJpnCharacterErrMsg, logisticsCostJpnCharacterErrMsg, "logisticsCostErrMsg", languageFlag)
+                valid = false;
+            }
+        }
+
+
+        let patName = patternName.value.replace(/ +/g, "").toLowerCase();
+
+        for (i = 0; i < patternNameList.length; i++) {
+            let patNameDb = patternNameList[i].trim();
+            patNameDb = patNameDb.replace(/ +/g, "").toLowerCase();
+
+            if (patName === patNameDb) {
+                showErrorMsg("patternNameErr", patternNameAlreadyExistErrMsg, patternNameAlreadyExistErrMsg, "patternNameErrMsg", languageFlag)
+                valid = false;
+                break;
+            }
+        }
+
+        if (valid == true) {
+            let form_elem = document.getElementById('exportRegistrationForm');
+            form_elem.submit();
+        } else if (valid === false) {
+            window.scrollTo(0, 0);
+        }
+    }
+
+    function openCalander(a, errorMsgElementId) {
+        let date = a;
+        const myDatePicker = MCDatepicker.create({
+            el: date,
+            closeOnBlur: true,
+            dateFormat: 'YYYY/MM/DD',
+            bodyType: 'inline',
+            theme: {
+                display: {
+                    foreground: 'rgba(255, 255, 255, 0.8)',
+                    background: '#18477E'
+                },
+                main_background: '#fff',
+                weekday: {
+                    foreground: '#18477E'
+                },
+                date: {
+                    active: {
+                        picked: {
+                            background: '#18477E'
+                        }
+                    }
+                },
+                button: {
+                    success: {
+                        foreground: '#18477E'
+                    }
+                },
+            },
+        });
+
+        document.getElementById(errorMsgElementId).style.visibility = "hidden";
+        myDatePicker.open();
+        // alert('hello');
+    }
+
+    function selectMonth(a, errorMsgElementId) {
+        let date = a;
+        const myDatePicker = MCDatepicker.create({
+            el: date,
+            closeOnBlur: true,
+            dateFormat: 'YYYY/MM',
+            bodyType: 'inline',
+            theme: {
+                display: {
+                    foreground: 'rgba(255, 255, 255, 0.8)',
+                    background: '#18477E'
+                },
+                main_background: '#fff',
+                weekday: {
+                    foreground: '#18477E'
+                },
+                date: {
+                    active: {
+                        picked: {
+                            background: '#18477E'
+                        }
+                    }
+                },
+                button: {
+                    success: {
+                        foreground: '#18477E'
+                    }
+                },
+            },
+        });
+
+        document.getElementById(errorMsgElementId).style.visibility = "hidden";
+        myDatePicker.open();
+        // alert('hello');
+    }
+
+</script>
+<script>
+    function changeDateTime(timestamp) {
+        let jsDate = new Date(timestamp);
+        let jsMonth = jsDate.getMonth() + 1;
+        return jsDate.getFullYear() + '/' + jsMonth + '/' + jsDate.getDate()
+    }
+</script>
+</body>
+</html>

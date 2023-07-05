@@ -1,0 +1,90 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+    setInterval(function() {
+      $.ajax({
+        url: "/check-session",
+        method: "GET",
+        contentType: 'application/json; charset=utf-8',
+        success: function(data){
+          console.log("OK")
+        },
+        error: function (data) {
+          window.location.replace("/login");
+        }
+      })
+    }, 1000);
+  </script>
+    <style>
+    .pad{
+    padding-left:3px !important;
+    padding-right:10px !important;
+}
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-light  addednav drown sticky-top " style="z-index:1002;" >
+    <div class="container-fluid">
+        <img src="../image/HLlogo.png" alt="">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse justify-content-end" id="navbarNavDropdown">
+            <ul class="navbar-nav " >
+                <li class="nav-item">
+                    <a class="nav-link pad  " id="priceList" aria-current="page" href="/priceList" th:text="#{priceList}"></a>
+                </li>
+
+
+
+
+                <li class="nav-item">
+                    <a class="nav-link  " id="inquiry" href="/inquiry " th:text="#{inquiry}"></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link pad " id="" aria-current="page" href="/login" th:text="#{login}">login</a>
+                </li>
+                <!--        <li class="nav-item disabled" style="pointer-events:none;opacity:0.0;">-->
+                <!--          <a class="nav-link" href="#"></a>-->
+                <!--        </li>-->
+
+                <li class="nav-item">
+
+                    <form th:action="@{/changeLanguage}" method="POST" id="changeLanguageForm">
+                        <input type="checkbox" id="toggle" name="url" value="entryPage"/>
+                        <button style="display:none;" type="submit" id="change">submit</button>
+                    </form>
+                    <label for="toggle" class="toggleWrapper mt-2" id="language" onclick="toggleClick()" value="Jpn" th:text="#{jp}"></label>
+                </li>
+
+            </ul>
+        </div>
+    </div>
+</nav>
+<script>
+  $(function() {
+$(window).scroll(function () {
+   if ($(this).scrollTop() > 0) {
+       $('nav').removeClass('addednav')
+      $('nav').addClass('transparent_nav')
+      $('#com_name').removeClass('company_name_style')
+      $('#com_name').addClass('company_name_style_after_scroll')
+   }else if ($(this).scrollTop() == 0) {
+    $('nav').addClass('addednav')
+      $('nav').removeClass('transparent_nav')
+      $('#com_name').removeClass('company_name_style_after_scroll')
+      $('#com_name').addClass('company_name_style')
+   }
+});
+});
+</script>
+
+</body>
+<script src="../js/menuListenRes.js"></script>
+</html>

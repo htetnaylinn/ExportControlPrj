@@ -1,0 +1,33 @@
+
+@media screen and (min-width: 1199px) {
+    .w-btn{
+        width:122px !important;
+    }
+
+}
+
+@media screen and (max-width: 1199px) {
+    .w-btn{
+        width:122px !important;
+    }
+}
+
+@media screen and (max-width: 991px) {
+    .font24{
+        font-size:16px !important;
+    }
+    .w-btn{
+        width:fit-content !important;
+    }
+}
+
+@media only screen and (max-width:576px)  {
+    .font24{
+        font-size:15px !important;
+    }
+
+    .w-btn{
+        width:fit-content !important;
+    }
+}
+

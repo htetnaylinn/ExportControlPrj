@@ -1,0 +1,73 @@
+
+
+@media screen and (min-width: 1199px) {
+
+    .container{
+        max-width: 100% !important;
+    }
+
+    .sendMailBtn{
+        position: fixed;
+        top: 90%;
+        left: 87%;
+    }
+
+
+}
+
+@media screen and (max-width: 1199px) {
+    .mail-send-box{
+        width:90% !important;
+    }
+    .container{
+        max-width: 1130px !important;
+    }
+    .sendMailBtn{
+        position: fixed;
+        top: 90%;
+        left: 79%;
+        width: 20%;
+    }
+}
+
+@media screen and (max-width: 991px) {
+
+
+    .font24{
+        font-size:16px !important;
+    }
+
+    .mail-send-box{
+        width:90% !important;
+    }
+
+    .container{
+        max-width : 951px !important;
+    }
+
+    .sendMailBtn{
+        position: fixed;
+        top: 90%;
+        left: 79%;
+        width: 20%;
+    }
+}
+
+@media only screen and (max-width:576px)  {
+
+    .font24{
+        font-size:15px !important;
+    }
+
+    .mail-send-box{
+        width:90% !important;
+    }
+    .sendMailBtn{
+        position: fixed;
+        top: 94%;
+        left: 68%;
+        width: 32%;
+    }
+
+}
+

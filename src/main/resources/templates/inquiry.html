@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="#{lblInquiryTitle}"></title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/inquiry.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+            crossorigin="anonymous"></script>
+    <script src="../js/common.js"></script>
+    <script src="../js/ajaxMessage/passwordChangeErrorMessages.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+</head>
+<body>
+
+<!--navigation-->
+<th:block th:if="${menuBarFlag} == 1" :: header th:include="@{/menu.html}"></th:block>
+
+<div class="box-content mt-5 pe-0 ms-5 pb-2">
+    <h2 class="font-header" th:text="#{lblInquiryTitle}"></h2>
+</div>
+<form id="inquiryForm" method="POST" th:object="${inquiry}" th:action="@{'/' + ${formActionName}}">
+
+    <div class="box-content" style="height:60px;">
+        <div class="row mt-1 justify-content-center " style="height:60px;">
+            <div class="col-lg-4 col-xl-4 col-sm-6 col-6 mt-2 pe-0">
+                <div class="border-color" id="optionOneBorder" style="text-align:end; height:60px;">
+                    <div class="me-5">
+                        <input aria-label="" class="form-check-input radio-check" type="radio" id="firstOption"
+                               name="flexRadioDefault" value="0" checked="checked" onclick="changeOption()">
+                        <label class="font-header h4 form-check-label" for="" th:text="#{lblEstimate}">
+
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-xl-4 col-sm-6 col-6 mt-2 ps-0 ">
+                <div id="optionTwoBorder" style="height:60px;">
+                    <div class="ms-xl-5 ms-lg-5 ms-md-3 ms-sm-2 ms-2">
+                        <input aria-label="" class="form-check-input radio-check" type="radio" id="secondOption"
+                               name="flexRadioDefault" value="1" onclick="changeOption()">
+                        <label class="font-header h4 form-check-label" for="" th:text="#{lblOtherInquires}">
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <div class="  box box-4 container mt-5" id="quotation_option1">
+        <div class="box-content w-100">
+            <div class="row ">
+                <div class="col-12">
+                    <div class="row mt-2">
+                        <label class="col-4 label text-info text-center mt-3 font24 "
+                               th:text="#{lblCompanyName}+':*'"></label>
+                        <div class="form__group field col-8">
+                            <input aria-label="" type="text" class="form__field w-75" th:placeholder="#{lblCompanyName}"
+                                   name="companyName" id='companyName' oninput="inputChange('companyNameErr')"
+                                   required/>
+                        </div>
+                    </div>
+                    <div class="row mt-1" id='companyNameErr' style="visibility:hidden;">
+                        <label class="col-4 label text-info text-center mt-3 font24 "></label>
+                        <div class="form__group field col-8">
+                            <label id="companyNameErrMsg" class=" font24 w-100 text-danger"></label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-2 ">
+                <div class="col-12">
+                    <div class="row">
+                        <label class="col-4 label text-info text-center mt-3 font24 " th:text="#{lblName}+':*'"></label>
+                        <div class="form__group field col-8">
+                            <input aria-label="" type="text" class="form__field w-75" th:placeholder="#{lblName}" name="name"
+                                   id='name' oninput="inputChange('nameErr')" required/>
+                        </div>
+                    </div>
+                    <div class="row" name="nameErr" id='nameErr' style="visibility:hidden;">
+                        <label class="col-4 label text-info text-center mt-3 font24 "></label>
+                        <div class="form__group field col-8">
+                            <label id="nameErrMsg" class="font24 text-danger w-75">客名を入力してください </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-2 ">
+                <div class="col-12">
+                    <div class="row">
+                        <label class="col-4 label text-info text-center mt-3 font24 "
+                               th:text="#{lblPhoneNo}+':'"></label>
+                        <div class="form__group field col-8">
+                            <input aria-label="" type="text" oninput="inputChange('phoneNoErr')" class="form__field w-75" name="phoneNo" th:placeholder="#{lblPhoneNo}"
+                                   id='phoneNo' required/>
+                        </div>
+                    </div>
+                    <div class="row" name="phoneNoErr" id='phoneNoErr' style="visibility:hidden;">
+                        <label class="col-4 label text-info text-center mt-3 font24 "></label>
+                        <div class="form__group field col-8">
+                            <label id='phoneNoErrMsg' class="font24 text-danger w-75">電話番号を入力してください </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-2">
+                <div class="col-12">
+                    <div class="row">
+                        <label class="col-4 label text-info text-center mt-3 font24 " th:text="#{lblMail}+':*'"></label>
+                        <div class="form__group field col-8">
+                            <input aria-label="" type="text" class="form__field w-75" name="mail" th:placeholder="#{lblMail}"
+                                   id='mail' oninput="inputChange('mailErr')" required/>
+                        </div>
+                    </div>
+                    <div class="row" name="mailErr" id='mailErr' style="visibility:hidden;">
+                        <label class="col-4 label text-info text-center mt-3 font24 "></label>
+                        <div class="form__group field col-8">
+                            <label id='mailErrMsg' class="font24 text-danger w-75">メールアドレスを入力してください </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!--table-->
+
+    <div class="w-100 d-flex justify-content-center">
+        <div class="  box box-4  mt-5  wrap " id="quotation_option2">
+            <div class="box-content">
+                <h2 class="ps-2" th:text="#{lblExportRegistration}"> </h2>
+                <label class="col-10 ps-2 label text-info text-center" id="exportErr" style="visibility:hidden;" ><span id="exportErrMsg" style="color:red;font-size: 14px;"></span></label>
+                <div class="row mt-xl-3 mt-lg-3 mt-md-2 mt-sm-2 mt-2">
+                    <div class="col-xl-4 col-lg-4 col-md-4 col-sm-12 col-12 mt-xl-0 mt-lg-0 mt-md-0 mt-sm-1 mt-3">
+                        <div class="row">
+                            <label class="col-xl-6 col-lg-6 col-md-4 col-sm-3 col-3 label text-info text-end mt-2 " th:text="#{lblExportOrImport}+':'"></label>
+                            <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                                <input aria-label="" type="text" class="form__field w-100 export" placeholder="" name="exportInport"
+                                       id='exportInport' oninput="inputChange('exportErr')" required/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-4 col-lg-4 col-md-4 col-sm-12 col-12 mt-xl-0 mt-lg-0 mt-md-0 mt-sm-1 mt-3">
+                        <div class="row">
+                            <label class="col-xl-6 col-lg-6 col-md-4 col-sm-3 col-3 label text-info text-end mt-2 ">Incoterms:</label>
+                            <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                                <input aria-label="" type="text" class="form__field w-100 export" placeholder="" name="incoterms"
+                                       id='incoterms' oninput="inputChange('exportErr')" required/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-4 col-lg-4 col-md-4 col-sm-12 col-12 mt-xl-0 mt-lg-0 mt-md-0 mt-sm-1 mt-3">
+                        <div class="row">
+                            <label class="col-xl-6 col-lg-6 col-md-4 col-sm-3 col-3 label text-info text-end mt-2 " th:text="#{lblTransportMode}+':'"></label>
+                            <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                                <input aria-label="" type="text" class="form__field w-100 export" placeholder="" name="transportMode"
+                                       id='transportMode' oninput="inputChange('exportErr')" required/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-xl-3 mt-lg-3 mt-md-2 mt-sm-2 mt-2">
+                    <div class="col-xl-4 col-lg-4 col-md-4 col-sm-12 col-12 mt-xl-0 mt-lg-0 mt-md-0 mt-sm-1 mt-3">
+                        <div class="row">
+                            <label class="col-xl-6 col-lg-6 col-md-4 col-sm-3 col-3 label text-info text-end mt-2 " th:text="#{lblDeparturePort}+':'"></label>
+                            <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                                <input aria-label="" type="text" class="form__field w-100 export" placeholder="" name="departurePort"
+                                       id='departurePort' oninput="inputChange('exportErr')" required/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-4 col-lg-4 col-md-4 col-sm-12 col-12 mt-xl-0 mt-lg-0 mt-md-0 mt-sm-1 mt-3">
+                        <div class="row">
+                            <label class="col-xl-6 col-lg-6 col-md-4 col-sm-3 col-3 label text-info text-end mt-2 " th:text="#{lblArrivalPort}+':'"></label>
+                            <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                                <input aria-label="" type="text" class="form__field w-100 export" placeholder="" name="arrivalPort"
+                                       id='arrivalPort' oninput="inputChange('exportErr')" required/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-4 col-lg-4 col-md-4 col-sm-12 col-12 mt-xl-0 mt-lg-0 mt-md-0 mt-sm-1 mt-3">
+                        <div class="row">
+                            <label class="col-xl-6 col-lg-6 col-md-4 col-sm-3 col-3 label text-info text-end mt-2 " th:text="#{lblCargoType}+':'"></label>
+                            <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                                <input aria-label="" type="text" class="form__field w-100 export" placeholder="" name="cargoType"
+                                       id='cargoType' oninput="inputChange('exportErr')" required/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-xl-3 mt-lg-3 mt-md-2 mt-sm-2 mt-2">
+                    <div class="col-xl-4 col-lg-4 col-md-4 col-sm-12 col-12 mt-xl-0 mt-lg-0 mt-md-0 mt-sm-1 mt-3">
+                        <div class="row">
+                            <label class="col-xl-6 col-lg-6 col-md-4 col-sm-3 col-3 label text-info text-end mt-2 " th:text="#{lblLoadingPort}+':'"></label>
+                            <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                                <input aria-label="" type="text" class="form__field w-100 export" placeholder="" name="loadingPort"
+                                       id='loadingPort' oninput="inputChange('exportErr')" required/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-4 col-lg-4 col-md-4 col-sm-12 col-12 mt-xl-0 mt-lg-0 mt-md-0 mt-sm-1 mt-3">
+                        <div class="row">
+                            <label class="col-xl-6 col-lg-6 col-md-4 col-sm-3 col-3 label text-info text-end mt-2 " th:text="#{lblLandingPort}+':'"></label>
+                            <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                                <input aria-label="" type="text" class="form__field w-100 export" placeholder="" name="landingPort"
+                                       id='landingPort' oninput="inputChange('exportErr')" required/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-4 col-lg-4 col-md-4 col-sm-12 col-12 mt-xl-0 mt-lg-0 mt-md-0 mt-sm-1 mt-3">
+                        <div class="row">
+                            <label class="col-xl-6 col-lg-6 col-md-4 col-sm-3 col-3 label text-info text-end mt-2 " th:text="#{lblQuantity}+':'"></label>
+                            <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                                <input aria-label="" type="text" class="form__field w-100 export" placeholder="" name="quantity"
+                                       id='Quantity' oninput="inputChange('exportErr')" required/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-xl-3 mt-lg-3 mt-md-2 mt-sm-2 mt-2">
+                    <div class="col-xl-4 col-lg-4 col-md-4 col-sm-12 col-12 mt-xl-0 mt-lg-0 mt-md-0 mt-sm-1 mt-3">
+                        <div class="row">
+                            <label class="col-xl-6 col-lg-6 col-md-4 col-sm-3 col-3 label text-info text-end mt-2 " th:text="#{packingType}+':'"></label>
+                            <div class="form__group field col-xl-6 col-lg-6 col-md-8 col-sm-8 col-8">
+                                <input aria-label="" type="text" class="form__field w-100 export" placeholder="" name="packing"
+                                       id='packing' oninput="inputChange('exportErr')" required/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="w-100 d-flex justify-content-center">
+        <div class=" wrap box box-4  my-5 " id="other_option">
+            <div class=" row box-content" style="background-color:#fdfdfd; ">
+                <label th:text="#{lblOtherInquires}+':'"></label>
+                <div class="mb-3">
+                    <label for="exampleFormControlTextarea1" class="form-label"></label>
+                    <textarea class="form-control" id="exampleFormControlTextarea1" rows="5"
+                              name="otherInquires"></textarea>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+    <div class="form__group field col-9" style="display: none">
+        <input autocomplete="off" aria-label="" th:text="${menuBarFlag}" type="text" class="form__field" name="menuBarFlag" id='update_check'
+               value="false" required/>
+    </div>
+    <div class="form__group field col-9" style="display: none">
+        <input autocomplete="off" aria-label="" th:text="${userCode}" type="text" class="form__field" name="userCode" id='update_check'
+               value="false" required/>
+    </div>
+    <div class="h-25 mb-5">
+        <div class="row justify-content-center w-100" style="margin-left: 0;">
+            <button type="button" onclick="sendInquiry()" class="m-1 btn btn-secondary  col-2 mt-3" style="width:auto;"
+                    th:text="#{lblMailSend}">
+            </button>
+            <a th:if="${menuBarFlag} != 1" type="button"  href="/" class="m-1 btn btn-secondary  col-2 mt-3" style="width:auto;"
+                    th:text="#{login}">
+            </a>
+        </div>
+    </div>
+</form>
+
+<script>
+
+    let languageFlag = "[[${languageOption}]]";
+    let menuBarFlag = "[[${menuBarFlag}]]";
+    loadInquiryMessage();
+
+    window.onload = function () {
+        if(menuBarFlag != 0) {
+            document.getElementById("inquiry").classList.add("active");
+            let systemErrMsg = "[[${systemErrorMsg}]]"
+            if (systemErrMsg) {
+                showSystemError(systemErrMsg);
+            }
+        }
+    };
+
+    function changeOption() {
+
+        let quotation_option_elem1 = document.getElementById('quotation_option1');
+        let quotation_option_elem2 = document.getElementById('quotation_option2');
+        let option_border_elem1 = document.getElementById('optionOneBorder');
+        let option_border_elem2 = document.getElementById('optionTwoBorder');
+        let other_option_elem = document.getElementById('other_option');
+
+        let radio_elem = document.getElementsByName('flexRadioDefault');
+
+        for (let i = 0; i < radio_elem.length; i++) {
+            if (radio_elem[i].checked) {
+
+                if (radio_elem[i].value == 1) {
+
+                    quotation_option_elem1.classList.remove('disabledElement');
+                    quotation_option_elem2.classList.add('disabledElement');
+                    other_option_elem.classList.remove('disabledElement');
+                    option_border_elem1.classList.remove('border-color');
+                    option_border_elem2.classList.add('border-color');
+                } else {
+                    other_option_elem.classList.remove('disabledElement');
+                    quotation_option_elem1.classList.remove('disabledElement');
+                    quotation_option_elem2.classList.remove('disabledElement');
+                    option_border_elem1.classList.add('border-color');
+                    option_border_elem2.classList.remove('border-color');
+                }
+                break;
+            }
+
+        }
+        document.getElementById('companyNameErr').style.visibility = "hidden";
+        document.getElementById('nameErr').style.visibility = "hidden";
+        document.getElementById('phoneNoErr').style.visibility = "hidden";
+        document.getElementById('mailErr').style.visibility = "hidden";
+        document.getElementById('exportErr').style.visibility = "hidden";
+        // document.getElementById('').style.visibility = "hidden";
+
+    }
+
+    function sendInquiry() {
+
+        let x = 0;
+        let y = 0;
+        let validFlag = true;
+        var emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        if ($("#firstOption").prop("checked")) {
+
+            let exportFlag = false;
+            let exports = document.querySelectorAll("[class*=export]");
+            for (var i = 0, len = exports.length; i < len; i++) {
+                if (exports[i].value !== '') {
+                    exportFlag = true
+                }
+            }
+
+            if(exportFlag === false){
+                validFlag = false;
+                y = 530;
+                showErrorMsg("exportErr",exportItemEmptyErrMsg,exportItemEmptyErrMsg,"exportErrMsg",languageFlag)
+            }
+        }
+
+
+        if ($("#companyName").val() === "") {
+            validFlag = false;
+            y = 0;
+            // $("#companyNameErr").show()
+            showErrorMsg("companyNameErr",companyEmptyErrMsg,companyEmptyErrMsg,"companyNameErrMsg",languageFlag)
+        }
+        if ($("#name").val() === "") {
+            validFlag = false;
+            y = 0;
+            //$("#nameErr").show()
+            showErrorMsg("nameErr",customerEmptyErrMsg,customerEmptyErrMsg,"nameErrMsg",languageFlag)
+        }
+        if ($("#phoneNo").val() === "") {
+            validFlag = false;
+            y = 0;
+           // $("#phoneNoErr").show()
+            showErrorMsg("phoneNoErr",phoneNoEmptyErrMsg,phoneNoEmptyErrMsg,"phoneNoErrMsg",languageFlag)
+        }
+        if ($("#mail").val() == "") {
+            validFlag = false;
+            y = 0;
+            // $("#mailErr").show()
+            showErrorMsg("mailErr",mailEmptyErrMsg,mailEmptyErrMsg,"mailErrMsg",languageFlag)
+        }else if(!emailRegex.test($("#mail").val())){
+            validFlag = false;
+            y = 0;
+            showErrorMsg("mailErr","メールのフォーマットが間違っています。","Mail Format is worng.","mailErrMsg",languageFlag)
+        }
+
+
+
+        if (validFlag) {
+            let form_elem = document.getElementById('inquiryForm');
+            form_elem.submit();
+        } else {
+            window.scrollTo(x, y);
+        }
+
+
+    }
+
+
+</script>
+
+</body>
+</html>

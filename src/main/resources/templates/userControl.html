@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="#{lblUserDetailTitle}"></title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/userControl.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/mc-datepicker/dist/mc-calendar.min.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+            crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script src="../js/common.js"></script>
+    <script src="../js/ajaxMessage/passwordChangeErrorMessages.js"></script>
+    <script th:if="${languageOption} == 0" src="../js/calendarJp.js"></script>
+    <script th:if="${languageOption} == 1" src="../js/calendarEn.js"></script>
+</head>
+<body>
+
+<!--navigation-->
+<th:block :: header th:include="@{/menu.html}"></th:block>
+
+<!--商品マスタ-->
+
+<!--navigation-->
+<form id="userControlForm" th:action="@{/saveUser}" method="POST" nonvalidate modelAttribute="schedleControl">
+    <!--商品マスタ-->
+    <div class="box box-4 container mt-5">
+        <div class="box-content">
+            <h2 th:text="#{lblUserDetailTitle}"></h2>
+            <div class="row  margin-xs">
+                <div class="col-xl-6 col-lg-6 col-sm-6 col-12">
+                    <div class="row">
+                        <label class="p-0 font24 col-3 label text-info text-center mt-2 " th:text="#{lblEmployeeNo}+':'"></label>
+                        <div class="form__group field col-9">
+                            <input aria-label="" oninput="inputChange('empNumberErr')" type="text" class="form__field"
+                                   id='emp_num'
+                                   name="employeeNumber" maxlength="5" required/>
+                        </div>
+                        <div class="col-12" id="empNumberErr" style="visibility:hidden;">
+                            <div class="row">
+                                <label class="col-3 label text-info text-center  "></label>
+                                <div class="font24 form__group field col-9">
+                                    <span id="empNumberErrMsg" style="color:red;"> </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-6 col-lg-6 col-sm-6 col-12 mt-xl-0 mt-lg-0 mt-md-2 mt-m-2 mt-2">
+                    <div class="row">
+                        <label class="p-0 font24 col-3 label text-info text-center mt-2" th:text="#{lblComName}+':'"></label>
+                        <div class="col-9">
+                            <select onchange="inputChange('companyNameErr')" class="form-select"
+                                    aria-label="Default select example" name="companyCode" id="companyName">
+                                <option></option>
+                                <option
+                                        th:each="company,stat: ${companyList}"
+                                        th:text="${languageOption}== 0? ${company.companyNameJPN}: ${company.companyNameENG}"
+                                        th:value="${company.companyCode}"></option>
+                            </select>
+                        </div>
+                        <div class="col-12" id="companyNameErr" style="visibility:hidden">
+                            <div class="row">
+                                <label class="col-3 label text-info text-center  "></label>
+                                <div class="font24 form__group field col-9">
+                                    <span id="companyNameErrMsg" style="color:red;"> </span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="row  margin-xs">
+                <div class="col-xl-6 col-lg-6 col-sm-6 col-12 mt-xl-0 mt-lg-0 mt-md-2 mt-m-2 mt-2">
+                    <div class="row">
+                        <label class="p-0 font24 col-3 label text-info text-center  mt-2 " th:text="#{lblEmpName}+':'"></label>
+                        <div class="form__group field col-9">
+                            <input aria-label="" oninput="inputChange('empNameErr')" type="text"
+                                   class="form__field" name="employeeName" id='emp_name'
+                                   maxlength="50" required/>
+                        </div>
+                        <div class="col-12" id="empNameErr" style="visibility:hidden;">
+                            <div class="row">
+                                <label class="col-3 label text-info text-center  "></label>
+                                <div class="font24 form__group field col-9">
+                                    <span id="empNameErrMsg" style="color:red;"> </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-6 col-lg-6 col-sm-6 col-12 mt-xl-0 mt-lg-0 mt-md-2 mt-m-2 mt-2">
+                    <div class="row">
+                        <label class="p-0 font24 col-3 label text-info text-center  mt-2 " th:text="#{lblStartDate}+':'"></label>
+                        <div class="form__group field col-9">
+                            <input aria-label="" type="text" class="form__field" name="startDate" id='date1'
+                                   autocomplete="off"
+                                   required onfocus="openCalander('#date1','startDateErr')" readonly/>
+                        </div>
+                        <div class="col-12" id="startDateErr" style="visibility:hidden">
+                            <div class="row">
+                                <label class="col-3 label text-info text-center  "></label>
+                                <div class="font24 form__group field col-9">
+                                    <span id="startDateErrMsg" style="color:red;"> </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="row  margin-xs">
+                <div class="col-xl-6 col-lg-6 col-sm-6 col-12 mt-xl-0 mt-lg-0 mt-md-2 mt-m-2 mt-2">
+                    <div class="row">
+                        <label class="p-0 font24 col-3 label text-info text-center mt-2 "
+                               th:text="#{lblAuthoritySelect}+':'"></label>
+                        <div class="col-9">
+                            <select onchange="roleChange()" id="role" class="form-select" name="role"
+                                    aria-label="Default select example">
+                                <option th:each="usertype : ${UserTypes}"
+                                        th:text="${usertype.type}"
+                                        th:value="${usertype.name}">
+                            </select>
+                        </div>
+                        <div class="col-12" id="roleChangeErr" style="visibility:hidden;">
+                            <div class="row">
+                                <label class="col-3 label text-info text-center  "></label>
+                                <div class="font24 form__group field col-9">
+                                    <span id="roleChangeErrMsg" style="color:red;"> </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-6 col-lg-6 col-sm-6 col-12 mt-xl-0 mt-lg-0 mt-md-2 mt-m-2 mt-2">
+                    <div class="row">
+                        <label class="p-0 font24 col-3 label text-info text-center mt-2 " th:text="#{lblEndDate}+':'"></label>
+                        <div class="form__group field col-9">
+                            <input aria-label="" type="text" class="form__field" name="endDate" autocomplete="off"
+                                   id='date2' readonly onfocus="openCalander('#date2','endDateErr')"/>
+                        </div>
+                        <div class="col-12" id="endDateErr" style="visibility:hidden">
+                            <div class="row">
+                                <label class="col-3 label text-info text-center  "></label>
+                                <div class="font24 form__group field col-9">
+                                    <span id="endDateErrMsg" style="color:red;"> </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="row  margin-xs">
+                <div class="col-xl-6 col-lg-6 col-sm-6 col-12 mt-xl-0 mt-lg-0 mt-md-2 mt-m-2 mt-2">
+                    <div class="row">
+                        <label class="p-0 font24 col-3 label text-info text-center mt-2 " th:text="#{lblMail}+':'"></label>
+                        <div class="form__group field col-9">
+                            <input aria-label="" type="text" class="form__field"
+                                   name="emailAddress" autocomplete="off"  id='mail'
+                                    maxlength="30" oninput="inputChange('mailErr')"/>
+                        </div>
+                        <div class="col-12" id="mailErr" style="visibility:hidden">
+                            <div class="row">
+                                <label class="col-3 label text-info text-center  "></label>
+                                <div class="font24 form__group field col-9">
+                                    <span id="mailErrMsg" style="color:red;"> </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="box box-4 container mt-5 mb-5" style="width: 90%; ">
+        <div class="box-content">
+            <h2 th:text="#{lblExportRegistration}"></h2>
+            <div style="height:300px;overflow-y: scroll;padding:13px;">
+                <div class="row mt-3 justify-content-between">
+                    <div class="col-xl-2 col-lg-2 col-md-6 col-sm-6 col-6 mt-3">
+                        <div class="row">
+                            <div class="form-check">
+                                <input class="form-check-input export" id="customerName" name="customerName"
+                                       type="checkbox">
+                                <label class="form-check-label" for="customerName" th:text="#{lblCustomerName}">
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-2 col-lg-2 col-md-6 col-sm-6 col-6 mt-3">
+                        <div class="row">
+                            <div class="form-check">
+                                <input class="form-check-input export" id="patternName" name="patternName"
+                                       type="checkbox">
+                                <label class="form-check-label" for="patternName" th:text="#{lblPatternName}">
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-2 col-lg-2 col-md-6 col-sm-6 col-6 mt-3">
+                        <div class="row">
+                            <div class="form-check">
+                                <input class="form-check-input export" id="billingMonth" name="billingMonth"
+                                       type="checkbox">
+                                <label class="form-check-label" for="billingMonth" th:text="#{lblBillingMonth}">
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-2 col-lg-2 col-md-6 col-sm-6 col-6 mt-3">
+                        <div class="row">
+                            <div class="form-check">
+                                <input class="form-check-input export" id="bookingNo" name="bookingNo" type="checkbox">
+                                <label class="form-check-label" for="bookingNo">
+                                    bookingNo
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6 col-6 mt-3">
+                        <div class="row">
+                            <div class="form-check">
+                                <input class="form-check-input export" id="poNo" name="poNo" type="checkbox">
+                                <label class="form-check-label" for="poNo">
+                                    po
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-2 col-lg-2 col-md-6 col-sm-6 col-6 mt-3">
+                        <div class="row">
+                            <div class="form-check">
+                                <input class="form-check-input export" id="shippingAgency" name="shippingAgency"
+                                       type="checkbox">
+                                <label class="form-check-label" for="shippingAgency" th:text="#{lblShippingAgency}">
+
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-2 col-lg-2 col-md-6 col-sm-6 col-6 mt-3">
+                        <div class="row">
+                            <div class="form-check">
+                                <input class="form-check-input export" id="exportInport" name="exportInport"
+                                       type="checkbox">
+                                <label class="form-check-label" for="exportInport" th:text="#{lblExportItem}">
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-2 col-lg-2 col-md-6 col-sm-6 col-6 mt-3">
+                        <div class="row">
+                            <div class="form-check">
+                                <input class="form-check-input export" id="incoterms" name="incoterms" type="checkbox">
+                                <label class="form-check-label" for="incoterms">Incoterms</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-2 col-lg-2 col-md-6 col-sm-6 col-6 mt-3">
+                        <div class="row">
+                            <div class="form-check">
+                                <input class="form-check-input export" id="shipName" name="shipName"
+                                       type="checkbox">
+                                <label class="form-check-label" for="shipName" th:text="#{lblShipName}">
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6 col-6 mt-3">
+                        <div class="row">
+                            <div class="form-check">
+                                <input class="form-check-input export" id="voyNo" name="voyNo" type="checkbox">
+                                <label class="form-check-label" for="voyNo">VOY No</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row  justify-content-between">
+                    <div class="col-xl-2 col-lg-2 col-md-6 col-sm-6 col-6 mt-3">
+                        <div class="row">
+                            <div class="form-check">
+                                <input class="form-check-input export" id="invoiceCode" name="invoiceCode"
+                                       type="checkbox">
+                                <label class="form-check-label" for="invoiceCode" th:text="#{lblInvoiceNo}">
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-2 col-lg-2 col-md-6 col-sm-6 col-6 mt-3">
+                        <div class="row">
+                            <div class="form-check">
+                                <input class="form-check-input export" id="packing" name="packing" type="checkbox">
+                                <label class="form-check-label" for="packing" th:text="#{lblPacking}"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-2 col-lg-2 col-md-6 col-sm-6 col-6 mt-3">
+                        <div class="row">
+                            <div class="form-check">
+                                <input class="form-check-input export" id="transportMode" name="transportMode"
+                                       type="checkbox">
+                                <label class="form-check-label" for="transportMode" th:text="#{lblTransportMode}">
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-2 col-lg-2 col-md-6 col-sm-6 col-6 mt-3">
+                        <div class="row">
+                            <div class="form-check">
+                                <input class="form-check-input export" id="fourtyf" name="fourtyf" type="checkbox">
+                                <label class="form-check-label" for="fourtyf">40f</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6 col-6 mt-3">
+                        <div class="row">
+                            <div class="form-check">
+                                <input class="form-check-input export" id="twentyf" name="twentyf" type="checkbox">
+                                <label class="form-check-label" for="twentyf">20f</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-2 col-lg-2 col-md-6 col-sm-6 col-6 mt-3">
+                        <div class="row">
+                            <div class="form-check">
+                                <input class="form-check-input export" id="invoicePrice" name="invoicePrice"
+                                       type="checkbox">
+                                <label class="form-check-label" for="invoicePrice" th:text="#{lblInvoicePrice}">
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-2 col-lg-2 col-md-6 col-sm-6 col-6 mt-3">
+                        <div class="row">
+                            <div class="form-check">
+                                <input class="form-check-input export" id="blawbNo" name="blawbNo" type="checkbox">
+                                <label class="form-check-label" for="blawbNo">BL No AWB No</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-2 col-lg-2 col-md-6 col-sm-6 col-6 mt-3">
+                        <div class="row">
+                            <div class="form-check">
+                                <input class="form-check-input export" id="departurePort" name="departurePort"
+                                       type="checkbox">
+                                <label class="form-check-label" for="departurePort" th:text="#{lblDeparturePort}">
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-2 col-lg-2 col-md-6 col-sm-6 col-6 mt-3">
+                        <div class="row">
+                            <div class="form-check">
+                                <input class="form-check-input export" id="arrivalPort" name="arrivalPort"
+                                       type="checkbox">
+                                <label class="form-check-label" for="arrivalPort" th:text="#{lblArrivalPort}">
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6 col-6 mt-3">
+                        <div class="row">
+                            <div class="form-check">
+                                <input class="form-check-input export" id="cut" name="cut" type="checkbox">
+                                <label class="form-check-label" for="cut">cut</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row  justify-content-between">
+                    <div class="col-xl-2 col-lg-2 col-md-6 col-sm-6 col-6 mt-3">
+                        <div class="row">
+                            <div class="form-check">
+                                <input class="form-check-input export" id="etd" name="etd"
+                                       type="checkbox">
+                                <label class="form-check-label" for="etd">ETD</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-2 col-lg-2 col-md-6 col-sm-6 col-6 mt-3">
+                        <div class="row">
+                            <div class="form-check">
+                                <input class="form-check-input export" id="eta" name="eta" type="checkbox">
+                                <label class="form-check-label" for="eta">ETA
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-2 col-lg-2 col-md-6 col-sm-6 col-6 mt-3">
+                        <div class="row">
+                            <div class="form-check">
+                                <input class="form-check-input export" id="anAdvanceFee" name="anAdvanceFee"
+                                       type="checkbox">
+                                <label class="form-check-label" for="anAdvanceFee" th:text="#{lblAnAdvanceFee}">
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-2 col-lg-2 col-md-6 col-sm-6 col-6 mt-3">
+                        <div class="row">
+                            <div class="form-check">
+                                <input class="form-check-input export" id="supplierName" name="supplierName"
+                                       type="checkbox">
+                                <label class="form-check-label" for="supplierName" th:text="#{lblSupplierName}">
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6 col-6 mt-3">
+                        <div class="row">
+                            <div class="form-check">
+                                <input class="form-check-input export" id="representativeItem" name="representativeItem"
+                                       type="checkbox">
+                                <label class="form-check-label" for="representativeItem" th:text="#{lblRepItem}">
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-2 col-lg-2 col-md-6 col-sm-6 col-6 mt-3">
+                        <div class="row">
+                            <div class="form-check">
+                                <input class="form-check-input export" id="freightKg" name="freightKg" type="checkbox">
+                                <label class="form-check-label" for="freightKg" th:text="#{lblCargoKg}">
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-2 col-lg-2 col-md-6 col-sm-6 col-6 mt-3">
+                        <div class="row">
+                            <div class="form-check">
+                                <input class="form-check-input export" id="freightM3" name="freightM3" type="checkbox">
+                                <label class="form-check-label" for="freightM3" th:text="#{lblCargoM3}">
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-2 col-lg-2 col-md-6 col-sm-6 col-6 mt-3">
+                        <div class="row">
+                            <div class="form-check">
+                                <input class="form-check-input export" id="ctsNumber" name="ctsNumber" type="checkbox">
+                                <label class="form-check-label" for="ctsNumber" th:text="#{lblCTSNo}">
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-2 col-lg-2 col-md-6 col-sm-6 col-6 mt-3">
+                        <div class="row">
+                            <div class="form-check">
+                                <input class="form-check-input export" id="size" name="size"
+                                       type="checkbox">
+                                <label class="form-check-label" for="size" th:text="#{lblSize}">
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6 col-6 mt-3">
+                        <div class="row">
+                            <div class="form-check">
+                                <input class="form-check-input export" id="rtShip" name="rtShip" type="checkbox">
+                                <label class="form-check-label" for="rtShip">RT(ship)</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row  justify-content-between">
+                    <div class="col-xl-2 col-lg-2 col-md-6 col-sm-6 col-6 mt-3">
+                        <div class="row">
+                            <div class="form-check">
+                                <input class="form-check-input export" id="vwAir" name="vwAir"
+                                       type="checkbox">
+                                <label class="form-check-label" for="vwAir">VW(air)</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-2 col-lg-2 col-md-6 col-sm-6 col-6 mt-3">
+                        <div class="row">
+                            <div class="form-check">
+                                <input class="form-check-input export" id="hlBoxesNumber" name="hlBoxesNumber"
+                                       type="checkbox">
+                                <label class="form-check-label" for="hlBoxesNumber" th:text="#{lblPackingBox}">
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-2 col-lg-2 col-md-6 col-sm-6 col-6 mt-3">
+                        <div class="row">
+                            <div class="form-check">
+                                <input class="form-check-input export" id="moneyOrder" name="moneyOrder"
+                                       type="checkbox">
+                                <label class="form-check-label" for="moneyOrder" th:text="#{lblExchange}">
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-2 col-lg-2 col-md-6 col-sm-6 col-6 mt-3">
+                        <div class="row">
+                            <div class="form-check">
+                                <input class="form-check-input export" id="inportTaxAdvanceAmount"
+                                       name="inportTaxAdvanceAmount" type="checkbox">
+                                <label class="form-check-label" for="inportTaxAdvanceAmount"
+                                       th:text="#{lblImportAmt}">
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6 col-6 mt-3">
+                        <div class="row">
+                            <div class="form-check">
+                                <input class="form-check-input export" id="remarks" name="remarks" type="checkbox">
+                                <label class="form-check-label" for="remarks" th:text="#{lblRemark}">
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-2 col-lg-2 col-md-6 col-sm-6 col-6 mt-3">
+                        <div class="row">
+                            <div class="form-check">
+                                <input class="form-check-input export" id="declarationDate" name="declarationDate"
+                                       type="checkbox">
+                                <label class="form-check-label" for="declarationDate" th:text="#{lblDeclarationDt}">
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-2 col-lg-2 col-md-6 col-sm-6 col-6 mt-3">
+                        <div class="row">
+                            <div class="form-check">
+                                <input class="form-check-input export" id="inspectionDate" name="inspectionDate"
+                                       type="checkbox">
+                                <label class="form-check-label" for="inspectionDate" th:text="#{lblInspectionDt}">
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-2 col-lg-2 col-md-6 col-sm-6 col-6 mt-3">
+                        <div class="row">
+                            <div class="form-check">
+                                <input class="form-check-input export" id="deliveryDateAndTime"
+                                       name="deliveryDateAndTime"
+                                       type="checkbox">
+                                <label class="form-check-label" for="deliveryDateAndTime"
+                                       th:text="#{lblDeliveryDate}">
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-2 col-lg-2 col-md-6 col-sm-6 col-6 mt-3">
+                        <div class="row">
+                            <div class="form-check">
+                                <input class="form-check-input export" id="possiblePickUpDate" name="possiblePickUpDate"
+                                       type="checkbox">
+                                <label class="form-check-label" for="possiblePickUpDate"
+                                       th:text="#{lblPossiblePickupDate}">
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6 col-6 mt-3">
+                        <div class="row">
+                            <div class="form-check">
+                                <input class="form-check-input export" id="pickUpDate" name="pickUpDate"
+                                       type="checkbox">
+                                <label class="form-check-label" for="pickUpDate" th:text="#{lblPickupDate}">
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row  justify-content-between">
+                    <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6 col-6 mt-3">
+                        <div class="row">
+                            <div class="form-check">
+                                <input class="form-check-input export" id="containerNo" name="containerNo"
+                                       type="checkbox">
+                                <label class="form-check-label" for="containerNo" th:text="#{lblContainerNo}">
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6 col-6 mt-3">
+                        <div class="row">
+                            <div class="form-check">
+                                <input class="form-check-input export" id="cargoInsurance" name="cargoInsurance"
+                                       type="checkbox">
+                                <label class="form-check-label" for="cargoInsurance" th:text="#{lblCargoInsurance}">
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6 col-6 mt-3">
+                        <div class="row">
+                            <div class="form-check">
+                                <input class="form-check-input export" id="logisticsCost" name="logisticsCost"
+                                       type="checkbox">
+                                <label class="form-check-label" for="logisticsCost" th:text="#{lblLogisticsCost}">
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6 col-6 mt-3">
+                        <div class="row">
+                            <div class="form-check">
+                                <input class="form-check-input export" id="freeTime" name="freeTime"
+                                       type="checkbox">
+                                <label class="form-check-label" for="freeTime" th:text="#{lblFreeTime}">
+                                    自由時間
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!--            <div class="row mt-5 justify-content-end ">-->
+            <!--                <button onclick="addCompany()" class="btn btn-secondary  col-2 mt-3" id="add"-->
+            <!--                        style="width:106px;margin-right:30px;"-->
+            <!--                        type="button" th:text="#{btnReg}">登録-->
+            <!--                </button>-->
+            <!--                <button class="btn btn-secondary  col-2 mt-3" onclick="resetListForm($('#generalForm'))"-->
+            <!--                        style="width:106px;margin-right:30px;"-->
+            <!--                        type="button" th:text="#{btnCancel}">キャンセル-->
+            <!--                </button>-->
+            <!--            </div>-->
+
+        </div>
+    </div>
+
+    <!--table-->
+
+    <div class="box box-4 container mt-5 mb-5">
+        <div class="box-content">
+            <table class="table table-striped table-bordered text-center">
+                <thead>
+                <tr>
+                    <th scope="col"></th>
+                    <th scope="col"><label class="form-check-label" for="Editable" th:text="#{lblEdit}"></label></th>
+                    <th scope="col"><label class="form-check-label" for="Viewable" th:text="#{lblView}"></label></th>
+                    <th scope="col"><label class="form-check-label" for="Invisible" th:text="#{lblNotView}"></label>
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <th scope="row" th:text="#{lblExportRegistration}"></th>
+                    <td><input class="form-check-input edit" type="radio" name="exportRegistration" value="editable"
+                               id="Editable" checked="checked"></td>
+                    <td><input class="form-check-input view" type="radio" name="exportRegistration" value="viewable"
+                               id="Viewable"></td>
+                    <td><input class="form-check-input" type="radio" name="exportRegistration" value="invisible"
+                               id="Invisible"></td>
+                </tr>
+                <tr>
+                    <th scope="row" th:text="#{lblSchedule}"></th>
+                    <td><input class="form-check-input edit" type="radio" name="schedule" value="editable" id="Editable"
+                               checked="checked"></td>
+                    <td><input class="form-check-input view" type="radio" name="schedule" value="viewable"
+                               id="Viewable"></td>
+                    <td><input class="form-check-input" type="radio" name="schedule" value="invisible" id="Invisible">
+                    </td>
+
+                </tr>
+                <tr>
+                    <th scope="row" th:text="#{lblUser}"></th>
+                    <td><input class="form-check-input edit" type="radio" name="userMaster" value="editable"
+                               id="Editable" checked="checked"></td>
+                    <td><input class="form-check-input view" type="radio" name="userMaster" value="viewable"
+                               id="Viewable"></td>
+                    <td><input class="form-check-input" type="radio" name="userMaster" value="invisible" id="Invisible">
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row" th:text="#{lblProduct}"></th>
+                    <td><input class="form-check-input edit" type="radio" name="productMaster" value="editable"
+                               id="Editable" checked="checked"></td>
+                    <td><input class="form-check-input view" type="radio" name="productMaster" value="viewable"
+                               id="Viewable"></td>
+                    <td><input class="form-check-input" type="radio" name="productMaster" value="invisible"
+                               id="Invisible"></td>
+
+                </tr>
+                <tr id="systemadmin">
+                    <th scope="row" th:text="#{lblCompany}">会社マスタ</th>
+                    <td><input class="form-check-input edit" type="radio" name="companyMaster" value="editable"
+                               id="Editable" checked="checked"></td>
+                    <td><input class="form-check-input view" type="radio" name="companyMaster" value="viewable"
+                               id="Viewable"></td>
+                    <td><input class="form-check-input" type="radio" name="companyMaster" value="invisible"
+                               id="Invisible"></td>
+
+                </tr>
+                <tr>
+                    <th scope="row" th:text="#{lblGroup}">グループマスタ</th>
+                    <td><input class="form-check-input edit" type="radio" name="groupMaster" value="editable"
+                               id="Editable" checked="checked"></td>
+                    <td><input class="form-check-input view" type="radio" name="groupMaster" value="viewable"
+                               id="Viewable"></td>
+                    <td><input class="form-check-input" type="radio" name="groupMaster" value="invisible"
+                               id="Invisible"></td>
+                </tr>
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+
+
+    <div class="row mb-4 w-100 ms-0 me-0 justify-content-center mt-3">
+        <button type="button" onclick="addNewUser()" class="btn btn-secondary  col-2 mt-3" id="add"
+                style="width:106px;margin-right:30px;" 　
+                th:text="#{btnReg}">
+        </button>
+        <button type="button" class="btn btn-secondary  col-2 mt-3" style="width:106px;"
+                th:text="#{btnCancel}" onclick="resetListForm($('#generalForm'))"></button>
+    </div>
+
+</form>
+
+
+<script>
+    let languageFlag = "[[${languageOption}]]";
+
+    loadErrorMessage();
+
+    function addNewUser() {
+        let empNum = document.getElementById('emp_num');
+        let companyName = document.getElementById('companyName');
+        let empName = document.getElementById('emp_name');
+        let startDate = document.getElementById('date1');
+        let endDate = document.getElementById('date2');
+        let mailAddress = document.getElementById('mail');
+        let role = document.getElementById('role');
+        let add = document.getElementById('add');
+        let valid = true;
+        let regex = /[\u3000-\u303F]|[\u3040-\u309F]|[\u30A0-\u30FF]|[\uFF00-\uFFEF]|[\u4E00-\u9FAF]|[\u2605-\u2606]|[\u2190-\u2195]|\u203B/g;
+
+        let checkedValue = $(".export").is(":checked");
+
+        if (empNum.value === "") {
+            //showErrorMsg("empNumberErr", "社員番号を入力してください", "Please enter the employee code", "empNumberErrMsg", languageFlag);
+            showErrorMsg("empNumberErr", userCodeEmptyErrorMsg, userCodeEmptyErrorMsg, "empNumberErrMsg", languageFlag)
+            add.type = "button";
+            valid = false;
+        } else if (regex.test(empNum.value)) {
+            // showErrorMsg("empNumberErr", "社員番号を半角数学で入力してください。", "Please enter the employee code in half-width math", "empNumberErrMsg", languageFlag);
+            showErrorMsg("empNumberErr", userCodeJpnCharacterErrMsg, userCodeJpnCharacterErrMsg, "empNumberErrMsg", languageFlag)
+            add.type = "button";
+            valid = false;
+        } else if (!empNum.value.match("[0-9]{3}")) {
+            //showErrorMsg("empNumberErr", "社員番号を数学で入力してください。", "Please enter the product employee in math", "empNumberErrMsg", languageFlag);
+            showErrorMsg("empNumberErr", userCodeNumberErrMsg, userCodeNumberErrMsg, "empNumberErrMsg", languageFlag)
+            add.type = "button";
+            valid = false;
+        } else {
+            let temp1 = "[[${userDeleteFlag0}]]";
+            //alert(temp1.length);
+            if (temp1.length > 2) {
+                let temp2 = temp1.substring(1, temp1.length - 1);
+                let userCodeDeleteFlag0 = temp2.split(',');
+                for (i = 0; i < userCodeDeleteFlag0.length; i++) {
+                    if (empNum.value === userCodeDeleteFlag0[i].trim()) {
+
+                        showErrorMsg("empNumberErr", userCodeAlreadyExistErrMsg, userCodeAlreadyExistErrMsg, "empNumberErrMsg", languageFlag)
+                        add.type = "button";
+                        valid = false;
+                        break;
+                    }
+                }
+
+            }
+
+        }
+
+        if (companyName.value === "") {
+
+            showErrorMsg("companyNameErr", companyNameEmptyErrorMsg, companyNameEmptyErrorMsg, "companyNameErrMsg", languageFlag)
+            add.type = "button";
+            valid = false;
+        }
+
+        if (empName.value === "") {
+
+            showErrorMsg("empNameErr", userNameEmptyErrorMsg, userNameEmptyErrorMsg, "empNameErrMsg", languageFlag)
+            add.type = "button";
+            valid = false;
+        }
+
+        if (startDate.value === "") {
+
+            showErrorMsg("startDateErr", startDateEmptyErrorMsg, startDateEmptyErrorMsg, "startDateErrMsg", languageFlag)
+            add.type = "button";
+            valid = false;
+        } else {
+            document.getElementById("startDateErr").style.visibility = "hidden";
+        }
+
+        if(mailAddress.value === ""){
+            showErrorMsg("mailErr", "メールアドレスを入力してください。", "Please enter the mail address.", "mailErrMsg", languageFlag)
+            add.type = "button";
+            valid = false;
+        }else{
+            document.getElementById("mailErr").style.visibility = "hidden"
+        }
+
+        if (startDate.value !== "" && endDate.value !== "") {
+            if (Date.parse(endDate.value) <= Date.parse(startDate.value)) {
+                showErrorMsg("endDateErr", startGreaterEndDateErrorMsg, startGreaterEndDateErrorMsg, "endDateErrMsg", languageFlag)
+                add.type = "button";
+                valid = false;
+            }
+        }
+
+        if (role.value === "") {
+            showErrorMsg("roleChangeErr", roleEmptyErrMsg, roleEmptyErrMsg, "roleChangeErrMsg", languageFlag)
+            add.type = "button";
+            valid = false;
+        }
+
+        if (checkedValue == false) {
+            // to add exportNotSelectErrMsg
+        }
+
+
+        if (valid === true) {
+            let form_elem = document.getElementById('userControlForm');
+            form_elem.submit();
+        } else if (valid === false) {
+            window.scrollTo(0, 0);
+        }
+    }
+
+    function roleChange() {
+
+        let select = document.getElementById('role');
+        let value = select.options[select.selectedIndex].value;
+        let disablerow = document.getElementById("systemadmin");
+        let editable = document.getElementsByClassName("edit");
+        let viewable = document.getElementsByClassName("view");
+        // alert(value);
+        // if (value === '0') {
+        if (value == "管理者" || value == "ADMIN") {
+            disablerow.style.display = "";
+
+            for (i = 0; i < viewable.length; i++) {
+
+                viewable[i].checked = false;
+                editable[i].checked = true;
+            }
+
+        } else if (value == "User" || value == "USER") {
+            disablerow.style.display = "none";
+
+            for (i = 0; i < editable.length; i++) {
+
+                editable[i].checked = false;
+                editable[i].disabled = true;
+                viewable[i].checked = true;
+            }
+        }
+
+    }
+
+    function openCalander(dateTemp, errorMsgElementId) {
+
+        let date = dateTemp;
+        const myDatePicker = MCDatepicker.create({
+            el: date,
+            closeOnBlur: true,
+            dateFormat: 'YYYY/MM/DD',
+            bodyType: 'inline',
+
+            theme: {
+                display: {
+                    foreground: 'rgba(255, 255, 255, 0.8)',
+                    background: '#18477E'
+                },
+                main_background: '#fff',
+                weekday: {
+                    foreground: '#18477E'
+                },
+                date: {
+                    active: {
+                        picked: {
+                            background: '#18477E'
+                        }
+                    }
+                },
+                button: {
+                    success: {
+                        foreground: '#18477E'
+                    }
+                },
+            },
+        });
+        document.getElementById(errorMsgElementId).style.visibility = "hidden";
+        myDatePicker.open();
+
+    }
+
+    window.onload = function () {
+        document.getElementById("navbarDropdownMenuLink").classList.add("active");
+    };
+</script>
+
+</body>
+</html>

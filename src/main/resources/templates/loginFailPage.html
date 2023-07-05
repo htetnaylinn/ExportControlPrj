@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Login Fail</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head>
+<body>
+
+<link href="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet" />
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+
+<!-- Either add the classes 'show' and 'in' to the HTML -->
+<div class="modal fade show in">
+  <div class="modal-dialog">
+    <div class="v-cell">
+      <div class="modal-content">
+        <div class="modal-body">
+          <h3>ログイン失敗しました！！！</h3><br>
+          <label style="color:red">申し訳ありませんが、そのユーザー名とパスワードのアカウントが見つかりませんでした。 再試行！</label>
+        </div>
+        <div class="modal-footer">
+          <!--<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>-->
+          <a th:href="@{/login}">
+          <button type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
+          </a>
+        </div>
+      </div>    </div>
+  </div>
+</div>
+
+</body>
+</html>

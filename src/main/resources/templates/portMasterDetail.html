@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="#{lblPortDetailTitle}"></title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/portMasterDetail.css">
+    <link href='https://fonts.googleapis.com/css?family=Anton' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Neucha' rel='stylesheet' type='text/css'>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+            crossorigin="anonymous"></script>
+    <script src="../js/common.js"></script>
+    <script src="../js/ajaxMessage/passwordChangeErrorMessages.js"></script>
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+</head>
+<body>
+
+<!--navigation-->
+<th:block :: header th:include="@{/menu.html}"></th:block>
+
+<!--会社マスタ-->
+<div class="box box-4 container mt-5">
+    <div class="box-content">
+        <h2 th:text="#{lblPortDetailTitle}"></h2>
+
+        <form id="generalForm" th:action="@{/savePortMaster}" method="GET" nonvalidate class="savePortMaster">
+            <div class="row mt-5">
+                <div class="col-xl-6 col-lg-6 col-sm-6 col-12">
+                    <div class="row">
+                        <label class="col-3 label text-info text-center mt-2 " th:text="#{lblPortCode} + ':'"></label>
+                        <div class="form__group field col-9">
+                            <input aria-label="" oninput="inputChange('portNumberErr')" autocomplete="off" type="text"
+                                   class="form__field" name="portCode" id='portCode' maxlength="6" required/>
+                        </div>
+                        <div class=" col-12" id="portNumberErr" style="visibility:hidden;">
+                            <div class="row">
+                                <label class="col-3 label text-info text-center  "></label>
+                                <div class="form__group field col-9">
+                                    <span class="font24" id="portNumberErrMsg" style="color:red;"> </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-6 col-lg-6 col-sm-6 col-12">
+                    <div class="row">
+                        <label class="col-3 label text-info text-center mt-2 " th:text="#{lblPortName} + ':'"></label>
+                        <div class="form__group field col-9">
+                            <input aria-label="" oninput="inputChange('portNameErr')" autocomplete="off" type="text"
+                                   class="form__field" name="portName" id='portName' maxlength="50"  required/>
+                        </div>
+                        <div class="col-12" id="portNameErr" style="visibility:hidden">
+                            <div class="row">
+                                <label class="col-3 label text-info text-center "></label>
+                                <div class="form__group field col-9">
+                                    <span class="font24" id="portNameErrMsg" style="color:red;"> </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form__group field col-9" style="display: none">
+                            <input aria-label="" autocomplete="off" type="" class="form__field" name="updateCheck"
+                                   id='update_check'
+                                   value="false" required/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-5">
+                <div class="col-xl-6 col-lg-6 col-sm-6 col-12">
+                    <div class="row">
+                        <label class="col-3 label text-info text-center mt-2"
+                               th:text="#{lblCountryName} + ':'"></label>
+                        <div class="col-9">
+                            <select onchange="inputChange('countryNameErr')" class="form-select"
+                                    aria-label="Default select example" name="countryName" id='countryName'>
+                                <option></option>
+                                <option th:each="countryList :${CountryNameList}"
+                                        th:text="${countryList.countryName}"
+                                        th:value="${countryList.countryName}">
+                            </select>
+                        </div>
+                        <div class="col-12" id="countryNameErr" style="visibility:hidden">
+                            <div class="row">
+                                <label class="col-3 label text-info text-center  "></label>
+                                <div class="form__group field col-9">
+                                    <span class="font24" id="countryNameErrMsg" style="color:red;"> </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-5 justify-content-end ">
+                <button onclick="addPort()" type="button" id="add" class="btn btn-secondary  col-2 mt-3"
+                        style="width:106px;margin-right:30px;" th:text="#{btnReg}"></button>
+                <button type="button" onclick="resetListForm($('#generalForm'))" class="btn btn-secondary  col-2 mt-3"
+                        style="width:106px;margin-right:30px;" th:text="#{btnCancel}"></button>
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!--table-->
+<script>
+    let languageFlag = "[[${languageOption}]]";
+
+    loadErrorMessage();
+
+    window.onload = function () {
+        document.getElementById("navbarDropdownMenuLink").classList.add("active");
+    };
+
+    function addPort() {
+
+        let temp1 = "[[${portCodeDeleteFlag0}]]";
+        let temp2 = temp1.substring(1, temp1.length - 1);
+        let portCodeDeleteFlag0 = temp2.split(',');
+
+        let temp3 = "[[${portCodeDeleteFlag1}]]";
+        let temp4 = temp3.substring(1, temp3.length - 1);
+        let portCodeDeleteFlag1 = temp4.split(',');
+
+        let temp5 = "[[${allPortList}]]";
+        let temp6 = temp5.substring(1, temp5.length - 1);
+        let portNameDeleteFlag0 = temp6.split(',');
+
+        let portCode = document.getElementById('portCode');
+        let portName = document.getElementById('portName');
+        portName = portName.value.replace(/ +/g, "").toLowerCase();
+        let countryName = document.getElementById('countryName');
+        countryName = countryName.value.replace(/ +/g, "").toLowerCase();
+        let add = document.getElementById('add');
+        let updateCheck = document.getElementById('update_check');
+        let valid = true;
+        let regex = /[\u3000-\u303F]|[\u3040-\u309F]|[\u30A0-\u30FF]|[\uFF00-\uFFEF]|[\u4E00-\u9FAF]|[\u2605-\u2606]|[\u2190-\u2195]|\u203B/g;
+        if (portName == "") {
+            //showErrorMsg("portNameErr", "港名を入力してください", "Please enter the port name.", "portNameErrMsg", languageFlag);
+            showErrorMsg("portNameErr", portNameEmptyErrMsg, portNameEmptyErrMsg, "portNameErrMsg", languageFlag)
+            add.type = "button";
+            valid = false;
+        }
+        if (countryName == "") {
+            //showErrorMsg("countryNameErr", "国名を選択してください。 ", "Please select your country name .", "countryNameErrMsg", languageFlag);
+            showErrorMsg("countryNameErr", countryNameEmptyErrMsg, countryNameEmptyErrMsg, "countryNameErrMsg", languageFlag)
+            add.type = "button";
+            valid = false;
+        }
+        if (portCode.value == "") {
+            showErrorMsg("portNumberErr", portCodeEmptyErrMsg, portCodeEmptyErrMsg, "portNumberErrMsg", languageFlag);
+            add.type = "button";
+            valid = false;
+
+        } else if (regex.test(portCode.value)) {
+            showErrorMsg("portNumberErr", portCodeJpnCharacterErrMsg, portCodeJpnCharacterErrMsg, "portNumberErrMsg", languageFlag);
+            add.type = "button";
+            valid = false;
+
+        } else if (!portCode.value.match("[0-9]{3}")) {
+            showErrorMsg("portNumberErr", portCodeNumberErrMsg, portCodeNumberErrMsg, "portNumberErrMsg", languageFlag);
+            add.type = "button";
+            valid = false;
+        } else {
+            for (i = 0; i < portCodeDeleteFlag0.length; i++) {
+                if (portCode.value == portCodeDeleteFlag0[i].trim()) {
+                    showErrorMsg("portNumberErr", portCodeAlreadyExistErrMsg, portCodeAlreadyExistErrMsg, "portNumberErrMsg", languageFlag);
+                    add.type = "button";
+                    valid = false;
+                    break;
+                }
+            }
+        }
+
+        let portNameWithCountryName = portName+'-'+ countryName;
+        // alert('portNameWithCountryName'+portNameWithCountryName);
+        for (i = 0; i < portNameDeleteFlag0.length; i++) {
+
+            if (portNameWithCountryName == portNameDeleteFlag0[i].trim().replace(/ +/g, "").toLowerCase()) {
+                // alert(portNameWithCountryName);
+                showErrorMsg("portNameErr", portNameAlreadyExistErrMsg, portNameAlreadyExistErrMsg, "portNameErrMsg", languageFlag);
+                add.type = "button";
+                valid = false;
+                break;
+            }
+        }
+
+        if (valid === true) {
+            for (i = 0; i < portCodeDeleteFlag1.length; i++) {
+                if (portCode.value === portCodeDeleteFlag1[i].trim()) {
+                    updateCheck.value = "true";
+                }
+            }
+            document.querySelector(".savePortMaster").submit();
+        }
+    }
+
+
+</script>
+
+
+</body>
+</html>

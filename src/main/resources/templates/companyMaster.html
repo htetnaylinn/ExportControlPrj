@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" content="width=device-width, initial-scale=1" name="viewport">
+    <title th:text="#{lblComTitle}"></title>
+    <link href="../css/style.css" rel="stylesheet">
+    <link href="../css/companyMaster.css" rel="stylesheet">
+    <link href='https://fonts.googleapis.com/css?family=Anton' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Neucha' rel='stylesheet' type='text/css'>
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link crossorigin href="https://fonts.gstatic.com" rel="preconnect">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap" rel="stylesheet">
+    <link href="../css/magnific-popup.css" rel="stylesheet">
+    <link href="../css/pagination.css" rel="stylesheet"/>
+    <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" rel="stylesheet">
+    <script crossorigin="anonymous"
+            integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/common.js"></script>
+    <script src="../js/ajaxMessage/passwordChangeErrorMessages.js"></script>
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js" type="text/javascript"></script>
+    <script src="https://cdn.datatables.net/fixedcolumns/4.0.2/js/dataTables.fixedColumns.min.js"></script>
+    <script src="../js/jquery.magnific-popup.js"></script>
+    <script src="../js/jquery.magnific-popup.min.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+</head>
+<body>
+
+<!--navigation-->
+<th:block :: header th:include="@{/menu.html}"></th:block>
+
+<!--会社マスタ-->
+<div class="box box-4 container mt-5">
+    <div class="box-content">
+        <h2 th:text="#{lblComTitle}"></h2>
+
+        <form class="generalForm" method="POST" novalidate th:action="@{/searchCompanyMaster}"
+              th:object="${company}">
+            <div class="row mt-5">
+                <div class="col-xl-6 col-lg-6 col-sm-6 col-12">
+                    <div class="row">
+                        <label class="col-3 label text-info text-center mt-2 "
+                               th:text="#{lblCompanyCode} + ':'"></label>
+                        <div class="form__group field col-9">
+                            <input aria-label="" class="form__field" id='companyCode' name="companyCode"
+
+                                   required th:value="${companyCode}" type="text"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-6 col-lg-6 col-sm-6 col-12">
+                    <div class="row">
+                        <label class="col-3 label text-info text-center mt-2 " th:text="#{lblComName} + ':'"></label>
+                        <div class="form__group field col-9">
+                            <input aria-label="" class="form__field" id='companyName' name="companyNameJpn"
+                                   required th:value="${searchCompanyName}" type="text"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-5 justify-content-end ">
+                <button class="btn btn-secondary  col-2 btn-xs mt-3" style="width:102px;margin-right:30px;"
+                        th:text="#{btnSearch}" type="submit"></button>
+                <button class="btn btn-secondary  col-2 btn-xs mt-3" onclick="saveScreen('companyMasterDetail')"
+                        style="width:102px;"
+                        th:text="#{btnNewReg}" type="button"></button>
+
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<div class="box box-4 container mt-5  mfp-hide info-popup-position info-popup-width " id="test-popup">
+    <div class="box-content">
+        <h2 th:text="#{lblCompUpdate}"></h2>
+
+        <form id="companyEditForm" method="POST" modelAttribute="company" th:action="@{/updateCompanyMaster}">
+            <div class="row mt-5">
+                <div class="col-12">
+                    <div class="row">
+                        <label class="col-6 label text-info text-center mt-2 " th:text="#{lblCompanyCode}+':'"></label>
+                        <div class="form__group field col-6">
+                            <input aria-label="" class="form__field w-100" id='company_code' name="companyCode"
+                                   readonly required type="text">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="row">
+                        <label class="col-6 label text-info text-center mt-2 "
+                               th:text="#{lblComName}+' (Jpn):'"></label>
+                        <div class="form__group field col-6">
+                            <input aria-label="" class="form__field w-100" id='companyNameJpn'
+                                   name="companyNameJpn" oninput="inputChange('companyNameJpnErr')"
+                                   type="text" maxlength="50"/>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12" id="companyNameJpnErr" style="visibility:hidden;">
+                    <div class="row">
+                        <label class="col-6 label text-info text-center mt-2 "></label>
+                        <div class="form__group field col-6">
+                            <span id="companyNameJpnErrMsg" style="color:red;"> </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="row">
+                        <label class="col-6 label text-info text-center mt-2 "
+                               th:text="#{lblComName}+' (Eng):'"></label>
+                        <div class="form__group field col-6">
+                            <input aria-label="" class="form__field w-100" id='companyNameEng'
+                                   name="companyNameEng" oninput="inputChange('companyNameEngErr')"
+                                   maxlength="50" type="text"/>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12" id="companyNameEngErr" style="visibility:hidden;">
+                    <div class="row">
+                        <label class="col-6 label text-info text-center mt-2 "></label>
+                        <div class="form__group field col-6">
+                            <span id="companyNameEngErrMsg" style="color:red;"> </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="row">
+                        <label class="col-6 label text-info text-center mt-2 " th:text="#{lblCountryName}+':'"></label>
+                        <div class="form__group field col-6">
+                            <select aria-label="" class="form__field w-100" id='countryName' name="countryName">
+                                <option th:each="country :${countryNameList}"
+                                        th:text="${country.countryName}"
+                                        th:value="${country.countryName}">
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-5 justify-content ">
+                <div class="btn btn-secondary  col-2 mt-3" onclick="updateCompany()"
+                     style="width:102px;" th:text="#{btnUpdate}"></div>
+            </div>
+        </form>
+    </div>
+</div>
+<!--table-->
+<div class="box box-4 container mt-5 ms-0 me-0 mb-5 wrap">
+    <div class="box-content ps-0 pe-0">
+        <div style="overflow: scroll;">
+            <table class="table table-striped table-bordered text-center table-width" id="tableId">
+                <thead>
+                <tr>
+                    <th scope="col">No</th>
+                    <th scope="col" th:text="#{lblCountryName}"></th>
+                    <th scope="col" th:text="#{lblCompanyCode}"></th>
+                    <th scope="col" th:text="#{lblComName}"></th>
+                    <th scope="col">-</th>
+                    <th scope="col">-</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr class="align-middle" th:each="companyList,stat: ${companyList}">
+                    <td class="text-center" id="no" th:text="${stat.count}"></td>
+                    <td class="text-center" th:text="${companyList.countryName}"></td>
+                    <td class="text-center" th:text="${companyList.companyCode}"></td>
+                    <td class="text-center"
+                        th:text="${languageOption}== 0? ${companyList.companyNameJPN}: ${companyList.companyNameENG}"></td>
+                    <td>
+                        <button class="open-popup-link btn btn-outline-primary btn-sm"
+                                href="#test-popup"
+                                style="border-radius:10px; width:65px;height:35px;"
+                                th:onclick="show([[${companyList.companyCode}]],[[${companyList.companyNameJPN}]],[[${companyList.companyNameENG}]],[[${companyList.countryName}]]);"
+                                th:text="#{btnEdit}" type="button"></button>
+                    </td>
+                    <td>
+                        <button class="open-popup-link btn btn-outline-danger btn-sm"
+                                style="border-radius:10px; width:65px;height:35px"
+                                th:href="'#confirm-popup-'+${stat.count}"
+                                th:text="#{btnDelete}" type="button"></button>
+                        <div class="box box-4 container mt-5 delete-popup-width mfp-hide "
+                             style="position:fixed;top:43%;left:50%;transform: translate(-50%, -50%);z-index:100;"
+                             th:id="'confirm-popup-'+${stat.count}">
+                            <div class="box-content">
+                                <div class="row">
+                                    <h5 class="text-center" th:text="#{msgDeleteMessage}">削除しますか ❔</h5>
+                                </div>
+                                <div class="row justify-content-center mt-4">
+                                    <a class="btn btn-outline-danger deleteBtn "
+                                       style="border-radius:10px; width:65px;height:35px;"
+                                       th:href="@{/deleteCompanyMaster/{companyCode}(companyCode=${companyList.companyCode})}"
+                                       th:text="#{btnYes}">
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script>
+    let languageFlag = "[[${languageOption}]]";
+    loadErrorMessage();
+
+    window.onload = function () {
+        document.getElementById("navbarDropdownMenuLink").classList.add("active");
+        let userControlFlag = "[[${userControlFlag.companyFlag}]]";
+        if (userControlFlag == '2') {
+            $("input").prop("disabled", true);
+            $("select").prop("disabled", true);
+            $("button").prop("disabled", true);
+            $("#newRegistrationBtn").css('pointer-events', 'none');
+            $(".deleteBtn").css('pointer-events', 'none');
+        }
+    };
+
+    function updateCompany() {
+        let companyNameJpn = document.getElementById('companyNameJpn');
+        let companyNameJpnCheck = companyNameJpn.value.replace(/ +/g, "").toLowerCase();
+        let companyNameEng = document.getElementById('companyNameEng');
+        let companyNameEngCheck = companyNameEng.value.replace(/ +/g, "").toLowerCase();
+        let companyCode = document.getElementById("company_code").value;
+
+        let country = document.getElementById("countryName").value;
+        let comCountryJpnName = companyNameJpnCheck +'-'+ country.replace(/ +/g, "").toLowerCase()+ '-' + companyCode;
+
+        let comCountryEngName = companyNameEngCheck +'-'+ country.replace(/ +/g, "").toLowerCase()+ '-' + companyCode;
+
+        let checkStringJpnCompany = companyNameJpnCheck + country.replace(/ +/g, "").toLowerCase();
+        let checkStringEngCompany = companyNameEngCheck + country.replace(/ +/g, "").toLowerCase();
+
+        let valid = true;
+
+        let temp5 = "[[${companyNameJpDeleteFlag0}]]";
+        let temp6 = temp5.substring(1, temp5.length - 1);
+        let companyNameJpDeleteFlag0 = temp6.split(',');
+
+        let temp7 = "[[${companyNameEngDeleteFlag0}]]";
+        let temp8 = temp7.substring(1, temp7.length - 1);
+        let companyNameEnDeleteFlag0 = temp8.split(',');
+
+
+
+        let countryNameJpnArr = [];
+        let countryNameEngArr = [];
+        let companyNameJpnArr = [];
+        let companyNameEngArr = [];
+
+        for (let i = 0; i < companyNameJpDeleteFlag0.length; i++) {
+            let testSt = companyNameJpDeleteFlag0[i].trim().toLowerCase().split('-');
+            let concatSt = testSt[0] + testSt[1];
+            let countryNameJpnDb = companyNameJpDeleteFlag0[i].trim();
+            countryNameJpnDb = countryNameJpnDb.replace(/ +/g, "-").toLowerCase();
+            countryNameJpnArr.push(countryNameJpnDb);
+            companyNameJpnArr.push(concatSt);
+        }
+
+        for (let i = 0; i < companyNameEnDeleteFlag0.length; i++) {
+            let testSt = companyNameEnDeleteFlag0[i].trim().toLowerCase().split('-');
+            let concatSt = testSt[0] + testSt[1];
+            let countryNameEngDb = companyNameEnDeleteFlag0[i].trim();
+            countryNameEngDb = countryNameEngDb.replace(/ +/g, "-").toLowerCase();
+            countryNameEngArr.push(countryNameEngDb);
+            companyNameEngArr.push(concatSt);
+        }
+
+        let arrayContainJpn = (countryNameJpnArr.indexOf(comCountryJpnName) > -1);
+        let arrayContainEng = (countryNameEngArr.indexOf(comCountryEngName) > -1);
+
+        if (arrayContainJpn == false) {
+            let containCheck = (companyNameJpnArr.indexOf(checkStringJpnCompany) > -1);
+
+            if (containCheck == true) {
+                valid = false;
+                showErrorMsg("companyNameJpnErr", companyJpnNameAlradyErrMsg, companyJpnNameAlradyErrMsg, "companyNameJpnErrMsg", languageFlag);
+            }
+        }
+
+        if (arrayContainEng == false) {
+            let containCheck = (companyNameEngArr.indexOf(checkStringEngCompany) > -1);
+            if (containCheck == true) {
+                valid = false;
+                showErrorMsg("companyNameEngErr", companyEngNameAlradyErrMsg, companyEngNameAlradyErrMsg, "companyNameEngErrMsg", languageFlag);
+            }
+        }
+
+        if (companyNameJpn.value === "") {
+            showErrorMsg("companyNameJpnErr", companyJpnNameEmptyErrMsg, companyJpnNameEmptyErrMsg, "companyNameJpnErrMsg", languageFlag)
+            valid = false;
+        } else {
+        }
+
+        if (companyNameEng.value === "") {
+            showErrorMsg("companyNameEngErr", companyEngNameEmptyErrMsg, companyEngNameEmptyErrMsg, "companyNameEngErrMsg", languageFlag)
+            valid = false;
+        }
+
+        if (valid === true) {
+            let form_elem = document.getElementById('companyEditForm');
+            form_elem.submit();
+        } else if (valid === false) {
+            window.scrollTo(0, 0);
+        }
+    }
+
+    function show(companyCode, companyNameJpn, companyNameEng, countryName) {
+        document.getElementById("company_code").value = companyCode;
+        document.getElementById("companyNameJpn").value = companyNameJpn;
+        document.getElementById("companyNameEng").value = companyNameEng;
+        document.getElementById("countryName").value = countryName;
+        document.getElementById("companyNameJpnErr").style.visibility = 'hidden';
+        document.getElementById("companyNameEngErr").style.visibility = 'hidden';
+    }
+
+    $('.open-popup-link').magnificPopup({
+        type: 'inline',
+        midClick: true // Allow opening popup on middle mouse click. Always set it to true if you don't provide alternative source in href.
+    });
+
+
+    $(document).ready(function () {
+        let systemErrMsg = "[[${systemErrorMsg}]]"
+        if (systemErrMsg) {
+            showSystemError(systemErrMsg);
+        }
+
+        let table = $('#tableId').DataTable({
+            searching: false,
+            ordering: false,
+            "lengthChange": false,
+            dom: '<"clear">lfrtp',
+            pagingType: "simple_numbers",
+            pageLength: 10,
+            scrollX: true,
+            language: {
+                "zeroRecords": " ",
+                'paginate': {
+                    'previous': '<span class="prev-icon"><i class="fa fa-backward" aria-hidden="true"></i></span>',
+                    'next': '<span class="next-icon"><i class="fa fa-forward" aria-hidden="true"></i></span>'
+                }
+            }
+        })
+    });
+</script>
+</body>
+</html>

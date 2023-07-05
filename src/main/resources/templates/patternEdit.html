@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta content="width=device-width, initial-scale=1, shrink-to-fit=0" name="viewport">
+    <title th:text="#{lblPatternEdit}"></title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/userMaster.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/mc-datepicker/dist/mc-calendar.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="../css/magnific-popup.css">
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/pagination.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+            crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script src="../js/ajaxMessage/passwordChangeErrorMessages.js"></script>
+    <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js" type="text/javascript"></script>
+    <script src="https://cdn.datatables.net/fixedcolumns/4.0.2/js/dataTables.fixedColumns.min.js"></script>
+    <script src="../js/jquery.magnific-popup.js"></script>
+    <script src="../js/jquery.magnific-popup.min.js"></script>
+    <script src="../js/moment.js"></script>
+    <script src="../js/common.js"></script>
+    <script th:if="${languageOption} == 0" src="../js/calendarJp.js"></script>
+    <script th:if="${languageOption} == 1" src="../js/calendarEn.js"></script>
+
+</head>
+<style>
+    #table_size {
+        table-layout: fixed !important;
+        width: max-content !important;
+    }
+
+    .label-center {
+        text-align: center;
+        vertical-align: middle;
+    }
+
+</style>
+<body>
+
+<!--navigation-->
+<th:block :: header th:include="@{/menu.html}"></th:block>
+<div class="box-content mt-3">
+    <div class="col-12" style="margin-top:10px">
+        <div class="row justify-content-start ms-3 mb-2">
+            <button type="button" class="btn btn-secondary  col-2 mt-3 " style="width:122px;height:fit-content;"
+                    onclick="patternEditSave()" th:text="#{btnReg}">
+            </button>
+        </div>
+    </div>
+
+    <div style=" overflow-x: scroll;margin-top:60px;">
+        <table id="table_size" class="table table-fixed  table-bordered  table-responsive" data-sticky-header="true">
+            <thead>
+            <tr class="header header-sticky">
+                <th rowspan="2" class="label-center" th:text="#{lblCustomerName}">顧客名</th>
+                <th rowspan="2" class="label-center" th:text="#{lblPatternName}">パターン</th>
+                <th rowspan="2" class="label-center" th:text="#{lblBillingMonth}">請求月</th>
+                <th rowspan="2" class="label-center">bookingNo</th>
+                <th rowspan="2" class="label-center">Po No</th>
+                <th rowspan="2" class="label-center" th:text="#{lblShippingAgency}">船社代理店</th>
+                <th rowspan="2" class="label-center" th:text="#{lblExportOrImport}">輸出or輸入</th>
+                <th rowspan="2" class="label-center">Incoterms</th>
+                <th rowspan="2" class="label-center" th:text="#{lblShipName}">船名</th>
+                <th rowspan="2" class="label-center">VOY No</th>
+                <th rowspan="2" class="label-center" th:text="#{lblInvoiceNo}">インボイスNo</th>
+                <th rowspan="2" class="label-center" th:text="#{lblPacking}">梱包</th>
+                <th rowspan="2" class="label-center" th:text="#{lblTransportMode}">輸送 モード</th>
+                <th rowspan="2" class="label-center">40f</th>
+                <th rowspan="2" class="label-center">20f</th>
+                <th rowspan="2" class="label-center" th:text="#{lblInvoicePrice}">インボイス価格</th>
+                <th rowspan="2" class="label-center">BL No AWB No</th>
+                <th rowspan="2" class="label-center" th:text="#{lblDeparturePort}">出発港</th>
+                <th rowspan="2" class="label-center" th:text="#{lblArrivalPort}">到着港</th>
+                <th rowspan="2" class="label-center">cut</th>
+                <th class="label-center" th:text="#{lblConfirm}">確定</th>
+                <th class="label-center" th:text="#{lblConfirm}">確定</th>
+                <th rowspan="2" class="label-center" th:text="#{lblAnAdvanceFee}">AN立替費用</th>
+                <th rowspan="2" class="label-center" th:text="#{lblSupplierName}">仕入先名</th>
+                <th rowspan="2" class="label-center" th:text="#{lblRepItem}">代表アイテム</th>
+                <th rowspan="2" class="label-center" th:text="#{lblCargoKg}">貨物Kg</th>
+                <th rowspan="2" class="label-center" th:text="#{lblCargoM3}">貨物m3</th>
+                <th rowspan="2" class="label-center" th:text="#{lblCTSNo}">CTS数</th>
+                <th rowspan="2" class="label-center">サイズ</th>
+                <th class="label-center" th:text="#{lblConfirm}">確定</th>
+                <th rowspan="2" class="label-center">RT(ship)</th>
+                <th rowspan="2" class="label-center">VW(air)</th>
+                <th rowspan="2" class="label-center" th:text="#{lblPackingBox}">HL梱包箱数</th>
+                <th rowspan="2" class="label-center" th:text="#{lblMoneyOrder}">為替</th>
+                <th rowspan="2" class="label-center" th:text="#{lblImportAmt}">輸入税立替金額</th>
+                <th rowspan="2" class="label-center" th:text="#{lblRemark}">備考</th>
+                <th class="label-center" th:text="#{lblConfirm}">確定</th>
+                <th class="label-center" th:text="#{lblConfirm}">確定</th>
+                <th class="label-center" th:text="#{lblConfirm}">確定</th>
+                <th class="label-center" th:text="#{lblConfirm}">確定</th>
+                <th rowspan="2" class="label-center" th:text="#{lblContainerNo}">コンテナNo</th>
+                <th rowspan="2" class="label-center" th:text="#{lblCargoInsurance}">貨物保険</th>
+                <th rowspan="2" class="label-center" th:text="#{lblLogisticsCost}">物流費</th>
+                <th rowspan="2" class="label-center" th:text="#{lblFreeTime}">自由時間</th>
+            </tr>
+            <tr>
+                <th class="label-center">ETD</th>
+                <th class="label-center">ETA</th>
+                <th class="label-center" th:text="#{lblPickupDate}">集荷日</th>
+                <th class="label-center" th:text="#{lblDeclarationDt}">申告日</th>
+                <th class="label-center" th:text="#{lblInspectionDt}">検査日</th>
+                <th class="label-center" th:text="#{lblDeliveryDate}">配送日 時刻</th>
+                <th class="label-center" th:text="#{lblPossiblePickupDate}">引き取り可能日</th>
+            </tr>
+            </thead>
+
+            <tbody id="patternEdit">
+            <tr th:each="patLst,stat: ${allPatternList}">
+                <td style="display:none;" name="patternCode" th:text="${patLst.patternCode}"></td>
+                <td>
+                    <div class="">
+                        <select class="form-select productCode " style="width:160px;"
+                                aria-label="Default select example"
+                                name="customerList" id='cusName'
+                                th:onchange="'javascript:inputChange(\'comapanyErrMsg'+${stat.count}+'\');'">
+                            <option value=""></option>
+                            <option th:each="comapany : ${customerList}"
+                                    th:value="${comapany.companyCode}"
+                                    th:text="${languageOption}== 0? ${comapany.companyNameJPN}: ${comapany.companyNameENG}"
+                                    th:selected="${#strings.equals(comapany.companyCode, patLst.customerName)}"
+                            ></option>
+                        </select>
+                        <span th:id="comapanyErrMsg+${stat.count}"
+                              style="display:none; color:red;"></span>
+                    </div>
+                </td>
+
+                <td>
+                    <div class="">
+                        <select class="form-select productCode " style="width:160px;"
+                                aria-label="Default select example"
+                                onchange="changeProductName(this)" name="patternName" id='patternName'>
+                            <option th:text="${patLst.patternName}"></option>
+                        </select>
+                    </div>
+                </td>
+                <td>
+                    <input readonly aria-label="" autocomplete="off" class="form__field w-100 billingMonth"
+                           name="billingMonth" th:id="billingMonth+${stat.count}"
+                           th:value="${#dates.format(patLst.billingMonth, 'yyyy/MM')}"
+                           th:onfocus="'javascript:selectMonth(\'#billingMonth'+${stat.count}+'\',\'#billingMonthErr'+${stat.count}+'\');'"
+                           required/>
+                    <span th:id="billingMonthErr+${stat.count}"
+                          style="display:none; color:red;"></span>
+                </td>
+                <td>
+                    <input aria-label="" th:oninput="'javascript:inputChange(\'bookingNoErrMsg'+${stat.count}+'\');'"
+                           th:value="${patLst.bookingNo}" autocomplete="off" type="text"
+                           class="text-center pName productName w-100 bookingNo"
+                           name="bookingNo" required th:id="${stat.count}" maxlength="10"/>
+                    <span th:id="bookingNoErrMsg+${stat.count}"
+                          style="display:none; color:red;"></span>
+                </td>
+                <td>
+                    <input aria-label="" th:oninput="'javascript:inputChange(\'poNOErrMsg'+${stat.count}+'\');'"
+                           th:value="${patLst.poNO}" autocomplete="off" type="text"
+                           class="text-center w-100 poNO"
+                           maxlength="10" name="poNO" id='poNO' required/>
+
+                    <span th:id="poNOErrMsg+${stat.count}"
+                          style="display:none; color:red;"></span>
+                </td>
+                <td>
+                    <input aria-label="" th:value="${patLst.shippingAgency}" autocomplete="off" type="text"
+                           class="text-center pName productName w-100 shippingAgency"
+                           th:oninput="'javascript:inputChange(\'shippingAgencyErrMsg'+${stat.count}+'\');'"
+                           maxlength="10" name="shippingAgency" id='shippingAgency' required value="非表示"/>
+                    <span th:id="shippingAgencyErrMsg+${stat.count}"
+                          style="display:none; color:red;"></span>
+                </td>
+                <td>
+                    <select th:onchange="'javascript:inputChange(\'exportInportErrMsg'+${stat.count}+'\');'"
+                            class="form-select exportInport"
+                            aria-label=""
+                            id="exportInport"
+                            name="exportInport">
+                        <option value=""></option>
+                        <option th:each="exportType : ${ExportType}"
+                                th:text="${exportType.type}"
+                                th:value="${exportType.name}"
+                                th:selected="${#strings.equals(exportType.name, patLst.exportInport)}"></option>
+                    </select>
+                    <span th:id="exportInportErrMsg+${stat.count}"
+                          style="display:none; color:red;"></span>
+                </td>
+                <td>
+                    <input aria-label="" th:value="${patLst.incoterms}" autocomplete="off" type="text"
+                           class="text-center pName productName w-100 incoterms"
+                           maxlength="10" name="incoterms" id='incoterms' required value="CIF"
+                           th:oninput="'javascript:inputChange(\'incotermsErrMsg'+${stat.count}+'\');'"/>
+                    <span th:id="incotermsErrMsg+${stat.count}"
+                          style="display:none; color:red;"></span>
+                </td>
+                <td>
+                    <input aria-label="" th:value="${patLst.shipName}" autocomplete="off" type="text"
+                           class="text-center pName productName w-100 shipName"
+                           maxlength="10" name="shipName" id='shipName'
+                           th:oninput="'javascript:inputChange(\'shipNameErrMsg'+${stat.count}+'\');'"
+                           required/>
+                    <span th:id="shipNameErrMsg+${stat.count}"
+                          style="display:none; color:red;"></span>
+                </td>
+                <td>
+                    <input aria-label="" th:value="${patLst.voyNo}" autocomplete="off" type="text"
+                           class="text-center pName productName w-100 voyNo"
+                           maxlength="10" name="voyNo" id='voyNo' required
+                           th:oninput="'javascript:inputChange(\'voyNoErrMsg'+${stat.count}+'\');'"
+                    />
+                    <span th:id="voyNoErrMsg+${stat.count}"
+                          style="display:none; color:red;"></span>
+                </td>
+                <td>
+                    <input aria-label="" th:value="${patLst.invoiceCode}" autocomplete="off" type="text"
+                           class="text-center pName productName w-100 invoiceCode"
+                           maxlength="10" name="invoiceCode" id='invoiceCode'
+                           th:oninput="'javascript:inputChange(\'invoiceCodeErrMsg'+${stat.count}+'\');'" required/>
+                    <span th:id="invoiceCodeErrMsg+${stat.count}"
+                          style="display:none; color:red;"></span>
+                </td>
+                <td>
+                    <input aria-label="" th:value="${patLst.packing}" autocomplete="off" type="text"
+                           class="text-center pName productName w-100 packing"
+                           th:oninput="'javascript:inputChange(\'packingErrMsg'+${stat.count}+'\');'"
+                           maxlength="10" name="packing" id='packing' required value="MM"/>
+                    <span th:id="packingErrMsg+${stat.count}"
+                          style="display:none; color:red;"></span>
+                </td>
+                <td>
+                    <select th:onchange="'javascript:inputChange(\'transportModeErr'+${stat.count}+'\');'"
+                            class="form-select transportMode" name="transportMode"
+                            aria-label="Default select example"
+                            id="transportMode">
+                        <option value=""></option>
+                        <option th:each="transportType : ${TransportType}"
+                                th:text="${transportType.type}"
+                                th:value="${transportType.name}"
+                                th:selected="${#strings.equals(transportType.name, patLst.transportMode)}"></option>
+                    </select>
+
+                    <span th:id="transportModeErr+${stat.count}"
+                          style="display:none; color:red;"></span>
+                </td>
+                <td>
+                    <input aria-label="" th:value="${patLst.fourtyf}" autocomplete="off" type="text"
+                           class="text-center pName productName w-100 fourtyf"
+                           th:oninput="'javascript:inputChange(\'fourtyfErrMsg'+${stat.count}+'\');'"
+                           maxlength="10" name="fourtyf" id='fourtyf' required/>
+                    <span th:id="fourtyfErrMsg+${stat.count}"
+                          style="display:none; color:red;"></span>
+                </td>
+                <td>
+                    <input aria-label="" th:value="${patLst.twentyf}" autocomplete="off" type="text"
+                           class="text-center pName productName w-100 twentyf"
+                           th:oninput="'javascript:inputChange(\'twentyfErrMsg'+${stat.count}+'\');'"
+                           maxlength="10" name="twentyf" id='twentyf' required/>
+                    <span th:id="twentyfErrMsg+${stat.count}"
+                          style="display:none; color:red;"></span>
+                </td>
+                <td>
+                    <input aria-label="" th:value="${patLst.invoicePrice}" autocomplete="off" type="text"
+                           class="text-center pName productName w-100 invoicePrice"
+                           th:oninput="'javascript:inputChange(\'invoicePriceErrMsg'+${stat.count}+'\');'"
+                           maxlength="10" name="invoicePrice" id='invoicePrice' required value="非表示"/>
+                    <span th:id="invoicePriceErrMsg+${stat.count}"
+                          style="display:none; color:red;"></span>
+                </td>
+                <td>
+                    <input aria-label="" th:value="${patLst.blawbNo}" autocomplete="off" type="text"
+                           class="text-center pName productName w-100 blawbNo"
+                           th:oninput="'javascript:inputChange(\'blawbNoErrMsg'+${stat.count}+'\');'"
+                           maxlength="10" name="blawbNo" id='blawbNo' required/>
+                    <span th:id="blawbNoErrMsg+${stat.count}"
+                          style="display:none; color:red;"></span>
+                </td>
+                <td>
+                    <select class="form-select departurePort" name="departurePort"
+                            aria-label="Default select example departurePort"
+                            id="departurePort"
+                            th:onchange="'javascript:inputChange(\'departurePortErrMsg'+${stat.count}+'\');'">
+                        <option value=""></option>
+                        <option th:each="port : ${portList}"
+                                th:text="${port.portName}"
+                                th:value="${port.portCode}"
+                                th:selected="${#strings.equals(port.portCode, patLst.departurePort)}"></option>
+                    </select>
+
+                    <span th:id="departurePortErrMsg+${stat.count}"
+                          style="display:none; color:red;"></span>
+                </td>
+                <td>
+                    <select class="form-select arrivalPort" name="arrivalPort"
+                            aria-label="Default select example arrivalPort"
+                            id="arrivalPort"
+                            th:onchange="'javascript:inputChange(\'arrivalPortErrMsg'+${stat.count}+'\');'">
+                        <option value=""></option>
+                        <option th:each="port : ${portList}"
+                                th:text="${port.portName}"
+                                th:value="${port.portCode}"
+                                th:selected="${#strings.equals(port.portCode, patLst.arrivalPort)}"></option>
+                    </select>
+
+                    <span th:id="arrivalPortErrMsg+${stat.count}"
+                          style="display:none; color:red;"></span>
+                </td>
+
+                <td>
+                    <input aria-label="" th:value="${#dates.format(patLst.cut, 'yyyy/MM/dd')}"
+                           autocomplete="off" type="text"
+                           class="form__field pName productName w-100 cut"
+                           maxlength="10" name="cut" th:id="cut+${stat.count}"
+                           th:onfocus="'javascript:openCalander(\'#cut'+${stat.count}+'\',\'#cutErrMsg'+${stat.count}+'\');'"
+                           required/>
+                    <span th:id="cutErrMsg+${stat.count}"
+                          style="display:none; color:red;"></span>
+                </td>
+                <td>
+                    <input aria-label="" th:value="${#dates.format(patLst.etd, 'yyyy/MM/dd')}"
+                           autocomplete="off" type="text"
+                           class="form__field pName productName w-100 etd"
+                           th:onfocus="'javascript:openCalander(\'#etd'+${stat.count}+'\',\'#etdErrMsg'+${stat.count}+'\');'"
+                           maxlength="10" name="etd" th:id="etd+${stat.count}" required/>
+                    <span th:id="etdErrMsg+${stat.count}" style="display:none; color:red;"></span>
+                </td>
+                <td>
+                    <input aria-label="" th:value="${#dates.format(patLst.eta, 'yyyy/MM/dd')}"
+                           autocomplete="off" type="text"
+                           class="form__field pName productName w-100 eta"
+                           th:onfocus="'javascript:openCalander(\'#eta'+${stat.count}+'\',\'#etaErrMsg'+${stat.count}+'\');'"
+                           maxlength="10" name="eta" th:id="eta+${stat.count}" required/>
+                    <span th:id="etaErrMsg+${stat.count}" style="display:none; color:red;"></span>
+                </td>
+                <td>
+                    <input aria-label="" th:value="${patLst.anAdvanceFee}" autocomplete="off" type="text"
+                           class="text-center pName productName w-100 anAdvanceFee"
+                           th:oninput="'javascript:inputChange(\'anAdvanceFeeErrMsg'+${stat.count}+'\');'"
+                           maxlength="10" name="anAdvanceFee" id='anAdvanceFee' required/>
+                    <span th:id="anAdvanceFeeErrMsg+${stat.count}"
+                          style="display:none; color:red;"></span>
+                </td>
+                <td>
+                    <input aria-label="" th:value="${patLst.supplierName}" autocomplete="off" type="text"
+                           class="text-center pName productName w-100 supplierName"
+                           th:oninput="'javascript:inputChange(\'supplierNameErrMsg'+${stat.count}+'\');'"
+                           maxlength="10" name="supplierName" id='supplierName' required/>
+                    <span th:id="supplierNameErrMsg+${stat.count}"
+                          style="display:none; color:red;"></span>
+                </td>
+
+                <td>
+                    <input aria-label="" th:value="${patLst.representativeItem}" autocomplete="off" type="text"
+                           class="text-center pName productName w-100 representativeItem"
+                           maxlength="10" name="representativeItem" id='representativeItem'
+                           th:oninput="'javascript:inputChange(\'representativeItemErrMsg'+${stat.count}+'\');'"
+                           required/>
+                    <span th:id="representativeItemErrMsg+${stat.count}"
+                          style="display:none; color:red;"></span>
+                </td>
+                <td>
+                    <input aria-label="" th:value="${patLst.freightKg}" autocomplete="off" type="text"
+                           class="text-center pName productName w-100 freightKg"
+                           maxlength="10" name="freightKg" id='freightKg'
+                           th:oninput="'javascript:inputChange(\'freightKgErrMsg'+${stat.count}+'\');'"
+                           required/>
+                    <span th:id="freightKgErrMsg+${stat.count}"
+                          style="display:none; color:red;"></span>
+                </td>
+                <td>
+                    <input aria-label="" th:value="${patLst.freightM3}" autocomplete="off" type="text"
+                           class="text-center pName productName w-100 freightM3"
+                           maxlength="10" name="freightM3" id='freightM3'
+                           th:oninput="'javascript:inputChange(\'freightM3ErrMsg'+${stat.count}+'\');'"
+                           required/>
+                    <span th:id="freightM3ErrMsg+${stat.count}"
+                          style="display:none; color:red;"></span>
+                </td>
+                <td>
+                    <input aria-label="" th:value="${patLst.ctsNumber}" autocomplete="off" type="text"
+                           class="text-center pName productName w-100 ctsNumber"
+                           maxlength="10" name="ctsNumber" id='ctsNumber'
+                           th:oninput="'javascript:inputChange(\'ctsNumberErrMsg'+${stat.count}+'\');'"
+                           required/>
+                    <span th:id="ctsNumberErrMsg+${stat.count}"
+                          style="display:none; color:red;"></span>
+                </td>
+                <td>
+                    <input aria-label="" th:value="${patLst.size}" autocomplete="off" type="text"
+                           class="text-center pName productName w-100 size"
+                           maxlength="10" name="size" id='size'
+                           th:oninput="'javascript:inputChange(\'sizeErrMsg'+${stat.count}+'\');'"
+                           required/>
+                    <span th:id="sizeErrMsg+${stat.count}" style="display:none; color:red;"></span>
+                </td>
+                <td>
+                    <input aria-label="" th:value="${#dates.format(patLst.pickUpDate,'yyyy/MM/dd')}"
+                           autocomplete="off"
+                           th:onfocus="'javascript:openCalander(\'#pickUpDate'+${stat.count}+'\',\'#pickUpDateErrMsg'+${stat.count}+'\');'"
+                           type="text" class="form__field pName productName w-100 pickUpDate"
+                           name="pickUpDate" th:id="pickUpDate+${stat.count}" required/>
+                    <span th:id="pickUpDateErrMsg+${stat.count}"
+                          style="display:none; color:red;"></span>
+                </td>
+                <td>
+                    <input aria-label="" th:value="${patLst.rtShip}" autocomplete="off" type="text"
+                           class="text-center pName productName w-100 rtShip"
+                           maxlength="10" name="rtShip" id='rtShip'
+                           th:oninput="'javascript:inputChange(\'rtShipErrMsg'+${stat.count}+'\');'"
+                           required/>
+                    <span th:id="rtShipErrMsg+${stat.count}" style="display:none; color:red;"></span>
+                </td>
+                <td>
+                    <input aria-label="" th:value="${patLst.vwAir}" autocomplete="off" type="text"
+                           class="text-center pName productName w-100 vwAir"
+                           maxlength="10" name="vwAir" id='vwAir'
+                           th:oninput="'javascript:inputChange(\'vwAirErrMsg'+${stat.count}+'\');'"
+                           required/>
+                    <span th:id="vwAirErrMsg+${stat.count}" style="display:none; color:red;"></span>
+                </td>
+                <td>
+                    <input aria-label="" th:value="${patLst.hlBoxesNumber}" autocomplete="off" type="text"
+                           class="text-center pName productName w-100 hlBoxesNumber"
+                           maxlength="10" name="hlBoxesNumber" id='hlBoxesNumber'
+                           th:oninput="'javascript:inputChange(\'hlBoxesNumberErrMsg'+${stat.count}+'\');'"
+                           required/>
+                    <span th:id="hlBoxesNumberErrMsg+${stat.count}" style="display:none; color:red;"></span>
+                </td>
+                <td>
+                    <input aria-label="" th:value="${patLst.moneyOrder}" autocomplete="off" type="text"
+                           class="text-center pName productName w-100 moneyOrder"
+                           maxlength="10" name="moneyOrder" id='moneyOrder'
+                           th:oninput="'javascript:inputChange(\'moneyOrderErrMsg'+${stat.count}+'\');'"
+                           required/>
+                    <span th:id="moneyOrderErrMsg+${stat.count}" style="display:none; color:red;"></span>
+                </td>
+                <td>
+                    <input aria-label="" th:value="${patLst.inportTaxAdvanceAmount}" autocomplete="off" type="text"
+                           class="text-center pName productName w-100 inportTaxAdvanceAmount"
+                           maxlength="10" name="inportTaxAdvanceAmount" id='inportTaxAdvanceAmount'
+                           th:oninput="'javascript:inputChange(\'inportTaxAdvanceAmountErrMsg'+${stat.count}+'\');'"
+                           required/>
+                    <span th:id="inportTaxAdvanceAmountErrMsg+${stat.count}" style="display:none; color:red;"></span>
+                </td>
+                <td>
+                    <input aria-label="" th:value="${patLst.remarks}" autocomplete="off" type="text"
+                           class="text-center pName productName w-100"
+                           maxlength="10" name="remarks" id='remarks' required/>
+                </td>
+                <td>
+                    <input aria-label="" th:value="${#dates.format(patLst.declarationDate,'yyyy/MM/dd')}"
+                           autocomplete="off"
+                           th:onfocus="'javascript:openCalander(\'#declarationDate'+${stat.count}+'\',\'#declarationDateErrMsg'+${stat.count}+'\');'"
+                           type="text" class="form__field pName productName w-100 declarationDate"
+                           name="declarationDate" th:id="declarationDate+${stat.count}" required/>
+                    <span th:id="declarationDateErrMsg+${stat.count}"
+                          style="display:none; color:red;"></span>
+                </td>
+                <td>
+                    <input aria-label="" th:value="${#dates.format(patLst.inspectionDate,'yyyy/MM/dd')}"
+                           autocomplete="off"
+                           th:onfocus="'javascript:openCalander(\'#inspectionDate'+${stat.count}+'\',\'#inspectionDateErrMsg'+${stat.count}+'\');'"
+                           type="text" class="form__field pName productName w-100 inspectionDate"
+                           name="inspectionDate" th:id="inspectionDate+${stat.count}" required/>
+                    <span th:id="inspectionDateErrMsg+${stat.count}"
+                          style="display:none; color:red;"></span>
+                </td>
+                <td>
+                    <input aria-label="" th:value="${#dates.format(patLst.deliveryDateAndTime,'yyyy/MM/dd')}"
+                           autocomplete="off" type="text"
+                           class="form__field pName productName w-100 deliveryDateAndTime"
+                           th:onfocus="'javascript:openCalander(\'#deliveryDateAndTime'+${stat.count}+'\',\'#deliveryDateAndTimeErrMsg'+${stat.count}+'\');'"
+                           name="deliveryDateAndTime" th:id="deliveryDateAndTime+${stat.count}" required/>
+                    <span th:id="deliveryDateAndTimeErrMsg+${stat.count}"
+                          style="display:none; color:red;"></span>
+                </td>
+                <td>
+                    <input aria-label="" th:value="${#dates.format(patLst.possiblePickUpDate,'yyyy/MM/dd')}"
+                           autocomplete="off" type="text" class="form__field pName productName w-100 possiblePickUpDate"
+                           th:onfocus="'javascript:openCalander(\'#possiblePickUpDate'+${stat.count}+'\',\'#possiblePickUpDateErrMsg'+${stat.count}+'\');'"
+                           name="possiblePickUpDate" th:id="possiblePickUpDate+${stat.count}" required/>
+                    <span th:id="possiblePickUpDateErrMsg+${stat.count}"
+                          style="display:none; color:red;"></span>
+                </td>
+
+                <td>
+                    <input aria-label="" th:value="${patLst.containerNo}" autocomplete="off" type="text"
+                           class="text-center pName productName w-100 containerNo"
+                           maxlength="10" name="containerNo" id='containerNo' required/>
+                    <!--                    <span th:id="containerNoErrMsg+${stat.count}"-->
+                    <!--                          style="display:none; color:red;"></span>-->
+                </td>
+                <td>
+                    <input aria-label="" th:value="${patLst.cargoInsurance}" autocomplete="off" type="text"
+                           class="text-center pName productName w-100"
+                           maxlength="10" name="cargoInsurance" id='cargoInsurance' required/>
+                </td>
+                <td>
+                    <input aria-label="" th:value="${patLst.logisticsCost}" autocomplete="off" type="text"
+                           class="text-center pName productName w-100 logisticsCost"
+                           maxlength="10" name="logisticsCost" id='logisticsCost'
+                           th:oninput="'javascript:inputChange(\'logisticsCostErrMsg'+${stat.count}+'\');'"
+                           required/>
+                    <span th:id="logisticsCostErr+${stat.count}"
+                          style="display:none; color:red;"></span>
+                </td>
+
+                <td>
+                    <input aria-label="" autocomplete="off" class="form__field w-100 freeTime"
+                           name="freeTime" th:id="freeTime+${stat.count}"
+                           th:value="${#dates.format(patLst.freeTime, 'yyyy/MM/dd')}"
+                           th:onfocus="'javascript:openCalander(\'#freeTime'+${stat.count}+'\',\'#freeTimeErr'+${stat.count}+'\');'"
+                           required/>
+                    <span th:id="freeTimeErr+${stat.count}"
+                          style="display:none; color:red;"></span>
+                </td>
+
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+
+<script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script>
+
+    let languageFlag = "[[${languageOption}]]";
+    loadErrorMessage();
+    AOS.init();
+
+    let next = document.getElementById("next");
+    let prev = document.getElementById("prev");
+
+    function disableNext() {
+
+        next.style.display = "none";
+        prev.style.display = "";
+
+    }
+
+    function disablePrev() {
+
+        prev.style.display = "none";
+        next.style.display = "";
+    }
+
+    function patternEditSave() {
+        let regex = /[\u3000-\u303F]|[\u3040-\u309F]|[\u30A0-\u30FF]|[\uFF00-\uFFEF]|[\u4E00-\u9FAF]|[\u2605-\u2606]|[\u2190-\u2195]|\u203B/g;
+        let editFlag = true;
+        let errMsgId = '';
+        let slides = document.getElementsByClassName("bookingNo");
+        for (let i = 0; i < slides.length; i++) {
+
+            if (slides.item(i).value === "") {
+                errMsgId = "bookingNoErrMsg" + slides.item(i).id;
+                showErrorMsg(bookingNoEmptyErrMsg, bookingNoEmptyErrMsg, errMsgId, languageFlag);
+                editFlag = false;
+            }
+        }
+
+        let poNo = document.getElementsByClassName("poNO");
+        for (let i = 0; i < poNo.length; i++) {
+
+            if (poNo.item(i).value === "") {
+                errMsgId = "poNOErrMsg" + slides.item(i).id;
+                showErrorMsg(poNoEmptyErrMsg, poNoEmptyErrMsg, errMsgId, languageFlag);
+                editFlag = false;
+            }
+        }
+
+        let billingMonth = document.getElementsByClassName("billingMonth");
+        for (let i = 0; i < billingMonth.length; i++) {
+
+            if (billingMonth.item(i).value === "") {
+                errMsgId = "billingMonthErr" + slides.item(i).id;
+                showErrorMsg(billingMonthEmptyErrMsg, billingMonthEmptyErrMsg, errMsgId, languageFlag)
+                editFlag = false;
+            }
+        }
+
+        let shippingAgency = document.getElementsByClassName("shippingAgency");
+        for (let i = 0; i < shippingAgency.length; i++) {
+
+            if (shippingAgency.item(i).value === "") {
+                errMsgId = "shippingAgencyErrMsg" + slides.item(i).id;
+                showErrorMsg(shippingAgencyEmptyErrMsg, shippingAgencyEmptyErrMsg, errMsgId, languageFlag)
+                editFlag = false;
+            }
+        }
+        //
+        let exportInport = document.getElementsByClassName("exportInport");
+        for (let i = 0; i < exportInport.length; i++) {
+            if (exportInport.item(i).value === "") {
+                errMsgId = "exportInportErrMsg" + slides.item(i).id;
+                showErrorMsg(tradeEmptyErrMsg, tradeEmptyErrMsg, errMsgId, languageFlag)
+                editFlag = false;
+            }
+        }
+
+        let incoterms = document.getElementsByClassName("incoterms");
+        for (let i = 0; i < incoterms.length; i++) {
+            if (incoterms.item(i).value === "") {
+                errMsgId = "incotermsErrMsg" + slides.item(i).id;
+                showErrorMsg(incotermsEmptyErrMsg, incotermsEmptyErrMsg, errMsgId, languageFlag)
+                editFlag = false;
+            }
+        }
+
+        let shipName = document.getElementsByClassName("shipName");
+        for (let i = 0; i < shipName.length; i++) {
+            if (shipName.item(i).value === "") {
+                errMsgId = "shipNameErrMsg" + slides.item(i).id;
+                showErrorMsg(shipNameEmptyErrMsg, shipNameEmptyErrMsg, errMsgId, languageFlag)
+                editFlag = false;
+            }
+        }
+
+        let voyNo = document.getElementsByClassName("voyNo");
+        for (let i = 0; i < voyNo.length; i++) {
+            if (voyNo.item(i).value === "") {
+                errMsgId = "voyNoErrMsg" + slides.item(i).id;
+                showErrorMsg(VOYNoEmptyErrMsg, VOYNoEmptyErrMsg, errMsgId, languageFlag)
+                editFlag = false;
+            }
+        }
+
+        let invoiceCode = document.getElementsByClassName("invoiceCode");
+        for (let i = 0; i < invoiceCode.length; i++) {
+            if (invoiceCode.item(i).value === "") {
+                errMsgId = "invoiceCodeErrMsg" + slides.item(i).id;
+                showErrorMsg(invoiceCodeEmptyErrMsg, invoiceCodeEmptyErrMsg, errMsgId, languageFlag)
+                editFlag = false;
+            }
+        }
+        //
+        let packing = document.getElementsByClassName("packing");
+        for (let i = 0; i < packing.length; i++) {
+            errMsgId = "packingErrMsg" + slides.item(i).id;
+            if (packing.item(i).value === "") {
+                showErrorMsg(packingEmptyErrMsg, packingEmptyErrMsg, errMsgId, languageFlag)
+                editFlag = false;
+            } else if (regex.test(packing.item(i).value)) {
+                showErrorMsg(packingJpnCharacterErrMsg, packingJpnCharacterErrMsg, errMsgId, languageFlag)
+                editFlag = false;
+            } else if (!packing.item(i).value.match("[^[0-9]*$")) {
+                showErrorMsg(packingNumberErrMsg, packingNumberErrMsg, errMsgId, languageFlag)
+                editFlag = false;
+            }
+        }
+        //
+        let transportMode = document.getElementsByClassName("transportMode");
+        for (let i = 0; i < transportMode.length; i++) {
+            if (transportMode.item(i).value === "") {
+                errMsgId = "transportModeErr" + slides.item(i).id;
+                showErrorMsg(transportModeEmptyErrMsg, transportModeEmptyErrMsg, errMsgId, languageFlag)
+                editFlag = false;
+            }
+        }
+
+        let fourtyf = document.getElementsByClassName("fourtyf");
+        for (let i = 0; i < fourtyf.length; i++) {
+            errMsgId = "fourtyfErrMsg" + slides.item(i).id;
+            if (fourtyf.item(i).value === "") {
+                showErrorMsg(fortyFEmptyErrMsg, fortyFEmptyErrMsg, errMsgId, languageFlag)
+                editFlag = false;
+            }else if (regex.test(fourtyf.item(i).value)) {
+                showErrorMsg(fortyFJpnCharacterErrMsg, fortyFJpnCharacterErrMsg, errMsgId, languageFlag)
+                editFlag = false;
+            }else if (!fourtyf.item(i).value.match("^[0-9]*$")) {
+                showErrorMsg(fortyFNumberErrMsg, fortyFNumberErrMsg, errMsgId, languageFlag)
+                editFlag = false;
+            }
+        }
+        let twentyf = document.getElementsByClassName("twentyf");
+        for (let i = 0; i < fourtyf.length; i++) {
+            errMsgId = "twentyfErrMsg" + slides.item(i).id;
+            if (twentyf.item(i).value === "") {
+                showErrorMsg(twentyFEmptyErrMsg, twentyFEmptyErrMsg, errMsgId, languageFlag)
+                editFlag = false;
+            } else if (regex.test(twentyf.item(i).value)) {
+                showErrorMsg( twentyFJpnCharacterErrMsg, twentyFJpnCharacterErrMsg, errMsgId, languageFlag)
+                editFlag = false;
+            } else if (!twentyf.item(i).value.match("[^[0-9]*$")) {
+                showErrorMsg(twentyFNumberErrMsg, twentyFNumberErrMsg, errMsgId, languageFlag)
+                editFlag = false;
+            }
+        }
+
+        let invoicePrice = document.getElementsByClassName("invoicePrice");
+        for (let i = 0; i < invoicePrice.length; i++) {
+            errMsgId = "invoicePriceErrMsg" + slides.item(i).id;
+            if (invoicePrice.item(i).value === "") {
+                showErrorMsg(invoicePriceEmptyErrMsg, invoicePriceEmptyErrMsg, errMsgId, languageFlag)
+                editFlag = false;
+            }else if (regex.test(invoicePrice.item(i).value)) {
+                showErrorMsg(invoicePriceJpnCharacterErrMsg, invoicePriceJpnCharacterErrMsg, errMsgId, languageFlag)
+                editFlag = false;
+            }else if (!invoicePrice.item(i).value.match("^[0-9]*$")) {
+                showErrorMsg(invoicePriceNumberErrMsg, invoicePriceNumberErrMsg, errMsgId, languageFlag)
+                editFlag = false;
+            }
+        }
+
+        let blawbNo = document.getElementsByClassName("blawbNo");
+        for (let i = 0; i < invoicePrice.length; i++) {
+            if (blawbNo.item(i).value === "") {
+                errMsgId = "blawbNoErrMsg" + slides.item(i).id;
+                showErrorMsg(blNoAwbNoEmptyErrMsg, blNoAwbNoEmptyErrMsg, errMsgId, languageFlag)
+                editFlag = false;
+            }
+        }
+
+        let departurePort = document.getElementsByClassName("departurePort");
+        for (let i = 0; i < invoicePrice.length; i++) {
+            if (departurePort.item(i).value === "") {
+                errMsgId = "departurePortErrMsg" + slides.item(i).id;
+                showErrorMsg(departPortEmptyErrMsg, departPortEmptyErrMsg, errMsgId, languageFlag)
+                editFlag = false;
+            }
+        }
+
+        let arrivalPort = document.getElementsByClassName("arrivalPort");
+        for (let i = 0; i < arrivalPort.length; i++) {
+            if (arrivalPort.item(i).value === "") {
+                errMsgId = "arrivalPortErrMsg" + slides.item(i).id;
+                showErrorMsg(arrivalPortEmptyErrMsg, arrivalPortEmptyErrMsg, errMsgId, languageFlag)
+                editFlag = false;
+            }
+        }
+
+        let cut = document.getElementsByClassName("cut");
+        for (let i = 0; i < cut.length; i++) {
+            if (cut.item(i).value === "") {
+                errMsgId = "cutErrMsg" + slides.item(i).id;
+                showErrorMsg(cutEmptyErrMsg, cutEmptyErrMsg, errMsgId, languageFlag)
+                editFlag = false;
+            }
+        }
+
+        let eta = document.getElementsByClassName("eta");
+        for (let i = 0; i < eta.length; i++) {
+            if (eta.item(i).value === "") {
+                errMsgId = "etaErrMsg" + slides.item(i).id;
+                showErrorMsg(etaDateEmptyErrMsg, etaDateEmptyErrMsg, errMsgId, languageFlag)
+                editFlag = false;
+            }
+        }
+
+        let etd = document.getElementsByClassName("etd");
+        for (let i = 0; i < etd.length; i++) {
+            if (etd.item(i).value === "") {
+                errMsgId = "etdErrMsg" + slides.item(i).id;
+                showErrorMsg(etdDateEmptyErrMsg, etdDateEmptyErrMsg, errMsgId, languageFlag)
+                editFlag = false;
+            }
+        }
+
+        let anAdvanceFee = document.getElementsByClassName("anAdvanceFee");
+        for (let i = 0; i < anAdvanceFee.length; i++) {
+            errMsgId = "anAdvanceFeeErrMsg" + slides.item(i).id;
+            if (anAdvanceFee.item(i).value === "") {
+
+                showErrorMsg(anAdvancedFeeEmptyErrMsg, anAdvancedFeeEmptyErrMsg, errMsgId, languageFlag)
+                editFlag = false;
+            } else if (regex.test(anAdvanceFee.item(i).value)) {
+                showErrorMsg(anAdvanceFeeJpnCharacterErrMsg, anAdvanceFeeJpnCharacterErrMsg, errMsgId, languageFlag)
+                editFlag = false;
+            }else if (!anAdvanceFee.item(i).value.match("^[0-9]*$")) {
+                showErrorMsg(anAdvanceFeeNumberErrMsg, anAdvanceFeeNumberErrMsg, errMsgId, languageFlag)
+                editFlag = false;
+            }
+        }
+
+        let supplierName = document.getElementsByClassName("supplierName");
+        for (let i = 0; i < supplierName.length; i++) {
+            if (supplierName.item(i).value === "") {
+                errMsgId = "supplierNameErrMsg" + slides.item(i).id;
+                showErrorMsg(supplierEmptyErrMsg, supplierEmptyErrMsg, errMsgId, languageFlag)
+                editFlag = false;
+            }
+        }
+
+        let representativeItem = document.getElementsByClassName("representativeItem");
+        for (let i = 0; i < representativeItem.length; i++) {
+            if (representativeItem.item(i).value === "") {
+                errMsgId = "representativeItemErrMsg" + slides.item(i).id;
+                showErrorMsg(typeItemEmptyErrMsg, typeItemEmptyErrMsg, errMsgId, languageFlag)
+                editFlag = false;
+            }
+        }
+
+        let freightKg = document.getElementsByClassName("freightKg");
+        for (let i = 0; i < freightKg.length; i++) {
+            errMsgId = "freightKgErrMsg" + slides.item(i).id;
+            if (freightKg.item(i).value === "") {
+                showErrorMsg(cargoKgEmptyErrMsg, cargoKgEmptyErrMsg, errMsgId, languageFlag)
+                editFlag = false;
+            }else if (regex.test(freightKg.item(i).value)) {
+                showErrorMsg(cargoKgJpnCharacterErrMsg, cargoKgJpnCharacterErrMsg, errMsgId, languageFlag)
+                editFlag = false;
+            } else if (!freightKg.item(i).value.match("^[0-9]\\d*(\\.\\d+)?$")) {
+                showErrorMsg(cargoKgNumberErrMsg, cargoKgNumberErrMsg, errMsgId, languageFlag)
+                editFlag = false;
+            }
+        }
+
+        let freightM3 = document.getElementsByClassName("freightM3");
+        for (let i = 0; i < freightM3.length; i++) {
+            errMsgId = "freightM3ErrMsg" + slides.item(i).id;
+            if (freightM3.item(i).value === "") {
+                showErrorMsg(cargoM3EmptyErrMsg, cargoM3EmptyErrMsg, errMsgId, languageFlag)
+                editFlag = false;
+            }else if (regex.test(freightM3.item(i).value)) {
+                showErrorMsg( cargoM3JpnCharacterErrMsg, cargoM3JpnCharacterErrMsg, errMsgId, languageFlag)
+                editFlag = false;
+            } else if (!freightM3.item(i).value.match("^[0-9]\\d*(\\.\\d+)?$")) {
+                showErrorMsg(cargoM3NumberErrMsg, cargoM3NumberErrMsg, errMsgId, languageFlag)
+                editFlag = false;
+            }
+        }
+
+        let ctsNumber = document.getElementsByClassName("ctsNumber");
+        for (let i = 0; i < freightM3.length; i++) {
+            errMsgId = "ctsNumberErrMsg" + slides.item(i).id;
+            if (ctsNumber.item(i).value === "") {
+                showErrorMsg(ctsNosEmptyErrMsg, ctsNosEmptyErrMsg, errMsgId, languageFlag)
+                editFlag = false;
+            }else if (regex.test(ctsNumber.item(i).value)) {
+                showErrorMsg( ctsNumberJpnCharacterErrMsg, ctsNumberJpnCharacterErrMsg, errMsgId, languageFlag)
+                editFlag = false;
+            } else if (!ctsNumber.item(i).value.match("^[0-9]*$")) {
+                showErrorMsg(ctsNumberDigitErrMsg, ctsNumberDigitErrMsg, errMsgId, languageFlag)
+                editFlag = false;
+            }
+        }
+
+        let size = document.getElementsByClassName("size");
+        for (let i = 0; i < size.length; i++) {
+            if (size.item(i).value === "") {
+                errMsgId = "sizeErrMsg" + slides.item(i).id;
+                showErrorMsg(sizeEmptyErrMsg, sizeEmptyErrMsg, errMsgId, languageFlag)
+                editFlag = false;
+            }
+        }
+
+        let pickUpDate = document.getElementsByClassName("pickUpDate");
+        for (let i = 0; i < pickUpDate.length; i++) {
+            if (pickUpDate.item(i).value === "") {
+                errMsgId = "pickUpDateErrMsg" + slides.item(i).id;
+                showErrorMsg(pickupDtEmptyErrMsg, pickupDtEmptyErrMsg, errMsgId, languageFlag)
+                editFlag = false;
+            }
+        }
+
+        let rtShip = document.getElementsByClassName("rtShip");
+        for (let i = 0; i < rtShip.length; i++) {
+            if (rtShip.item(i).value === "") {
+                errMsgId = "rtShipErrMsg" + slides.item(i).id;
+                showErrorMsg(rtShipEmptyErrMsg, rtShipEmptyErrMsg, errMsgId, languageFlag)
+                editFlag = false;
+            }
+        }
+
+        let vwAir = document.getElementsByClassName("vwAir");
+        for (let i = 0; i < vwAir.length; i++) {
+            if (vwAir.item(i).value === "") {
+                errMsgId = "vwAirErrMsg" + slides.item(i).id;
+                showErrorMsg(vwAirEmptyErrMsg, vwAirEmptyErrMsg, errMsgId, languageFlag)
+                editFlag = false;
+            }
+        }
+
+        let hlBoxesNumber = document.getElementsByClassName("hlBoxesNumber");
+        for (let i = 0; i < hlBoxesNumber.length; i++) {
+            errMsgId = "hlBoxesNumberErrMsg" + slides.item(i).id;
+            if (hlBoxesNumber.item(i).value === "") {
+                showErrorMsg(hlPackBoxEmptyErrMsg, hlPackBoxEmptyErrMsg, errMsgId, languageFlag)
+                editFlag = false;
+            }else if (regex.test(hlBoxesNumber.item(i).value)) {
+                showErrorMsg( hlBoxesNumberJpnCharacterErrMsg, hlBoxesNumberJpnCharacterErrMsg, errMsgId, languageFlag)
+                editFlag = false;
+            } else if (!hlBoxesNumber.item(i).value.match("^[0-9]*$")) {
+                showErrorMsg(hlBoxesNumberDigitErrMsg, hlBoxesNumberDigitErrMsg, errMsgId, languageFlag)
+                editFlag = false;
+            }
+        }
+
+        let moneyOrder = document.getElementsByClassName("moneyOrder");
+        for (let i = 0; i < moneyOrder.length; i++) {
+            errMsgId = "moneyOrderErrMsg" + slides.item(i).id;
+            if (moneyOrder.item(i).value === "") {
+                showErrorMsg(exchangeEmptyErrMsg, exchangeEmptyErrMsg, errMsgId, languageFlag)
+                editFlag = false;
+            } else if (regex.test(moneyOrder.item(i).value)) {
+                showErrorMsg( exchangeJpnCharacterErrMsg, exchangeJpnCharacterErrMsg, errMsgId, languageFlag)
+                editFlag = false;
+            }else if (!moneyOrder.item(i).value.match("^[0-9]*$")) {
+                showErrorMsg(exchangeNumberErrMsg, exchangeNumberErrMsg, errMsgId, languageFlag)
+                editFlag = false;
+            }
+        }
+
+        let inportTaxAdvanceAmount = document.getElementsByClassName("inportTaxAdvanceAmount");
+        for (let i = 0; i < inportTaxAdvanceAmount.length; i++) {
+            errMsgId = "inportTaxAdvanceAmountErrMsg" + slides.item(i).id;
+            if (inportTaxAdvanceAmount.item(i).value === "") {
+                showErrorMsg(inportTaxAdvanceAmtEmptyErrMsg, inportTaxAdvanceAmtEmptyErrMsg, errMsgId, languageFlag)
+                editFlag = false;
+            } else if (regex.test(inportTaxAdvanceAmount.item(i).value)) {
+                showErrorMsg( importTaxAdvanceAmountJpnCharacterErrMsg, importTaxAdvanceAmountJpnCharacterErrMsg, "inportTaxAdvanceAmountErrMsg", languageFlag)
+                editFlag = false;
+            }else if (!inportTaxAdvanceAmount.item(i).value.match("^[0-9]*$")) {
+                showErrorMsg(importTaxAdvanceAmountNumberErrMsg, importTaxAdvanceAmountNumberErrMsg, "inportTaxAdvanceAmountErrMsg", languageFlag)
+                editFlag = false;
+            }
+        }
+
+        let declarationDate = document.getElementsByClassName("declarationDate");
+        for (let i = 0; i < declarationDate.length; i++) {
+            if (declarationDate.item(i).value === "") {
+                errMsgId = "declarationDateErrMsg" + slides.item(i).id;
+                showErrorMsg(declarationDtEmptyErrMsg, declarationDtEmptyErrMsg, errMsgId, languageFlag)
+                editFlag = false;
+            }
+        }
+
+        let inspectionDate = document.getElementsByClassName("inspectionDate");
+        for (let i = 0; i < inspectionDate.length; i++) {
+            if (inspectionDate.item(i).value === "") {
+                errMsgId = "inspectionDateErrMsg" + slides.item(i).id;
+                showErrorMsg(inspectionDtEmptyErrMsg, inspectionDtEmptyErrMsg, errMsgId, languageFlag)
+                editFlag = false;
+            }
+        }
+
+        let deliveryDateAndTime = document.getElementsByClassName("deliveryDateAndTime");
+        for (let i = 0; i < deliveryDateAndTime.length; i++) {
+            if (deliveryDateAndTime.item(i).value === "") {
+                errMsgId = "deliveryDateAndTimeErrMsg" + slides.item(i).id;
+                showErrorMsg(deliveryDtEmptyErrMsg, deliveryDtEmptyErrMsg, errMsgId, languageFlag)
+                editFlag = false;
+            }
+        }
+
+        let possiblePickUpDate = document.getElementsByClassName("possiblePickUpDate");
+        for (let i = 0; i < possiblePickUpDate.length; i++) {
+            if (possiblePickUpDate.item(i).value === "") {
+                errMsgId = "possiblePickUpDateErrMsg" + slides.item(i).id;
+                showErrorMsg(possiblePickupDtEmptyErrMsg, possiblePickupDtEmptyErrMsg, errMsgId, languageFlag)
+                editFlag = false;
+            }
+        }
+
+        let freeTime = document.getElementsByClassName("freeTime");
+        for (let i = 0; i < freeTime.length; i++) {
+
+            if (freeTime.item(i).value === "") {
+                errMsgId = "freeTimeErr" + slides.item(i).id;
+                showErrorMsg(freeTimeEmptyErrMsg, freeTimeEmptyErrMsg, errMsgId, languageFlag)
+                editFlag = false;
+            }
+        }
+
+        let logisticsCost = document.getElementsByClassName("logisticsCost");
+        for (let i = 0; i < logisticsCost.length; i++) {
+            errMsgId = "logisticsCostErr" + slides.item(i).id;
+            if (logisticsCost.item(i).value !== "") {
+                 if (regex.test(logisticsCost.item(i).value)) {
+                    showErrorMsg(logisticsCostJpnCharacterErrMsg, logisticsCostJpnCharacterErrMsg, errMsgId, languageFlag)
+                    editFlag = false;
+                }else if (!logisticsCost.item(i).value.match("^[0-9]*$")) {
+                    showErrorMsg(logisticsCostNumberErrMsg, logisticsCostNumberErrMsg, errMsgId, languageFlag)
+                    editFlag = false;
+                }
+            }
+        }
+
+        // let size = document.getElementsByClassName("size");
+        // for (let i = 0; i < size.length; i++) {
+        //     if (size.item(i).value === "") {
+        //
+        //         errMsgId = "sizeErrMsg" + slides.item(i).id;
+        //         showErrorMsg(sizeEmptyErrMsg, sizeEmptyErrMsg, errMsgId, languageFlag)
+        //         editFlag = false;
+        //     }
+        // }
+        // alert(editFlag);
+        if (editFlag == true) {
+            //alert('TEST');
+            let tblData = [];
+            //alert(tblData.length);
+            $('#patternEdit tr').each(function (index, item) {
+                let $item = $(item);
+                //alert($item.find("[name='patternCode']").html());
+                tblData.push({
+                    patternCode: $item.find("[name='patternCode']").html(),
+                    customerName: $item.find("[name='customerList']").val(),
+                    patternName: $item.find("[name='patternName']").val(),
+                    billingMonth: $item.find("td input[name='billingMonth']").val()+'/01',
+                    bookingNo: $item.find("td input[name='bookingNo']").val(),
+                    poNO: $item.find("td input[name='poNO']").val(),
+                    shippingAgency: $item.find("td input[name='shippingAgency']").val(),
+                    exportInport: $item.find("select[name='exportInport']").val(),
+                    incoterms: $item.find("td input[name='incoterms']").val(),
+                    shipName: $item.find("td input[name='shipName']").val(),
+                    voyNo: $item.find("td input[name='voyNo']").val(),
+                    invoiceCode: $item.find("td input[name='invoiceCode']").val(),
+                    packing: $item.find("td input[name='packing']").val(),
+                    transportMode: $item.find("select[name='transportMode']").val(),
+                    fourtyf: $item.find("td input[name='fourtyf']").val(),
+                    twentyf: $item.find("td input[name='twentyf']").val(),
+                    invoicePrice: $item.find("td input[name='invoicePrice']").val(),
+                    blawbNo: $item.find("td input[name='blawbNo']").val(),
+                    departurePort: $item.find("select[name='departurePort']").val(),
+                    arrivalPort: $item.find("select[name='arrivalPort']").val(),
+                    cut: $item.find("td input[name='cut']").val(),
+                    etd: $item.find("td input[name='etd']").val(),
+                    eta: $item.find("td input[name='eta']").val(),
+                    anAdvanceFee: $item.find("td input[name='anAdvanceFee']").val(),
+                    supplierName: $item.find("td input[name='supplierName']").val(),
+                    representativeItem: $item.find("td input[name='representativeItem']").val(),
+                    freightKg: $item.find("td input[name='freightKg']").val(),
+                    freightM3: $item.find("td input[name='freightM3']").val(),
+                    ctsNumber: $item.find("td input[name='ctsNumber']").val(),
+                    size: $item.find("td input[name='size']").val(),
+                    pickUpDate: $item.find("td input[name='pickUpDate']").val(),
+                    rtShip: $item.find("td input[name='rtShip']").val(),
+                    vwAir: $item.find("td input[name='vwAir']").val(),
+                    hlBoxesNumber: $item.find("td input[name='hlBoxesNumber']").val(),
+                    moneyOrder: $item.find("td input[name='moneyOrder']").val(),
+                    inportTaxAdvanceAmount: $item.find("td input[name='inportTaxAdvanceAmount']").val(),
+                    remarks: $item.find("td input[name='remarks']").val(),
+                    declarationDate: $item.find("td input[name='declarationDate']").val(),
+                    inspectionDate: $item.find("td input[name='inspectionDate']").val(),
+                    deliveryDateAndTime: $item.find("td input[name='deliveryDateAndTime']").val(),
+                    possiblePickUpDate: $item.find("td input[name='possiblePickUpDate']").val(),
+                    containerNo: $item.find("td input[name='containerNo']").val(),
+                    cargoInsurance: $item.find("td input[name='cargoInsurance']").val(),
+                    logisticsCost: $item.find("td input[name='logisticsCost']").val(),
+                    freeTime: $item.find("td input[name='freeTime']").val(),
+                });
+            });
+
+
+            $.get('/patternEdit/tblData', {tblData: JSON.stringify(tblData)}, function (data) {
+
+                // let patObj = data.patternObj;
+                // document.getElementById("billingMonth").value = patObj.billingMonth;
+                // document.getElementById("bookingNo").value = patObj.bookingNo;
+                // document.getElementById("poNo").value = patObj.poNO;
+                // document.getElementById("shippingAgency").value = patObj.shippingAgency;
+                // document.getElementById("exportInport").value = patObj.exportInport;
+                // document.getElementById("incoterms").value = patObj.incoterms;
+                // document.getElementById("shipName").value = patObj.shipName;
+                // document.getElementById("voyNo").value = patObj.voyNo;
+                // document.getElementById("invoiceCode").value = patObj.invoiceCode;
+                // document.getElementById("packing").value = patObj.packing;
+                // document.getElementById("transportMode").value = patObj.transportMode;
+                // document.getElementById("fourtyf").value = patObj.fourtyf;
+                // document.getElementById("twentyf").value = patObj.twentyf;
+                // document.getElementById("invoicePrice").value = patObj.invoicePrice;
+                // document.getElementById("blawbNo").value = patObj.blawbNo;
+                // document.getElementById("departurePort").value = patObj.departurePort;
+                // document.getElementById("arrivalPort").value = patObj.arrivalPort;
+                // document.getElementById("cut").value = patObj.cut;
+                // document.getElementById("anAdvanceFee").value = patObj.anAdvanceFee;
+                // document.getElementById("supplierName").value = patObj.supplierName;
+                // document.getElementById("representativeItem").value = patObj.representativeItem;
+                // document.getElementById("freightKg").value = patObj.freightKg;
+                // document.getElementById("freightM3").value = patObj.freightM3;
+                // document.getElementById("ctsNumber").value = patObj.ctsNumber;
+                // document.getElementById("size").value = patObj.size;
+                // document.getElementById("rtShip").value = patObj.rtShip;
+                // document.getElementById("vwAir").value = patObj.vwAir;
+                // document.getElementById("hlBoxesNumber").value = patObj.hlBoxesNumber;
+                // document.getElementById("inportTaxAdvanceAmount").value = patObj.inportTaxAdvanceAmount;
+                // document.getElementById("remarks").value = patObj.remarks;
+                // document.getElementById("declarationDate").value = patObj.declarationDate;
+                // document.getElementById("inspectionDate").value = patObj.inspectionDate;
+                // document.getElementById("deliveryDateAndTime").value = patObj.deliveryDateAndTime;
+                // document.getElementById("possiblePickUpDate").value = patObj.possiblePickUpDate;
+                // document.getElementById("pickUpDate").value = patObj.pickUpDate;
+                // document.getElementById("containerNo").value = patObj.containerNo;
+                // document.getElementById("cargoInsurance").value = patObj.cargoInsurance;
+                // document.getElementById("logisticsCost").value = patObj.logisticsCost;
+                // document.getElementById("etd").value = patObj.etd;
+                // document.getElementById("eta").value = patObj.eta;
+                // document.getElementById("freeTime").value = patObj.freeTime;
+                // //document.getElementById("cusName").value = patObj.customerName;
+                // console.log(patObj.customerName);
+                // $('#cusName option[value="' + patObj.customerName + '"]').attr("selected", "selected");
+
+
+                //alert(changeDateTime(patObj.billingMonth))
+                window.location = '/patternEdit';
+            });
+
+        } else {
+            // let form_elem = document.getElementById('exportRegistrationForm');
+            // form_elem.submit();
+        }
+        // window.scrollTo(0, 0);
+
+    }
+
+    function changeDateTime(timestamp) {
+        let jsDate = new Date(timestamp);
+        let jsMonth = jsDate.getMonth() + 1;
+        return jsDate.getFullYear() + '/' + jsMonth + '/' + jsDate.getDate()
+    }
+
+    function showErrorMsg(errMsgJp, errMsgEn, errMsgId, languageFlag) {
+
+        if (languageFlag === 0) {
+            document.getElementById(errMsgId).textContent = errMsgJp;
+        } else {
+            document.getElementById(errMsgId).textContent = errMsgEn;
+        }
+        document.getElementById(errMsgId).style.visibility = "visible";
+        document.getElementById(errMsgId).style.display = "block";
+    }
+
+    function openCalander(a) {
+        let date = a;
+        const myDatePicker = MCDatepicker.create({
+            el: date,
+            closeOnBlur: true,
+            dateFormat: 'YYYY/MM/DD',
+            bodyType: 'inline',
+            theme: {
+                display: {
+                    foreground: 'rgba(255, 255, 255, 0.8)',
+                    background: '#18477E'
+                },
+                main_background: '#fff',
+                weekday: {
+                    foreground: '#18477E'
+                },
+                date: {
+                    active: {
+                        picked: {
+                            background: '#18477E'
+                        }
+                    }
+                },
+                button: {
+                    success: {
+                        foreground: '#18477E'
+                    }
+                },
+            },
+        });
+
+        myDatePicker.open();
+        // alert('hello');
+    }
+
+    function selectMonth(a) {
+        let date = a;
+        const myDatePicker = MCDatepicker.create({
+            el: date,
+            closeOnBlur: true,
+            dateFormat: 'YYYY/MM',
+            bodyType: 'inline',
+            theme: {
+                display: {
+                    foreground: 'rgba(255, 255, 255, 0.8)',
+                    background: '#18477E'
+                },
+                main_background: '#fff',
+                weekday: {
+                    foreground: '#18477E'
+                },
+                date: {
+                    active: {
+                        picked: {
+                            background: '#18477E'
+                        }
+                    }
+                },
+                button: {
+                    success: {
+                        foreground: '#18477E'
+                    }
+                },
+            },
+        });
+
+        myDatePicker.open();
+        // alert('hello');
+    }
+
+
+</script>
+</body>
+</html>

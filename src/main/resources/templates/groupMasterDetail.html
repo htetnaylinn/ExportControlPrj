@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="#{lblGroupDetailTitle}"></title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/groupMasterDetail.css">
+    <link href='https://fonts.googleapis.com/css?family=Anton' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Neucha' rel='stylesheet' type='text/css'>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap" rel="stylesheet">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+            crossorigin="anonymous"></script>
+    <script src="../js/common.js"></script>
+    <script src="../js/ajaxMessage/passwordChangeErrorMessages.js"></script>
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+</head>
+<body>
+
+<!--navigation-->
+<th:block :: header th:include="@{/menu.html}"></th:block>
+
+<!--会社マスタ-->
+<div class="box box-4 container mt-5">
+    <div class="box-content">
+        <h2 th:text="#{lblGroupDetailTitle}"></h2>
+
+        <form id="generalForm" th:action="@{/saveGroupMaster}" method="GET" nonvalidate class="saveGroupMaster">
+            <div class="row mt-5">
+                <div class="col-xl-6 col-lg-6 col-sm-6 col-12">
+                    <div class="row">
+                        <label class="p-0 font24 col-3 label text-info text-center mt-2 " th:text="#{lblGroupCode} + ':'"></label>
+                        <div class="form__group field col-9">
+                            <input oninput="inputChange('groupNumberErr')" autocomplete="off" type="text"
+                                   class="form__field" name="groupCode" id='groupCode' maxlength="6" required/>
+                        </div>
+                        <div class="col-12" id="groupNumberErr" style="visibility:hidden;">
+                            <div class="row">
+                                <label class="col-3 label text-info text-center  "></label>
+                                <div class="form__group field col-9">
+                                    <span class="font24" id="groupNumberErrMsg" style="color:red;"> </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-6 col-lg-6 col-sm-6 col-12">
+                    <div class="row">
+                        <label class="p-0 font24 col-3 label text-info text-center mt-2 " th:text="#{lblGroupName} + ':'"></label>
+                        <div class="form__group field col-9">
+                            <input oninput="inputChange('groupNameErr')" autocomplete="off" type="text"
+                                   class="form__field" name="groupName" id='groupName' maxlength="50" required/>
+                        </div>
+                        <div class="col-12" id="groupNameErr" style="visibility:hidden">
+                            <div class="row">
+                                <label class="col-3 label text-info text-center  "></label>
+                                <div class="form__group field col-9">
+                                    <span class="font24" id="groupNameErrMsg" style="color:red;"> </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form__group field col-9" style="display: none">
+                            <input autocomplete="off" type="" class="form__field" name="updateCheck" id='update_check'
+                                   value="false" required/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-5">
+                <div class="col-xl-6 col-lg-6 col-sm-6 col-12">
+                    <div class="row">
+                        <label class="p-0 font24 col-3 label text-info text-center mt-2 "
+                               th:text="#{lblRepCompanyName} + ':'"></label>
+                        <div class="col-9">
+                            <select onchange="inputChange('companyNameErr')" class="form-select"
+                                    aria-label="Default select example" name="companyName" id='companyName'>
+                                <option></option>
+                                <option th:each="AllCompanyList :${AllCompanyList}"
+                                        th:text="${AllCompanyList.companyNameJPN}"
+                                        th:value="${AllCompanyList.companyNameJPN}">
+                            </select>
+                        </div>
+                        <div class="col-12" id="companyNameErr" style="visibility:hidden">
+                            <div class="row">
+                                <label class="col-3 label text-info text-center  "></label>
+                                <div class="form__group field col-9">
+                                    <span class="font24" id="companyNameErrMsg" style="color:red;"> </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row ">
+
+            </div>
+            <div class="box box-4 container mt-5 mb-5">
+                <div class="box-content">
+                    <table id="tableId" class="table table-striped table-bordered text-center">
+                        <thead>
+                        <tr>
+                            <th scope="col" th:text="#{lblComName}"></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr class="align-middle">
+                            <td>
+                                <div class="w-100">
+                                    <select class="form-select productCode" aria-label="Default select example"
+                                            name="companyName" id='companyName1'>
+                                        <option></option>
+                                        <option th:each="AllCompanyList :${AllCompanyList}"
+                                                th:text="${AllCompanyList.companyNameJPN}"
+                                                th:value="${AllCompanyList.companyNameJPN}">
+                                    </select>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="align-middle">
+                            <td>
+                                <div class="w-100">
+                                    <select class="form-select productCode" aria-label="Default select example"
+                                            name="companyName" id='companyName2'>
+                                        <option></option>
+                                        <option th:each="AllCompanyList :${AllCompanyList}"
+                                                th:text="${AllCompanyList.companyNameJPN}"
+                                                th:value="${AllCompanyList.companyNameJPN}">
+                                    </select>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="align-middle">
+                            <td>
+                                <div class="w-100">
+                                    <select class="form-select productCode" aria-label="Default select example"
+                                            name="companyName" id='companyName3'>
+                                        <option></option>
+                                        <option th:each="AllCompanyList :${AllCompanyList}"
+                                                th:text="${AllCompanyList.companyNameJPN}"
+                                                th:value="${AllCompanyList.companyNameJPN}">
+                                    </select>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+
+            <div class="row mt-5 justify-content-end ">
+                <button onclick="addGroup()" type="button" id="add" class="btn btn-secondary  col-2 mt-3"
+                        style="width:106px;margin-right:30px;" th:text="#{btnReg}"></button>
+                <button type="button" onclick="resetListForm($('#generalForm'))" class="btn btn-secondary  col-2 mt-3"
+                        style="width:106px;margin-right:30px;" th:text="#{btnCancel}"></button>
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!--table-->
+<script>
+    let languageFlag = "[[${languageOption}]]";
+    loadErrorMessage();
+
+    window.onload = function () {
+        document.getElementById("navbarDropdownMenuLink").classList.add("active");
+    };
+
+    function addGroup() {
+
+        let temp1 = "[[${groupCodeDeleteFlag0}]]";
+        let temp2 = temp1.substring(1, temp1.length - 1);
+        let groupCodeDeleteFlag0 = temp2.split(',');
+
+        let temp3 = "[[${groupCodeDeleteFlag1}]]";
+        let temp4 = temp3.substring(1, temp3.length - 1);
+        let groupCodeDeleteFlag1 = temp4.split(',');
+
+        let groupCode = document.getElementById('groupCode');
+        let groupName = document.getElementById('groupName');
+        let companyName = document.getElementById('companyName');
+        let add = document.getElementById('add');
+        let updateCheck = document.getElementById('update_check');
+        let valid = true;
+        let regex = /[\u3000-\u303F]|[\u3040-\u309F]|[\u30A0-\u30FF]|[\uFF00-\uFFEF]|[\u4E00-\u9FAF]|[\u2605-\u2606]|[\u2190-\u2195]|\u203B/g;
+
+
+        if (groupName.value == "") {
+            showErrorMsg("groupNameErr", groupNameEmptyErrMsg, groupNameEmptyErrMsg, "groupNameErrMsg", languageFlag);
+            add.type = "button";
+            valid = false;
+        }
+
+        if (companyName.value == "") {
+            showErrorMsg("companyNameErr", repCompanyEmptyErrMsg, repCompanyEmptyErrMsg, "companyNameErrMsg", languageFlag);
+        }
+
+        if (groupCode.value == "") {
+            showErrorMsg("groupNumberErr", groupCodeEmptyErrMsg, groupCodeEmptyErrMsg, "groupNumberErrMsg", languageFlag);
+            add.type = "button";
+            valid = false;
+        } else if (regex.test(groupCode.value)) {
+            showErrorMsg("groupNumberErr", groupCodeJpnCharacterErrMsg, groupCodeJpnCharacterErrMsg, "groupNumberErrMsg", languageFlag);
+            add.type = "button";
+            valid = false;
+        } else if (!groupCode.value.match("[0-9]{3}")) {
+            showErrorMsg("groupNumberErr", groupCodeNumberErrMsg, "Please enter the group code in math", "groupNumberErrMsg", languageFlag);
+            add.type = "button";
+            valid = false;
+        } else {
+            for (i = 0; i < groupCodeDeleteFlag0.length; i++) {
+                if (groupCode.value == groupCodeDeleteFlag0[i].trim()) {
+                    showErrorMsg("groupNumberErr", groupCodeAlreadyExistErrMsg, groupCodeAlreadyExistErrMsg, "groupNumberErrMsg", languageFlag);
+                    add.type = "button";
+                    valid = false;
+                    break;
+                }
+            }
+
+            if (valid == true) {
+
+                for (i = 0; i < groupCodeDeleteFlag1.length; i++) {
+                    if (groupCode.value == groupCodeDeleteFlag1[i].trim()) {
+                        updateCheck.value = "true";
+                    }
+                }
+                document.querySelector(".saveGroupMaster").submit();
+            }
+        }
+    }
+
+
+</script>
+
+
+</body>
+</html>

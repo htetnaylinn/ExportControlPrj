@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=0">
+
+
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+
+<!--    <link href='https://fonts.googleapis.com/css?family=Anton' rel='stylesheet' type='text/css'>-->
+<!--    <link href='https://fonts.googleapis.com/css?family=Neucha' rel='stylesheet' type='text/css'>-->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!--    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap" rel="stylesheet">-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+            crossorigin="anonymous"></script>
+    <script src="../js/common.js"></script>
+
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+</head>
+<body>
+
+<!--navigation-->
+<th:block :: header th:include="@{/menu.html}"></th:block>
+
+<!--商品マスタ-->
+<form id="generalForm"  method="GET" nonvalidate>
+
+<div class="box box-4 container mt-5" data-aos="fade-up"
+     data-aos-duration="2000">
+    <div class="box-content">
+        <h2>輸出登録</h2>
+
+        <div class="row mt-5">
+            <div class="col-6">
+                <div class="row">
+                    <label class="col-3 label text-info text-center mt-2 ">会社名:</label>
+                    <div class="col-9">
+                        <select class="form-select" aria-label="Default select example">
+                            <option selected>Open this select menu</option>
+                            <option value="1">One</option>
+                            <option value="2">Two</option>
+                            <option value="3">Three</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="row">
+                    <label class="col-3 label text-info text-center mt-2 ">invoice No:</label>
+                    <div class="form__group field col-9">
+                        <input type="input" class="form__field" placeholder="P00000001" name="invoiceNumber" id='invoiceNumber'
+                               />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-5">
+            <div class="col-6">
+                <div class="row">
+                    <label class="col-3 label text-info text-center mt-2 ">Incoterms:</label>
+                    <div class="col-9">
+                        <select class="form-select" aria-label="Default select example">
+                            <option selected>Open this select menu</option>
+                            <option value="1">One</option>
+                            <option value="2">Two</option>
+                            <option value="3">Three</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="row mt-5">
+            <div class="col-6">
+                <div class="row">
+                    <label class="col-3 label text-info text-center mt-2 ">積地:</label>
+                    <div class="col-9">
+                        <select class="form-select" aria-label="Default select example" name="loadingPort">
+                            <option selected>Open this select menu</option>
+                            <option value="1">One</option>
+                            <option value="2">Two</option>
+                            <option value="3">Three</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="row">
+                    <label class="col-3 label text-info text-center mt-2 ">積地国名:</label>
+                    <div class="col-9">
+                        <select class="form-select" aria-label="Default select example">
+                            <option selected>Open this select menu</option>
+                            <option value="1">One</option>
+                            <option value="2">Two</option>
+                            <option value="3">Three</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-5">
+            <div class="col-6">
+                <div class="row">
+                    <label class="col-3 label text-info text-center mt-2 ">揚地:</label>
+                    <div class="col-9">
+                        <select class="form-select" aria-label="Default select example" name="unloadingLand">
+                            <option selected>Open this select menu</option>
+                            <option value="1">One</option>
+                            <option value="2">Two</option>
+                            <option value="3">Three</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="row">
+                    <label class="col-3 label text-info text-center mt-2 ">揚地国名:</label>
+                    <div class="col-9">
+                        <select class="form-select" aria-label="Default select example">
+                            <option selected>Open this select menu</option>
+                            <option value="1">One</option>
+                            <option value="2">Two</option>
+                            <option value="3">Three</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-5">
+            <div class="col-6">
+                <div class="row">
+                    <label class="col-3 label text-info text-center mt-2 ">船社名:</label>
+                    <div class="col-9">
+                        <select class="form-select" aria-label="Default select example">
+                            <option selected>Open this select menu</option>
+                            <option value="1">One</option>
+                            <option value="2">Two</option>
+                            <option value="3">Three</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="row">
+                    <label class="col-3 label text-info text-center mt-2 ">船名:</label>
+                    <div class="form__group field col-9">
+                        <input type="input" class="form__field" placeholder="P00000001" name="employeeNumber" id='name'
+                               />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-5">
+            <div class="col-6">
+                <div class="row">
+                    <label class="col-3 label text-info text-center mt-2 ">コンテナサイズ:</label>
+                    <div class="col-9">
+                        <select class="form-select" aria-label="Default select example">
+                            <option selected>Open this select menu</option>
+                            <option value="1">One</option>
+                            <option value="2">Two</option>
+                            <option value="3">Three</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="row">
+                    <label class="col-3 label text-info text-center mt-2 ">コンテナ本数:</label>
+                    <div class="form__group field col-9">
+                        <input type="input" class="form__field" placeholder="P00000001" name="employeeNumber" id='name'
+                               />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-5">
+            <div class="col-6">
+                <div class="row">
+                    <label class="col-3 label text-info text-center mt-2 ">BL No:</label>
+                    <div class="form__group field col-9">
+                        <input type="input" class="form__field" placeholder="P00000001" name="employeeNumber" id='name'
+                               />
+                    </div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="row">
+                    <label class="col-3 label text-info text-center mt-2 ">AWB No:</label>
+                    <div class="form__group field col-9">
+                        <input type="input" class="form__field" placeholder="P00000001" name="employeeNumber" id='name'
+                               />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-5">
+            <div class="col-6">
+                <div class="row">
+                    <label class="col-3 label text-info text-center mt-2 ">為替:</label>
+                    <div class="form__group field col-9">
+                        <input type="input" class="form__field" placeholder="P00000001" name="employeeNumber" id='name'
+                               />
+                    </div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="row">
+                    <label class="col-3 label text-info text-center mt-2 ">保険付保:</label>
+                    <div class="col-9">
+                        <select class="form-select" aria-label="Default select example">
+                            <option selected>Open this select menu</option>
+                            <option value="1">One</option>
+                            <option value="2">Two</option>
+                            <option value="3">Three</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+</div>
+
+<div class="box box-4 container mt-5 mb-5" style="height:750px; background-color:#e0f8f8;">
+        <div class="box-content">
+
+            <!--pagination-->
+            <div class="row justify-content-center mb-3">
+                <div class="col-8 text-center">
+                    <span style="font-size:22px; color:#2b2f33;">商品登録: </span>
+                </div>
+            </div>
+            <div style="height:550px;overflow: scroll; background-color:#e0f8f8;">
+                <table class="table table-striped table-bordered text-center ">
+                    <thead>
+                    <tr>
+                        <th scope="col">No</th>
+                        <th scope="col">代表アイテム</th>
+                        <th scope="col">商品CD</th>
+                        <th scope="col">商品名</th>
+                        <th scope="col">数量</th>
+
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr class="align-middle" th:each="ProductList,stat: ${ProductList}">
+                        <td class="text-center" id="number" th:text="${stat.count}"></td>
+                        <td>test</td>
+                        <td>
+                            <div class="w-100">
+                                <select class="form-select productCode" aria-label="Default select example"
+                                        onchange="changeProductName(this)" name="productCode" id='productCode'>
+                                    <option></option>
+                                    <option th:each="ProductCode :${ProductCode}"
+                                            th:text="${ProductCode.productCode}"
+                                            th:value="${ProductCode.productCode}">
+                                </select>
+                            </div>
+                        </td>
+                        <td>
+                            <input autocomplete="off" type="text" class="text-center pName productName w-100"
+                                   name="productName" id='productName' required readonly/>
+                        </td>
+                        <td>
+                            <input autocomplete="off" type="number" class="text-center w-100"
+                                   name="quantity" id='quantity'/>
+                        </td>
+
+
+                    </tr>
+
+
+                    </tbody>
+                </table>
+
+            </div>
+
+        </div>
+</div>
+
+
+<div class="box box-4 container mt-5 mb-5 " style=" background-color:#e0f8f8;">
+    <div class="box-content">
+
+        <!--pagination-->
+        <div class="row justify-content-center mb-3">
+            <div class="col-8 text-center">
+                <span style="font-size:22px; color:#2b2f33;">スケジュール登録: </span>
+            </div>
+        </div>
+
+        <div>
+            <table class="table table-striped table-bordered text-center">
+                <thead>
+                <tr>
+                    <th scope="col">集荷</th>
+                    <th scope="col">出港</th>
+                    <th scope="col">入港</th>
+                    <th scope="col">納品</th>
+                    <th scope="col">引取り可能日</th>
+                    <th scope="col">納品希望日</th>
+                    <th scope="col">輸送モード</th>
+
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <th scope="row">#####</th>
+                    <td>#####</td>
+                    <td>#####</td>
+                    <td>#####</td>
+                    <td>4/26/2022</td>
+                    <td>4/26/2022</td>
+                    <td>
+                        <div class="w-100">
+                            <select class="form-select" aria-label="Default select example" name="transportMode">
+                                <option selected value="1">飛行機</option>
+                                <option value="2">船</option>
+                            </select>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+    </div>
+
+</div>
+
+<!--table-->
+
+<div class="h-25">
+    <div class="row justify-content-center">
+        <button type="button" id="add" onclick="saveExportRegistration()" class="btn btn-secondary  col-2 mt-3"
+                style="width:106px;margin-right:30px;">登録
+        </button>
+    </div>
+</div>
+
+
+</form>
+
+<script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script>
+    AOS.init();
+
+    var next= document.getElementById("next");
+    var prev= document.getElementById("prev");
+
+    function disableNext() {
+
+        next.style.display="none";
+        prev.style.display="";
+
+    }
+
+    function disablePrev(){
+
+        prev.style.display="none";
+        next.style.display="";
+    }
+
+
+    window.onload = function() {
+    document.getElementById("exportMenu").classList.add("active");
+};
+
+</script>
+<script>
+    function changeProductName(element) {
+
+    var temp1 = "[[${ProductCodeList}]]";
+    var temp2 = temp1.substring(1,temp1.length - 1);
+    var ProductCodeList = temp2.split(',');
+
+    var temp3 = "[[${ProductNameList}]]";
+    var temp4 = temp3.substring(1,temp3.length - 1);
+    var ProductNameList = temp4.split(',');
+
+    var rowjQuery = $(element).closest("tr");
+    var rowIndex = (rowjQuery[0].rowIndex - 1);
+    const pdCode=document.getElementsByClassName("productCode");
+    var nameIndex = 0;
+
+    for (let i = 0; i < ProductCodeList.length; i++) {
+           if(pdCode[rowIndex].value===ProductCodeList[0]){
+            nameIndex = i;
+           }
+           if(pdCode[rowIndex].value===ProductCodeList[i].substring(1)){
+            nameIndex = i;
+           }
+      }
+    const pdName=document.getElementsByClassName("pName");
+    pdName[rowIndex].value=ProductNameList[nameIndex];
+}
+
+
+</script>
+<script>
+//     function saveExportRegistration() {
+//
+//     var n = document.querySelector(".productCode").value;
+//     var pdCodeList = document.querySelectorAll("tr:nth-child(n) td:nth-child(2) select:nth-child(1)");
+//     var check = 0;
+//     for(var i = 0; i < pdCodeList.length; i++) {
+//         for(var j=0;j<pdCodeList.length;j++){
+//             if(i!=j){
+//                 if(pdCodeList[i].value==pdCodeList[j].value && pdCodeList[i].value!=''){
+//                     check = 1;
+//                 }
+//             }
+//         }
+//     }
+//     var add = document.getElementById('add');
+//     if(check!=1){
+//         alert('ok');
+//         add.type = "submit";
+//     } else{
+//             swal("商品コードは重複しています。", {icon: "warning",});
+//             add.type = "button";
+//             valid = false;
+//     }
+// }
+
+
+</script>
+</body>
+
+</html>
