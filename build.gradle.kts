@@ -9,6 +9,21 @@ plugins {
 	id("war")
 
 }
+//bootRun {
+//	jvmArgs = ['-Xms2048m', '-Xmx4096m']
+//}
+tasks.named<org.springframework.boot.gradle.tasks.run.BootRun>("bootRun") {
+	jvmArgs = listOf("-Xms2048m", "-Xmx4096m")
+}
+//tasks.withType<org.jetbrains.kotlin.gradle.tasks.Kotlin2JsCompile> {
+//	kotlinOptions {
+//		js {
+//			runtimeTask {
+//				options("-Xmx4g", "-Xms2g")
+//			}
+//		}
+//	}
+//}
 
 group = "com.example"
 version = "0.0.1-SNAPSHOT"

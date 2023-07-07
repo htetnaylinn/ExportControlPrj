@@ -148,7 +148,15 @@
                                 <label class="col-6 label text-info text-center mt-2 " for="file_input"
                                        th:text="#{file} + ':'"></label>
                                 <div class="form__group field col-6">
-                                    <input type="file" class=" w-100" name="fareFile" id='file_input' required/>
+                                    <input type="file" accept=".xlsx, .xls, .pdf, .doc, .docx, .csv"  oninput="inputChange('fileInputErr')" class=" w-100" name="fareFile" id='file_input' required/>
+                                </div>
+                                <div class="col-12"  >
+                                    <div class="row">
+                                        <label style="font-size:14px;color:black !important;" class="col-6 label text-info text-center" th:text="#{fileErrorNote}"></label>
+                                        <div id="fileInputErr" class="form__group field col-6" style="visibility:hidden">
+                                            <span class="font24" id="fileInputErrMsg" style="color:red;"> </span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -175,14 +183,14 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr class="" th:each="allFareList,stat: ${allFareList}">
+                        <tr class="text-center" th:each="allFareList,stat: ${allFareList}">
                             <td class=""  th:text="${stat.count}"> </td>
-                            <td class=""  th:text="${allFareList.fareCode}"> </td>
-                            <td class=""  th:text="${allFareList.orderList}"></td>
-                            <td class=""  th:text="${allFareList.fareTitle}"></td>
-                            <td class="" th:text="${allFareList.fareContent}"></td>
+                            <td class=""  th:text="${allFareList.getFareCode()}"> </td>
+                            <td class=""  th:text="${allFareList.getOrderList()}"></td>
+                            <td class=""  th:text="${allFareList.getFareTitle()}"></td>
+                            <td class="" th:text="${allFareList.getFareContent()}"></td>
                             <td >
-                                <button href="#test-popup" th:onclick="show([[${allFareList.fareCode}]],[[${allFareList.orderList}]],[[${allFareList.fareTitle}]],[[${allFareList.fareContent}]],[[${allFareList.fareFileName}]]);"
+                                <button href="#test-popup" th:onclick="show([[${allFareList.getFareCode()}]],[[${allFareList.getOrderList()}]],[[${allFareList.getFareTitle()}]],[[${allFareList.getFareContent()}]],[[${allFareList.getFareFileName()}]]);"
                                         type="button" class="open-popup-link btn btn-outline-primary btn-sm" style="border-radius:10px; width:65px;height:35px;"  th:text="#{btnEdit}"></button>
                                 <button  th:href="'#confirm-popup-'+${stat.count}"  type="button" class="open-popup-link btn btn-outline-danger btn-sm" style="border-radius:10px; width:65px;height:35px" th:text="#{btnDelete}"></button>
                                 <div th:id="'confirm-popup-'+${stat.count}" class="box box-4 container mt-5 delete-popup-width mfp-hide " style="position:fixed;top:43%;left:50%;transform: translate(-50%, -50%);z-index:100;">
@@ -193,13 +201,13 @@
                                         <div class="row justify-content-center mt-4">
                                             <a class="btn btn-outline-danger deleteBtn "
                                                style="border-radius:10px; width:65px;height:35px;"
-                                               th:href="@{/deleteFareMaster/{fareCode}(fareCode=${allFareList.fareCode})}"
+                                               th:href="@{/deleteFareMaster/{fareCode}(fareCode=${allFareList.getFareCode()})}"
                                                th:text="#{btnYes}">
                                             </a>
                                         </div>
                                     </div>
                                 </div>
-                                <a th:href="@{/files/{fileId}/download(fileId=${allFareList.fareCode})}" download>
+                                <a th:href="@{/files/{fileId}/download(fileId=${allFareList.getFareCode()})}" download>
                                     <div class="btn btn-success" th:text="#{downloadBtn}"> </div>
                                 </a>
                             </td>
@@ -277,10 +285,15 @@
         let orderList = document.getElementById('order_list');
         let fareTitle = document.getElementById('fare_title');
         let fareContent = document.getElementById('fare_content');
+        const fileInput = document.getElementById('file_input');
+        const file = fileInput.files[0];
+        const maxSizeInBytes = 500 * 1024 * 1024; // 500MB
+
 
         let add = document.getElementById('add');
         let valid = true;
         let regex = /[\u3000-\u303F]|[\u3040-\u309F]|[\u30A0-\u30FF]|[\uFF00-\uFFEF]|[\u4E00-\u9FAF]|[\u2605-\u2606]|[\u2190-\u2195]|\u203B/g;
+
 
         if(beforeOrderList != orderList.value){
             if (orderList.value == "") {
@@ -315,6 +328,12 @@
 
         if(fareContent.value == ""){
             showErrorMsg("fareContentErr", "運賃表の説明を入力してください。", "Please Enter Fare Content.", "fareContentErrMsg", languageFlag);
+            add.type = "button";
+            valid = false;
+        }
+
+        if (file && file.size > maxSizeInBytes) {
+            showErrorMsg("fileInputErr", "転送可能なファイル容量に達しています。", "The transferable file capacity has been reached.", "fileInputErrMsg", languageFlag);
             add.type = "button";
             valid = false;
         }

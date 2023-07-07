@@ -38,7 +38,7 @@
                                    maxlength="5" name="fareCode"
                                    oninput="inputChange('fareCodeErr')" required th:placeholder="#{fareCode}" type="text"/>
                         </div>
-                        <div class="col-12" id="fareCodeErr" style="visibility:hidden;">
+                        <div class="col-12 errorMsg" id="fareCodeErr" style="visibility:hidden;">
                             <div class="row">
                                 <label class="col-4 label text-info text-center  "></label>
                                 <div class="form__group field col-8">
@@ -57,7 +57,7 @@
                                    required th:placeholder="#{orderList}"
                                    maxlength="10" type="text"/>
                         </div>
-                        <div class="col-12" id="orderListErr" style="visibility:hidden">
+                        <div class="col-12 errorMsg" id="orderListErr" style="visibility:hidden">
                             <div class="row">
                                 <label class="col-4 label text-info text-center  "></label>
                                 <div class="form__group field col-8">
@@ -77,7 +77,7 @@
                                    maxlength="50" name="fareTitle"
                                    oninput="inputChange('fareTitleErr')" required th:placeholder="#{fareTitle}" type="text"/>
                         </div>
-                        <div class="col-12" id="fareTitleErr" style="visibility:hidden;">
+                        <div class="col-12 errorMsg" id="fareTitleErr" style="visibility:hidden;">
                             <div class="row">
                                 <label class="col-4 label text-info text-center  "></label>
                                 <div class="form__group field col-8">
@@ -96,7 +96,7 @@
                                    required th:placeholder="#{fareContent}"
                                    maxlength="250" type="text"/>
                         </div>
-                        <div class="col-12" id="fareContentErr" style="visibility:hidden">
+                        <div class="col-12 errorMsg" id="fareContentErr" style="visibility:hidden">
                             <div class="row">
                                 <label class="col-4 label text-info text-center  "></label>
                                 <div class="form__group field col-8">
@@ -118,13 +118,13 @@
                         <label for="fareFile" class="col-4 label text-info text-center mt-2 " th:text="#{file}+':'"></label>
                         <div class=" field col-8">
                             <input autocomplete="off" id='fareFile'
-                                   name="fareFile"
+                                   name="fareFile" accept=".xlsx, .xls, .pdf, .doc, .docx, .csv"
                                    oninput="inputChange('fileErr')" required  type="file"/>
                         </div>
-                        <div class="col-12" id="fileErr" style="visibility:hidden;">
+                        <div class="col-12 "  >
                             <div class="row">
-                                <label class="col-4 label text-info text-center  "></label>
-                                <div class="form__group field col-8">
+                                <label style="font-size:14px;color:black !important;" class="col-4 label text-info text-center" th:text="#{fileErrorNote}"></label>
+                                <div id="fileErr" class="form__group field col-8 errorMsg" style="visibility:hidden;">
                                     <span class="font24" id="fileErrMsg" style="color:red;"> </span>
                                 </div>
                             </div>
@@ -183,6 +183,7 @@
         let fareContent = document.getElementById('fareContent');
         const fileInput = document.getElementById('fareFile');
         const selectedFile = fileInput.files[0];
+        const maxSizeInBytes = 500 * 1024 * 1024; // 500MB
 
         let add = document.getElementById('add');
         let updateCheck = document.getElementById('update_check');
@@ -226,6 +227,10 @@
 
         if (!selectedFile) {
             showErrorMsg("fileErr", "ファイルを選択してください。", "Please Select File.", "fileErrMsg", languageFlag);
+            add.type = "button";
+            valid = false;
+        }else if (selectedFile && selectedFile.size > maxSizeInBytes) {
+            showErrorMsg("fileErr", "転送可能なファイル容量に達しています。", "The transferable file capacity has been reached.", "fileErrMsg", languageFlag);
             add.type = "button";
             valid = false;
         }

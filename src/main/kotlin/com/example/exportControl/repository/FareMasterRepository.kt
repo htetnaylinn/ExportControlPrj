@@ -2,6 +2,8 @@ package com.example.exportControl.repository
 
 import com.example.exportControl.model.Company
 import com.example.exportControl.model.Fare
+import com.example.exportControl.model.FareFileAndName
+import com.example.exportControl.model.FarePartial
 import com.example.exportControl.model.requestModel.CompanyRequestModel
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
@@ -12,11 +14,14 @@ import java.sql.Timestamp
 
 interface FareMasterRepository : CrudRepository<Fare, String> {
 
-    @Query(value = "select * from m_fare where delete_flag = 0 order by fare_code ", nativeQuery = true)
-    fun selectAllFare(): List<Fare>?
+    @Query(value = "select fare_code,order_list,fare_title,fare_content,fare_file_name from m_fare where delete_flag = 0 order by fare_code ", nativeQuery = true)
+    fun selectAllFare(): List<FarePartial>?
 
-    @Query(value = "select * from m_fare where delete_flag = 0 ORDER BY (order_list ~ '^\\d') DESC, (CASE WHEN (order_list ~ '^\\d') THEN CAST(order_list AS numeric) END) NULLS LAST, order_list ", nativeQuery = true)
-    fun selectAllFareOrderByOrderList(): List<Fare>?
+    @Query(value = "select fare_file,fare_file_name from m_fare where fare_code = :fareCode and delete_flag = 0 order by fare_code ", nativeQuery = true)
+    fun getFileByCode(@Param("fareCode")fareCode:String?): FareFileAndName?
+
+    @Query(value = "select fare_code,order_list,fare_title,fare_content,fare_file_name from m_fare where delete_flag = 0 ORDER BY (order_list ~ '^\\d') DESC, (CASE WHEN (order_list ~ '^\\d') THEN CAST(order_list AS numeric) END) NULLS LAST, order_list ", nativeQuery = true)
+    fun selectAllFareOrderByOrderList(): List<FarePartial>?
 
     @Query(value = "select fare_code from m_fare where delete_flag = 0 order by fare_code ", nativeQuery = true)
     fun getFareCodeDeleteFlag0(): List<String>?

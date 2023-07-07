@@ -133,7 +133,7 @@
                                 <label class="col-xl-3 col-lg-3 col-sm-3 col-4 p-xl-0 p-lg-0 p-sm-0 label text-info text-center mt-2 " for="file_input"
                                        th:text="#{Image} + ':'"></label>
                                 <div class="form__group field col-xl-9 col-lg-9 col-sm-9 col-8 p-xl-0 p-lg-0 p-sm-0">
-                                    <input type="file" class=" w-100" name="bannerImage" id='file_input' required/>
+                                    <input type="file"  accept=".jpg, .jpeg, .png" class=" w-100" name="bannerImage" id='file_input' required/>
                                 </div>
                                 <div class="col-12" id="fileErr" style="visibility:hidden">
                                     <div class="row">
@@ -152,7 +152,7 @@
                                 <label class="col-xl-3 col-lg-3 col-sm-3 col-4 p-xl-0 p-lg-0 p-sm-0 label text-info text-center mt-2 "
                                        th:text="#{link} + ':'"></label>
                                 <div class="form__group field col-xl-9 col-lg-9 col-sm-9 col-8 p-xl-0 p-lg-0 p-sm-0">
-                                    <input type="text" class=" label  form-control" id="banner_link" name="bannerLink" th:placeholder="#{link}" oninput="inputChange('bannerLinkErr')" maxlength="250">
+                                    <input type="text" class=" label  form-control" id="banner_link" name="bannerLink" th:placeholder="#{link}" oninput="inputChange('bannerLinkErr')">
                                 </div>
                                 <div class="col-12" id="bannerLinkErr" style="visibility:hidden">
                                     <div class="row">
@@ -311,6 +311,10 @@
 
       if(bannerLink.value == ""){
           showErrorMsg("bannerLinkErr", "バナーのリンクを入力してください。", "Please Enter Banner Link.", "bannerLinkErrMsg", languageFlag);
+          add.type = "button";
+          valid = false;
+      }else if(bannerLink.value.length > 254){
+          showErrorMsg("bannerLinkErr", "リンクは255文字以下で入力してください。", "Please enter the link in 255 characters or less.", "bannerLinkErrMsg", languageFlag);
           add.type = "button";
           valid = false;
       }

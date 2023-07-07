@@ -45,6 +45,13 @@ function resetListForm($form) {
     $form.find("option:selected").prop("selected", false)
     // $form.find('input:checkbox').prop( 'checked', false );
     $form.find('input:checkbox').prop( 'checked', false );
+
+    const errorElements = document.querySelectorAll('.errorMsg');
+
+    for (let i = 0; i < errorElements.length; i++) {
+        const errorElement = errorElements[i];
+        errorElement.style.visibility = 'hidden';
+    }
 }
 
 function showErrorMsg(elementId,errMsgJp,errMsgEn,errMsgId,languageFlag){

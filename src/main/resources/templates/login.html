@@ -107,11 +107,11 @@ xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
                         </thead>
                         <tbody>
                         <tr class="text-center" th:each="allFareList,stat: ${allFareList}">
-                            <td class=""  th:text="${allFareList.orderList}"></td>
-                            <td class=""  th:text="${allFareList.fareTitle}"></td>
-                            <td class="" th:text="${allFareList.fareContent}"></td>
+                            <td class=""  th:text="${allFareList.getOrderList()}"></td>
+                            <td class=""  th:text="${allFareList.getFareTitle()}"></td>
+                            <td class="" th:text="${allFareList.getFareContent()}"></td>
                             <td >
-                                <a th:href="@{/files/{fileId}/downloadBeforeLogin(fileId=${allFareList.fareCode})}" >
+                                <a th:href="@{/files/{fileId}/downloadBeforeLogin(fileId=${allFareList.getFareCode()})}" >
                                     <div class="btn btn-success" th:text="#{downloadBtn}"> </div>
                                 </a>
                             </td>

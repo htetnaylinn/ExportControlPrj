@@ -2,7 +2,7 @@
 <html lang="en" xmlns="http://www.w3.org/1999/html" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8" content="width=device-width, initial-scale=1" name="viewport">
-    <title th:text="#{lblCountryMasterDetail}"></title>
+    <title th:text="#{lblVideoMasterDetail}"></title>
     <link href="../css/style.css" rel="stylesheet">
     <link href="../css/fareMasterDetail.css" rel="stylesheet">
     <link href='https://fonts.googleapis.com/css?family=Anton' rel='stylesheet' type='text/css'>
@@ -43,7 +43,7 @@
                                    maxlength="5" name="videoCode"
                                    oninput="inputChange('videoCodeErr')" required th:placeholder="#{videoCode}" type="text"/>
                         </div>
-                        <div class="col-12" id="videoCodeErr" style="visibility:hidden;">
+                        <div class="col-12 errorMsg" id="videoCodeErr" style="visibility:hidden;">
                             <div class="row">
                                 <label class="col-4 label text-info text-center  "></label>
                                 <div class="form__group field col-8">
@@ -60,9 +60,9 @@
                             <input autocomplete="off" class="form__field" id='videoTitle'
                                    name="videoTitle" oninput="inputChange('videoTitleErr')"
                                    required th:placeholder="#{videoTitle}"
-                                   maxlength="250" type="text"/>
+                                   maxlength="50" type="text"/>
                         </div>
-                        <div class="col-12" id="videoTitleErr" style="visibility:hidden">
+                        <div class="col-12 errorMsg" id="videoTitleErr" style="visibility:hidden">
                             <div class="row">
                                 <label class="col-4 label text-info text-center  "></label>
                                 <div class="form__group field col-8">
@@ -82,7 +82,7 @@
                                    maxlength="10" name="orderList"
                                    oninput="inputChange('orderListErr')" required th:placeholder="#{orderList}" type="text"/>
                         </div>
-                        <div class="col-12" id="orderListErr" style="visibility:hidden;">
+                        <div class="col-12 errorMsg" id="orderListErr" style="visibility:hidden;">
                             <div class="row">
                                 <label class="col-4 label text-info text-center  "></label>
                                 <div class="form__group field col-8">
@@ -100,7 +100,7 @@
                                    maxlength="250" name="videoContent"
                                    oninput="inputChange('videoContentErr')" required th:placeholder="#{videoContent}" type="text"/>
                         </div>
-                        <div class="col-12" id="videoContentErr" style="visibility:hidden;">
+                        <div class="col-12 errorMsg" id="videoContentErr" style="visibility:hidden;">
                             <div class="row">
                                 <label class="col-4 label text-info text-center  "></label>
                                 <div class="form__group field col-8">
@@ -120,7 +120,7 @@
                             <input type="text" name="videoLink" class=" label form-control" id="videoLink" th:placeholder="#{link}" oninput="inputChange('linkErr')">
                         </div>
 
-                         <div class="col-12" id="linkErr" style="visibility:hidden;">
+                         <div class="col-12 errorMsg" id="linkErr" style="visibility:hidden;">
                             <div class="row">
                                 <label class="col-xl-2 col-lg-2 col-sm-2 col-4  label text-info text-center "></label>
                                 <div class="form__group field col-8">
@@ -228,6 +228,10 @@
 
         if(videoLink.value == ""){
             showErrorMsg("linkErr", "動画のリンクを入力してください。", "Please Enter Video Link.", "linkErrMsg", languageFlag);
+            add.type = "button";
+            valid = false;
+        }else if(videoLink.value.length > 254){
+            showErrorMsg("linkErr", "リンクは255文字以下で入力してください。", "Please enter the link in 255 characters or less.", "linkErrMsg", languageFlag);
             add.type = "button";
             valid = false;
         }

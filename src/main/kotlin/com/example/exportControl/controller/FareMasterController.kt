@@ -42,6 +42,10 @@ class FareMasterController : MenuController() {
 
     @RequestMapping("fareMaster")
     fun fareMaster(model: Model, principal: Principal): String {
+        val runtime = Runtime.getRuntime()
+        val totalMemory = runtime.totalMemory()
+        val freeMemory = runtime.freeMemory()
+        val usedMemory = (totalMemory - freeMemory)
 
         val userName = principal.name
         val muser = usermasterRepo?.selectUserByUserCode(userName);
@@ -131,15 +135,14 @@ class FareMasterController : MenuController() {
 
     @GetMapping("/files/{id}/download")
     fun downloadFile(@PathVariable("id") id: String): ResponseEntity<ByteArrayResource> {
-        val fileEntity = fareMasterRepo?.findById(id)
-            ?.orElseThrow { NoSuchElementException("File not found with id: $id") }
+        val fileEntity = fareMasterRepo?.getFileByCode(id)
 
-        val resource = ByteArrayResource(fileEntity?.fareFile!!)
-        val encodedFileName = URLEncoder.encode(fileEntity.fareFileName, "UTF-8")
+        val resource = fileEntity?.let { ByteArrayResource(it.getFareFile()) }
+        val encodedFileName = URLEncoder.encode(fileEntity!!.getFareFileName(), "UTF-8")
         return ResponseEntity.ok()
             .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename*=UTF-8''$encodedFileName")
             .contentType(MediaType.APPLICATION_OCTET_STREAM)
-            .contentLength(fileEntity.fareFile!!.size.toLong())
+            .contentLength(fileEntity.getFareFile().size.toLong())
             .body(resource)
     }
 }

@@ -142,8 +142,7 @@
                                 <label class="col-xl-3 col-lg-3 col-sm-3 col-4 p-xl-0 p-lg-0 p-sm-0 label text-info text-center mt-2 "
                                        th:text="#{link} + ':'"></label>
                                 <div class="form__group field col-xl-9 col-lg-9 col-sm-9 col-8 p-xl-0 p-lg-0 p-sm-0">
-                                    <input name="videoLink" oninput="inputChange('videoLinkErr')" type="text" class=" label  form-control" id="video_link" th:placeholder="#{link}"
-                                    maxlength="250">
+                                    <input name="videoLink" oninput="inputChange('videoLinkErr')" type="text" class=" label  form-control" id="video_link" th:placeholder="#{link}">
                                 </div>
                                 <div class="col-12" id="videoLinkErr" style="visibility:hidden">
                                     <div class="row">
@@ -310,13 +309,17 @@
       }
 
       if(videoContent.value == ""){
-          showErrorMsg("videoContentErr", "動画の説明を入力してください。", "Please Enter Video Content.", "videoContentErrMsg", languageFlag);
+          showErrorMsg("videoContentErr", "動画のコンテンツを入力してください。", "Please Enter Video Content.", "videoContentErrMsg", languageFlag);
           add.type = "button";
           valid = false;
       }
 
       if(videoLink.value == ""){
           showErrorMsg("videoLinkErr", "動画のリンクを入力してください。", "Please Enter Video Link.", "videoLinkErrMsg", languageFlag);
+          add.type = "button";
+          valid = false;
+      }else if(videoLink.value.length > 254){
+          showErrorMsg("videoLinkErr", "リンクは255文字以下で入力してください。", "Please enter the link in 255 characters or less.", "videoLinkErrMsg", languageFlag);
           add.type = "button";
           valid = false;
       }

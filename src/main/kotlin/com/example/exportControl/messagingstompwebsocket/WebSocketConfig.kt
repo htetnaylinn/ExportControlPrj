@@ -21,7 +21,7 @@ class WebSocketConfig : WebSocketMessageBrokerConfigurer {
         registration
             .setSendTimeLimit(10 * 1000)
             .setSendBufferSizeLimit(512 * 1024)
-            .setMessageSizeLimit(128 * 1024)
+            .setMessageSizeLimit(1024 * 1024) // Set to 1MB
     }
 
     override fun registerStompEndpoints(registry: StompEndpointRegistry) {

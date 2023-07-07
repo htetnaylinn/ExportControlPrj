@@ -2,7 +2,7 @@
 <html lang="en" xmlns="http://www.w3.org/1999/html" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8" content="width=device-width, initial-scale=1" name="viewport">
-    <title th:text="#{lblCountryMasterDetail}"></title>
+    <title th:text="#{lblBannerMasterDetail}"></title>
     <link href="../css/style.css" rel="stylesheet">
     <link href="../css/fareMasterDetail.css" rel="stylesheet">
     <link href='https://fonts.googleapis.com/css?family=Anton' rel='stylesheet' type='text/css'>
@@ -43,7 +43,7 @@
                                    maxlength="5" name="bannerCode"
                                    oninput="inputChange('bannerCodeErr')" required th:placeholder="#{bannerCode}" type="text"/>
                         </div>
-                        <div class="col-12" id="bannerCodeErr" style="visibility:hidden;">
+                        <div class="col-12 errorMsg" id="bannerCodeErr" style="visibility:hidden;">
                             <div class="row">
                                 <label class="col-4 label text-info text-center  "></label>
                                 <div class="form__group field col-8">
@@ -62,7 +62,7 @@
                                    required th:placeholder="#{bannerTitle}"
                                    maxlength="50" type="text"/>
                         </div>
-                        <div class="col-12" id="bannerTitleErr" style="visibility:hidden">
+                        <div class="col-12 errorMsg" id="bannerTitleErr" style="visibility:hidden">
                             <div class="row">
                                 <label class="col-4 label text-info text-center  "></label>
                                 <div class="form__group field col-8">
@@ -82,7 +82,7 @@
                                    maxlength="10" name="orderList"
                                    oninput="inputChange('orderListErr')" required th:placeholder="#{orderList}" type="text"/>
                         </div>
-                        <div class="col-12" id="orderListErr" style="visibility:hidden;">
+                        <div class="col-12 errorMsg" id="orderListErr" style="visibility:hidden;">
                             <div class="row">
                                 <label class="col-4 label text-info text-center  "></label>
                                 <div class="form__group field col-8">
@@ -98,11 +98,11 @@
                     <div class="row">
                         <label for="bannerImage" class="p-0 font24 col-4 label text-info text-center mt-2 " th:text="#{Image}+':'"></label>
                         <div class=" field col-8">
-                            <input autocomplete="off" id='bannerImage'
+                            <input autocomplete="off" id='bannerImage'  accept=".jpg, .jpeg, .png"
                                    name="bannerImage"
                                    oninput="inputChange('fileErr')" required  type="file"/>
                         </div>
-                        <div class="col-12" id="fileErr" style="visibility:hidden;">
+                        <div class="col-12 errorMsg" id="fileErr" style="visibility:hidden;">
                             <div class="row">
                                 <label class="col-4 label text-info text-center  "></label>
                                 <div class="form__group field col-8">
@@ -118,10 +118,10 @@
                     <div class="row">
                               <label for="bannerLink" class="p-0 font24 ol-xl-2 col-lg-2 col-sm-2 col-4 label text-info text-center form-label" th:text="#{link}+':'"> </label>
                         <div class="form__group field col-8">
-                            <input type="text" oninput="inputChange('linkErr')" class=" label form-control" id="bannerLink" name="bannerLink" th:placeholder="#{link}" maxlength="250">
+                            <input type="text" oninput="inputChange('linkErr')" class=" label form-control" id="bannerLink" name="bannerLink" th:placeholder="#{link}">
                         </div>
 
-                         <div class="col-12" id="linkErr" style="visibility:hidden;">
+                         <div class="col-12 errorMsg" id="linkErr" style="visibility:hidden;">
                             <div class="row">
                                 <label class="ol-xl-2 col-lg-2 col-sm-2 col-4 label text-info text-center "></label>
                                 <div class="form__group field col-8">
@@ -225,6 +225,10 @@
 
         if(bannerLink.value == ""){
             showErrorMsg("linkErr", "バナーリンクを入力してください。", "Please Enter Banner Link.", "linkErrMsg", languageFlag);
+            add.type = "button";
+            valid = false;
+        }else if(bannerLink.value.length > 254){
+            showErrorMsg("linkErr", "リンクは255文字以下で入力してください。", "Please enter the link in 255 characters or less.", "linkErrMsg", languageFlag);
             add.type = "button";
             valid = false;
         }
