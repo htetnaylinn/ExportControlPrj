@@ -61,106 +61,112 @@ xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
 
 <body>
 
-<div class="row w-100 mt-4 m-0 px-2">
-    <div class=" col-xl-4 col-lg-6 col-sm-12 col-md-12 p-0 d-flex align-items-center flex-column " style="height:465px;">
-        <div class="wrapper w-75">
-            <!-- <h4 class="systemName " style="display: none">輸出入管理システム</h4> -->
-            <div class="text-align mt-4 name" style="text-align: center"> ログイン</div>
-            <form autocomplete="off" class="p-3 mt-3" id="loginForm" th:action="@{/j_spring_security_check}" method="POST">
-                <div class="form-field d-flex align-items-center">
-                    <i class="bi bi-person-fill"></i>
-                    <input autocomplete="off" type="text" name="username" id="username" placeholder="ユーザーID">
-                </div>
-                <div class="form-field d-flex align-items-center">
-                    <i class="bi bi-key-fill"></i>
-                    <input autocomplete="off" type="password" name="password" id="password" placeholder="パスワード">
-                </div>
-                <button id="loginButton" type="button" onclick="checkLogin()" class="btn mt-3">ログイン</button>
-            </form>
-        </div>
-        <a href="/inquiryBeforeLogin" class="btn mt-4 w-75 h-25 d-flex align-items-center justify-content-center btn-success">
-            <i class="bi bi-telephone pe-3"></i>
-            <label>お見積り・問い合わせ</label>
-       </a>
-    </div>
-
-    <div class=" col-xl-8 col-lg-12 col-sm-12 col-md-12 p-0 h-100 title" >
-
-
-        <div class="boxShadowBorder  col-xl-12 col-lg-12 col-sm-12 col-md-12 p-0 title" >
-            <div class="bg-white rounded-3 w-100 h-100" >
-                <!-- label -->
-                <div class="row w-100 m-0 justify-content-center text-center">
-                    <div class="col-3 fare-bg text-white fare-label-border py-2"><h5 class="m-0">運賃表</h5></div>
-                </div>
-
-                <!-- list -->
-                <div class="w-100  mt-1 bg-white ps-2 text-dark" >
-                    <table id="tableId" class="display nowrap cell-border w-100 " >
-                        <thead>
-                        <tr class="text-center">
-                            <th scope="col" th:text="#{orderList}"></th>
-                            <th scope="col" th:text="#{fareTitle}"></th>
-                            <th scope="col" th:text="#{fareContent}"></th>
-                            <th></th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr class="text-center" th:each="allFareList,stat: ${allFareList}">
-                            <td class=""  th:text="${allFareList.getOrderList()}"></td>
-                            <td class=""  th:text="${allFareList.getFareTitle()}"></td>
-                            <td class="" th:text="${allFareList.getFareContent()}"></td>
-                            <td >
-                                <a th:href="@{/files/{fileId}/downloadBeforeLogin(fileId=${allFareList.getFareCode()})}" >
-                                    <div class="btn btn-success" th:text="#{downloadBtn}"> </div>
-                                </a>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-
-</div>
-    <div class="row w-100  mt-3 m-0 px-1">
-        <div class="col-xl-4 col-lg-4 col-sm-4 col-12 bg-color p-0 d-flex justify-content-center">
-            <div  class="row p-1 w-75 m-0 flex-column d-flex justify-content-around align-items-center">
-                <div style="height:420px !important;overflow-y: scroll;" class="col-12 pb-2 ">
-                    <div class="p-1" th:each="banner : ${allBannerList}">
-                        <div class="w-100">
-                            <p class="fs-3" style="word-wrap: break-word;" th:text="${banner.bannerTitle}">【貿易特化の転職エージェント】</p>
+<div class="row w-100 m-0" >
+    <div class="col-xl-3 col-lg-3 col-sm-12 col-12 " style="height:100vh;">
+        <div class="row w-100 d-flex flex-column  m-0 px-2 h-100">
+            <div class="w-100 col-xl-4 col-lg-6 col-sm-12 col-md-12 p-0 d-flex align-items-center flex-column " style="height:45%;">
+                <div class="wrapper ">
+                    <!-- <h4 class="systemName " style="display: none">輸出入管理システム</h4> -->
+                    <div class="text-align  name" style="text-align: center"> ログイン</div>
+                    <form autocomplete="off" id="loginForm" th:action="@{/j_spring_security_check}" method="POST">
+                        <div class="form-field d-flex align-items-center mb-0">
+                            <i class="bi bi-person-fill"></i>
+                            <input autocomplete="off" type="text" name="username" id="username" placeholder="ユーザーID">
                         </div>
-                        <a target="_blank" th:href="@{${banner.bannerLink}}">
-                            <img alt="Image" class="w-100 h-25"
-                                 th:src="'data:image/jpeg;base64,' + ${banner.bannerImage}"/>
-                        </a>
-                    </div>
+                        <div class="form-field d-flex align-items-center  ">
+                            <i class="bi bi-key-fill"></i>
+                            <input autocomplete="off" type="password" name="password" id="password" placeholder="パスワード">
+                        </div>
+                        <button id="loginButton" type="button" onclick="checkLogin()" class="btn ">ログイン</button>
+                    </form>
                 </div>
+                <a href="/inquiryBeforeLogin" class="btn mt-2 w-100 h-25 d-flex align-items-center justify-content-center btn-success">
+                    <i class="bi bi-telephone pe-3"></i>
+                    <label>お見積り・問い合わせ</label>
+                </a>
             </div>
-        </div>
-
-        <div class="col-xl-8 col-lg-8 col-sm-8 col-12-12  mb-2 p-0">
-            <strong class="ms-2">動画</strong>
-            <div class="w-100 p-1 bg-white" th:each="videoList,stat: ${allVideoList}">
-                <div class="splide d-flex justify-content-center p-1" role="group" aria-label="Splide Basic HTML Example">
-                    <div class="splide__track w-100" style="height:470px !important">
-                        <ul class="splide__list w-100">
-                            <li class="splide__slide d-flex justify-content-center" th:each="video : ${videoList}">
-                                <div class="w-100 text-center">
-                                    <iframe width="200" height="145" th:src="'https://www.youtube.com/embed/' + ${video.videoId}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-                                    <strong  th:text="${video.videoTitle}">Title</strong>
-                                    <p  th:text="${video.videoContent}">Content</p>
-                                </div>
-                            </li>
-                        </ul>
+            <div class="w-100 col-xl-4 col-lg-4 col-sm-4 col-12 bg-color p-0 d-flex justify-content-center" style="height:55%;">
+                <div  class="row p-1 w-100 m-0 flex-column d-flex justify-content-around align-items-center h-100">
+                    <div style="height:100% !important;overflow-y: scroll;" class="col-12 pb-2 ">
+                        <div class="p-1" th:each="banner : ${allBannerList}">
+                            <div class="w-100">
+                                <p class="m-0" style="word-wrap: break-word;" th:text="${banner.bannerTitle}">【貿易特化の転職エージェント】</p>
+                            </div>
+                            <a target="_blank" th:href="@{${banner.bannerLink}}">
+                                <img alt="Image" class="w-100 h-25"
+                                     th:src="'data:image/jpeg;base64,' + ${banner.bannerImage}"/>
+                            </a>
+                        </div>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
+    <div class="col-xl-9 col-lg-9 col-sm-12 col-12"  style="height:100vh;">
+        <div class="row w-100 d-flex flex-column  m-0 px-1 h-100">
+            <div style="height:35%;" class="w-100 col-xl-8 col-lg-12 col-sm-12 col-md-12 p-0  title" >
+                <div class="boxShadowBorder h-100 col-xl-12 col-lg-12 col-sm-12 col-md-12 p-0 title" >
+                    <div class="bg-white rounded-3 w-100 h-100" >
+                        <!-- label -->
+                        <div class="row w-100 m-0 justify-content-center text-center" style="height: 18%;">
+                            <div class="col-3 fare-bg text-white fare-label-border py-2"><h5 class="m-0">運賃表</h5></div>
+                        </div>
+
+                        <!-- list -->
+                        <div class="w-100  mt-1 bg-white ps-2 text-dark" style="height:82%;" >
+                            <table id="tableId" class="display nowrap cell-border w-100 " >
+                                <thead>
+                                <tr class="text-center">
+                                    <th scope="col" th:text="#{orderList}"></th>
+                                    <th scope="col" th:text="#{fareTitle}"></th>
+                                    <th scope="col" th:text="#{fareContent}"></th>
+                                    <th></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr class="text-center" th:each="allFareList,stat: ${allFareList}">
+                                    <td class="p-0"  th:text="${allFareList.getOrderList()}"></td>
+                                    <td class="p-0"  th:text="${allFareList.getFareTitle()}"></td>
+                                    <td class="p-0" th:text="${allFareList.getFareContent()}"></td>
+                                    <td class="p-0">
+                                        <a th:href="@{/files/{fileId}/downloadBeforeLogin(fileId=${allFareList.getFareCode()})}" >
+                                            <div class="btn btn-success" th:text="#{downloadBtn}"> </div>
+                                        </a>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div style="height:65%;" class="w-100 col-xl-8 col-lg-8 col-sm-8 col-12-12   p-0">
+                <strong class="ms-2">動画</strong>
+                <div style="height:93% !important;overflow-y: scroll;">
+                    <div class="w-100 p-1 bg-white" th:each="videoList,stat: ${allVideoList}">
+                        <div class="splide d-flex justify-content-center p-1" role="group" aria-label="Splide Basic HTML Example">
+                            <div class="splide__track w-100" style="height:470px !important">
+                                <ul class="splide__list w-100">
+                                    <li class="splide__slide d-flex justify-content-center" th:each="video : ${videoList}">
+                                        <div class="w-100 d-flex flex-column align-items-center text-center">
+                                            <iframe width="200" height="145" th:src="'https://www.youtube.com/embed/' + ${video.videoId}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                                            <strong class="text-start" th:text="${video.videoTitle}">Title</strong>
+                                            <p class="text-start m-0" th:text="${video.videoContent}">Content</p>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
 
 
     <script>
@@ -246,7 +252,7 @@ xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
                 dom: '<"clear">lfrtp',
                 "bPaginate": false,
                 scrollX: true,
-                scrollY: '420px',
+                scrollY: '125px',
                 fixedHeader: true
             });
 
